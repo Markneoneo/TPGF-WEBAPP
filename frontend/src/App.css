@@ -103,6 +103,12 @@ h4 {
   transform: translateY(1px);
 }
 
+.download-link-container {
+  margin-top: 1.5rem;       /* Push it down below the button group */
+  display: flex;
+  justify-content: center;  /* Center it horizontally */
+}
+
 /* IP SELECTION STYLES */
 .ip-selection-container {
   display: flex;
@@ -128,6 +134,7 @@ h4 {
   flex-wrap: wrap;
 }
 
+/* Color of IP Types */
 .checkbox-label {
   display: flex;
   align-items: center;

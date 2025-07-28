@@ -175,8 +175,9 @@ function App() {
               <div className="download-link-container">
                 <a
                   href="http://localhost:4567/tsettings.json"
+                  // href="http://localhost:5173/tsettings.json"
                   download
-                  className="download-link"
+                  className="primary-button"
                   target="_blank"
                   rel="noopener noreferrer"
                 >

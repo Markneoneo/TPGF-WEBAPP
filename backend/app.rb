@@ -38,6 +38,18 @@ get '/api/hello' do
   { message: "Hello from Ruby backend!", timestamp: Time.now }.to_json
 end
 
+# Add this route to serve the tsettings.json file
+get '/tsettings.json' do
+  if File.exist?('tsettings.json')
+    content_type 'application/json'
+    send_file 'tsettings.json', :filename => 'tsettings.json', :type => 'application/json'
+  else
+    status 404
+    content_type :json
+    { error: "File not found" }.to_json
+  end
+end
+
 # Updated data processing endpoint
 post '/api/process-data' do
   request.body.rewind

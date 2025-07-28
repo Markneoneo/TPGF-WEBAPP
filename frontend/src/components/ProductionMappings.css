@@ -80,3 +80,9 @@
 .production-mapping-block .test-points-list-input {
   margin-bottom: 0;
 }
+
+.production-mapping-block input[type="checkbox"] {
+  background-color: #fff;
+  color-scheme: light;
+}
+

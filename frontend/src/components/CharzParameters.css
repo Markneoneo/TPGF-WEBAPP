@@ -39,6 +39,7 @@
   border: 1px solid #d1b3ff;
   padding: 0.5rem 0.7rem;
   text-align: center;
+  color: #000; /* Force black text */
 }
 
 .charz-table th {
