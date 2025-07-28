@@ -1,0 +1,357 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f7f9fb;
+}
+
+#root {
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: left;
+}
+
+.title {
+  text-align: center;
+  color: #222;
+  margin-bottom: 0.5rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.subheading {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.card {
+  background: #fff;
+  max-width: 90%;
+  margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  padding: 2rem 2.5rem;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+label {
+  display: block;
+  padding-left: 3px;
+}
+
+h4 {
+  margin: 0;
+}
+
+.title {
+  font-size: 2rem;
+  margin: 0px;
+  font-size: 4.4rem;
+}
+
+.subheading {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  color: #555;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.button-group {
+  width: 100%;
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.processing-results {
+  margin: 0px;
+}
+
+.download-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download-button {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.download-button:hover {
+  background-color: #218838;
+}
+
+.download-button:active {
+  transform: translateY(1px);
+}
+
+/* IP SELECTION STYLES */
+.ip-selection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.ip-selection-container h3 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.checkbox-group {
+  display: flex;
+  justify-content: start;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  padding: 0.5rem 0;
+  user-select: none;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid #007bff; /* Change to #ffb300 for yellow if needed */
+  border-radius: 5px;
+  margin-right: 0.7rem;
+  position: relative;
+  transition: all 0.2s;
+  background: #fff;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: #007bff; /* Change to #ffb300 for yellow if needed */
+  border-color: #007bff;     /* Change to #ffb300 for yellow if needed */
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 7px;
+  height: 13px;
+  border: solid #fff;
+  border-width: 0 3px 3px 0;
+  border-radius: 1px;
+  transform: translate(-50%, -55%) rotate(45deg);
+  display: block;
+  pointer-events: none;
+}
+
+.checkbox-label:hover .checkbox-custom {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+/* FORMS CONTAINER */
+.forms-container {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+/* EXTENDED FORM STYLES */
+.extended-form {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-width: 350px;
+  width: 800px;
+}
+
+.form-title {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #007bff;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+}
+
+/* GLOBAL ACTIONS */
+.global-actions {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.global-button-group {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+
+.single-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: #fff;
+  color: black;
+  transition: border-color 0.2s;
+}
+
+.single-input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.error {
+  border-color: #dc3545 !important;
+  background: #fff0f0 !important;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.75rem;
+  padding-left: 3px;
+  margin-top: 5px;
+  display: block;
+}
+
+.input-hint {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+/* Button styles */
+.primary-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.primary-button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.primary-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.secondary-button:hover {
+  background-color: #545b62;
+}
+
+/* Results section */
+.result-container {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #d4edda;
+  border-radius: 4px;
+  border: 1px solid #c3e6cb;
+}
+
+.success-message {
+  color: #155724;
+}
+
+.success-message p {
+  margin: 5px 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #root {
+    max-width: 95%;
+    padding: 1rem;
+  }
+  .title {
+    font-size: 3rem;
+  }
+  .subheading {
+    font-size: 1.4rem;
+  }
+  .button-group {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .global-button-group {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .forms-container {
+    flex-direction: column;
+  }
+  .extended-form {
+    min-width: unset;
+    padding: 1rem;
+  }
+  .checkbox-group {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .single-input {
+    min-width: 100px;
+  }
+  .form-title {
+    font-size: 1.5rem;
+  }
+}

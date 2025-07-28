@@ -1,0 +1,20 @@
+.core-mappings-section {
+  background: #f0f7ff;
+  border: 1.5px solid #b6d4fe;
+  border-radius: 8px;
+  padding: 1rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.core-mappings-section label {
+  font-weight: 600;
+  color: #0056b3;
+  min-width: 50%;
+}
+
+.core-mapping-row {
+  display: flex;
+  gap: 1rem;
+  margin: 0.4rem 0;
+  align-items: center;
+}

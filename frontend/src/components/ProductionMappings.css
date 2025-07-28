@@ -1,0 +1,82 @@
+.production-section {
+  background: #f9f6ef;
+  border: 1.5px solid #ffe5b4;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(255, 179, 0, 0.06);
+}
+
+.production-section label {
+  font-weight: 600;
+  color: #b36b00;
+}
+
+.production-mapping-block {
+  border: 1.5px solid #ffe5b4;
+  border-radius: 8px;
+  padding: 1.1rem 1.2rem;
+  margin-bottom: 1.2rem;
+  background: #fffbe6;
+  box-shadow: 0 1px 4px rgba(255, 179, 0, 0.04);
+}
+
+.production-mapping-block strong {
+  color: #b36b00;
+  font-size: 1.13rem;
+  letter-spacing: 0.01em;
+}
+
+.production-mapping-block input {
+  /* width: 100%; */
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 5px;
+  border: 1.5px solid #ffe5b4;
+  font-size: 1rem;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.production-mapping-block input:focus {
+  border-color: #ffb300;
+  outline: none;
+  box-shadow: 0 0 0 2px #ffe5b4;
+}
+
+.production-section .error-message {
+  color: #d32f2f;
+  font-size: 0.92rem;
+  margin-top: 0.2rem;
+  display: block;
+}
+
+.production-section .input-hint {
+  font-size: 0.85rem;
+  color: #b36b00;
+  margin-top: 0.1rem;
+  font-style: italic;
+  padding-left: 3px;
+}
+
+.production-mapping-block .binnable-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  justify-content: space-between;
+}
+
+.production-mapping-block .binnable-row label {
+  margin-right: 8px;
+  font-weight: 500;
+}
+
+.production-mapping-block .binnable-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+}
+
+.production-mapping-block .test-points-list-input {
+  margin-bottom: 0;
+}
