@@ -25,9 +25,23 @@ options "*" do
   200
 end
 
+# def symbolize_keys(hash)
+#   hash.each_with_object({}) do |(k, v), memo|
+#     key = k.is_a?(String) && k.start_with?(':') ? k[1..-1].to_sym : k
+#     memo[key] = v.is_a?(Hash) ? symbolize_keys(v) : v
+#   end
+# end
+
 def symbolize_keys(hash)
   hash.each_with_object({}) do |(k, v), memo|
-    key = k.is_a?(String) && k.start_with?(':') ? k[1..-1].to_sym : k
+    # Convert string keys that start with ':' to symbols
+    key = if k.is_a?(String) && k.start_with?(':')
+            k[1..-1].to_sym
+          elsif k.is_a?(String)
+            k.to_sym
+          else
+            k
+          end
     memo[key] = v.is_a?(Hash) ? symbolize_keys(v) : v
   end
 end

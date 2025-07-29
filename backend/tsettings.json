@@ -2,13 +2,13 @@
   "1": {
     "fwload_settings": {
       "fwload": {
-        "burst": "avfs_soc_1_fwload_burst",
-        "softsets": "SoftsetProfile_avfs_soc_1_fwload"
+        "burst": "avfs_gfx_1_fwload_burst",
+        "softsets": "SoftsetProfile_avfs_gfx_1_fwload"
       }
     },
     "prod_settings": {
       "dfll": {
-        "burst": "avfs_soc_1_dfll_burst",
+        "burst": "avfs_gfx_1_dfll_burst",
         "binnable": false,
         "test_points": {
           "spec_variable": "1",
@@ -20,7 +20,7 @@
         },
         "register_setup": {
           "vector_variable": {
-            "avfs_soc_1_dfll": 512
+            "avfs_gfx_1_dfll": 512
           }
         }
       }
@@ -32,7 +32,7 @@
           "bist": {},
           "pbist": {
             "1": {
-              "burst": "avfs_soc_1_pbist_1_burst",
+              "burst": "avfs_gfx_1_pbist_1_burst",
               "binnable": false,
               "test_points": {
                 "spec_variable": "1",
@@ -40,7 +40,7 @@
                   "1": {
                     "override_primaries": {},
                     "softsets": {
-                      "profile_name": "SoftsetProfile_avfs_soc_1_pbist_1_1"
+                      "profile_name": "SoftsetProfile_avfs_gfx_1_pbist_1_1"
                     }
                   }
                 }
@@ -56,7 +56,7 @@
                 "burst": "",
                 "register_setup": {
                   "vector_variable": {
-                    "avfs_soc_1_pbist_1_minPSM": 512
+                    "avfs_gfx_1_pbist_1_minPSM": 512
                   }
                 }
               }
