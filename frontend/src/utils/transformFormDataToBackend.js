@@ -48,7 +48,7 @@ function transformFormDataToBackend(formData) {
       ':test_points': parseFlowOrderTestPoints(m),
       ':frequency': Number(m.frequency),
       ':register_size': Number(m.register_size),
-      ':binnable': !!m.ore_enable
+      ':binnable': !!m.binnable
     };
   });
 

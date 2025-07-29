@@ -259,38 +259,16 @@ end
 
 def core_mapping
   {
-    classic: { count: 4, supply: 'VDDCR_CCX0', clk: 'SMNCLK', freq: 1000 },
-    dense:   { count: 8, supply: 'VDDCR_CCX1', clk: 'SMNCLK', freq: 1000 }
   }
 end
 
 def floworder_mapping
   {
-    psm:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: false},
-    mafdd:  { test_points: [0.9, 1.1], frequency: 1000, register_size: 14, binnable: true, softsetenable: false},
-    favfs:  { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true },
-    cpo:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true }
   }
 end
 
 def charztype_mapping
   {
-    granularity: ['allcore'],
-    searchtype: { vmin: {
-    testtype: {
-      crest: { wl_count: 7, wl: %w[a b c d e f g], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } },
-      bist:  { wl_count: 3, wl: %w[a b c], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } },
-      pbist: { wl_count: 1, wl: %w[a], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } }
-        }
-      },
-      fmax: {
-    testtype: {
-      crest: { wl_count: 7, wl: %w[a b c d e f g], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } },
-      bist:  { wl_count: 3, wl: %w[a b c], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } },
-      pbist: { wl_count: 1, wl: %w[a], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } }
-        }
-      }
-    }  
   }
 end
 
