@@ -39,6 +39,22 @@ const CharzParameters = ({
     });
   };
 
+  // New handler for test type selection
+  const handleTestTypeChange = (searchType, testType) => {
+    setCharzData(prev => {
+      const selectedTestTypes = { ...(prev.selectedTestTypes || {}) };
+      if (!selectedTestTypes[searchType]) selectedTestTypes[searchType] = [];
+      
+      if (selectedTestTypes[searchType].includes(testType)) {
+        selectedTestTypes[searchType] = selectedTestTypes[searchType].filter(t => t !== testType);
+      } else {
+        selectedTestTypes[searchType] = [...selectedTestTypes[searchType], testType];
+      }
+      
+      return { ...prev, selectedTestTypes };
+    });
+  };
+
   const handleTableChange = (searchType, testType, field, value) => {
     setCharzData(prev => {
       const table = { ...(prev.table || {}) };
@@ -111,59 +127,91 @@ const CharzParameters = ({
         <React.Fragment key={searchType}>
           <div className="charz-table-block">
             <div className="charz-table-title">{searchType.toUpperCase()} Test Types</div>
-            <div className="charz-table-scroll">
-              <table className="charz-table">
-                <thead>
-                  <tr>
-                    <th>Test Type</th>
-                    {TABLE_FIELDS.map(f => (
-                      <th key={f.key}>{f.label}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {TEST_TYPES.map(testType => (
-                    <tr key={testType}>
-                      <td>{testType}</td>
-                      {TABLE_FIELDS.map(field => (
-                        <td key={field.key}>
-                          <input
-                            type={field.type}
-                            min={field.min}
-                            value={charzData.table?.[searchType]?.[testType]?.[field.key] || ''}
-                            onChange={e =>
-                              handleTableChange(
-                                searchType,
-                                testType,
-                                field.key,
-                                e.target.value
-                              )
-                            }
-                            className={
-                              errors[`charz_${searchType}_${testType}_${field.key}`]
-                                ? 'error single-input'
-                                : 'single-input'
-                            }
-                            style={{ width: '100px' }}
-                          />
-                        </td>
+            
+            {/* Test Type Checkboxes */}
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              {/* <label>Select Test Types</label> */}
+              <div className="checkbox-group">
+                {TEST_TYPES.map(testType => (
+                  <label key={testType} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      className="checkbox-input"
+                      checked={charzData.selectedTestTypes?.[searchType]?.includes(testType) || false}
+                      onChange={() => handleTestTypeChange(searchType, testType)}
+                    />
+                    <span className="checkbox-custom"></span>
+                    {testType}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Only show table if at least one test type is selected */}
+            {charzData.selectedTestTypes?.[searchType]?.length > 0 && (
+              <div className="charz-table-scroll">
+                <table className="charz-table">
+                  <thead>
+                    <tr>
+                      <th>Test Type</th>
+                      {TABLE_FIELDS.map(f => (
+                        <th key={f.key}>{f.label}</th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {/* Only show rows for selected test types */}
+                    {TEST_TYPES.filter(testType => 
+                      charzData.selectedTestTypes?.[searchType]?.includes(testType)
+                    ).map(testType => (
+                      <tr key={testType}>
+                        <td>{testType}</td>
+                        {TABLE_FIELDS.map(field => (
+                          <td key={field.key}>
+                            <input
+                              type={field.type}
+                              min={field.min}
+                              value={charzData.table?.[searchType]?.[testType]?.[field.key] || ''}
+                              onChange={e =>
+                                handleTableChange(
+                                  searchType,
+                                  testType,
+                                  field.key,
+                                  e.target.value
+                                )
+                              }
+                              className={
+                                errors[`charz_${searchType}_${testType}_${field.key}`]
+                                  ? 'error single-input'
+                                  : 'single-input'
+                              }
+                              style={{ width: '100px' }}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
+
           {/* Workload Table for this searchType, below the test type table */}
           {(() => {
-            // Get wl_count for each test type
+            // Only show workload table if test types are selected
+            const selectedTestTypes = charzData.selectedTestTypes?.[searchType] || [];
+            if (selectedTestTypes.length === 0) return null;
+
+            // Get wl_count for each selected test type
             const wlCounts = {};
-            TEST_TYPES.forEach(testType => {
+            selectedTestTypes.forEach(testType => {
               wlCounts[testType] = parseInt(charzData.table?.[searchType]?.[testType]?.wl_count || '0', 10);
             });
             // Find the max wl_count to determine number of rows
             const maxWlCount = Math.max(...Object.values(wlCounts));
             if (!maxWlCount || maxWlCount <= 0) return null;
+            
             return (
               <div key={searchType + '-workload-table'} className="charz-table-block">
                 <div className="charz-table-title">{searchType.toUpperCase()} Workload Table</div>
@@ -171,7 +219,7 @@ const CharzParameters = ({
                   <table className="charz-table">
                     <thead>
                       <tr>
-                        {TEST_TYPES.map(testType => (
+                        {selectedTestTypes.map(testType => (
                           <th key={testType}>{testType}</th>
                         ))}
                       </tr>
@@ -179,7 +227,7 @@ const CharzParameters = ({
                     <tbody>
                       {Array.from({ length: maxWlCount }).map((_, rowIdx) => (
                         <tr key={rowIdx}>
-                          {TEST_TYPES.map(testType => (
+                          {selectedTestTypes.map(testType => (
                             WORKLOAD_FIELDS.map(field => {
                               const errorKey = `charz_${searchType}_${testType}_${field.key}_${rowIdx}`;
                               if (rowIdx < wlCounts[testType]) {

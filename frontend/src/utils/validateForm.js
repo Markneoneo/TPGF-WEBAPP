@@ -58,7 +58,7 @@ export default function validate({
     }
     if (!mapping.frequency || isNaN(Number(mapping.frequency))) newErrors[`frequency_${order}`] = 'Frequency is required and must be a number for ' + order;
     if (!mapping.register_size || isNaN(Number(mapping.register_size))) newErrors[`register_size_${order}`] = 'Register Size is required and must be a number for ' + order;
-    if (typeof mapping.ore_enable !== 'boolean') newErrors[`ore_enable_${order}`] = 'Binnable (ore_enable) is required for ' + order;
+    if (typeof mapping.binnable !== 'boolean') newErrors[`binnable${order}`] = 'Binnable (binnable) is required for ' + order;
   });
 
   // Charz parameters

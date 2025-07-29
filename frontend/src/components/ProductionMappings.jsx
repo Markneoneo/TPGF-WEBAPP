@@ -114,20 +114,20 @@ const ProductionMappings = ({
           <input
             type="checkbox"
             id={`binnable_${order}`}
-            checked={!!productionMappings[order]?.ore_enable}
-            onChange={e => handleProductionMappingChange(order, 'ore_enable', e.target.checked)}
+            checked={!!productionMappings[order]?.binnable}
+            onChange={e => handleProductionMappingChange(order, 'binnable', e.target.checked)}
             style={{ width: 18, height: 18, marginLeft: 'auto' }}
           />
         </div>
 
         {/* SoftsetEnable Checkbox Option */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
-          <label htmlFor={`softset_enable_${order}`} style={{ marginRight: 8 }}>Softset Enable?</label>
+          <label htmlFor={`softsetenable_${order}`} style={{ marginRight: 8 }}>Softset Enable?</label>
           <input
             type="checkbox"
-            id={`softset_enable_${order}`}
-            checked={!!productionMappings[order]?.softset_enable}
-            onChange={e => handleProductionMappingChange(order, 'softset_enable', e.target.checked)}
+            id={`softsetenable_${order}`}
+            checked={!!productionMappings[order]?.softsetenable}
+            onChange={e => handleProductionMappingChange(order, 'softsetenable', e.target.checked)}
             style={{ width: 18, height: 18, marginLeft: 'auto' }}
           />
         </div>

@@ -3,7 +3,8 @@ module TestHelper
   def tpsettings
     {
       'burst' => pertpburst? ? "": burst ,
-      'binnable' => true,
+      'binnable' => binnable,
+      'softsetenable' => softsetenable,
       'test_points' => {
         'spec_variable' => spec_variable,
         'values' => gentp
@@ -53,19 +54,23 @@ end
   
   # Abstract base for tests
 class Test
-  attr_accessor :ip, :coretype, :testtype, :testpoints
+  attr_accessor :ip, :coretype, :testtype, :testpoints, :binnable, :softsetenable
 
-  def initialize(ip: default_ip, coretype: default_coretype, testtype: default_testtype, tp: default_testpoints, **options)
-    @ip = ip
-    @coretype = coretype
-    @testtype = testtype
+  def initialize(ip: default_ip, coretype: default_coretype, testtype: default_testtype, tp: default_testpoints, binnable: default_binnable, softsetenable: default_softsetenable, **options)
+    @ip         = ip
+    @coretype   = coretype
+    @testtype   = testtype
     @testpoints = tp
+    @binnable   = binnable
+    @softsetenable = softsetenable
     post_initialize(options)
   end
 
   def default_ip; "ip"; end
   def default_coretype; ""; end
   def default_testtype; "test"; end
+  def default_binnable; false; end
+  def default_softsetenable; true; end
   def default_testpoints; [0.6]; end
 
   def gentp
@@ -90,19 +95,20 @@ class Test
 
   def pertpburst?
     testtype.to_sym == :favfs
-  end
+  end 
 
   def softsetprofile
     "SoftsetProfile_avfs_" + parameters.values.select { |v| v && !v.empty? }.join("_")
   end
 
   def testsettings
-    {
+    settings = {
       testtype => {
-        'burst' => burst,
-        'softsets' => softsetprofile
+        'burst' => burst
       }
     }
+    settings[testtype]['softsets'] = softsetprofile if softsetenable
+    settings
   end
 end
   
@@ -123,7 +129,9 @@ class Parametric < Test
   end
 
   def testsettings
-    tpsettings.merge(regreadsetup).merge('softsets' => softsetprofile)
+    settings = tpsettings.merge(regreadsetup)
+    settings['softsets'] = softsetprofile if softsetenable
+    settings
   end
 end
   
@@ -168,7 +176,7 @@ class Search < Test
 end
 
 class TestSettingsGenerator
-  attr_reader :ip, :coretypes, :core_mapping, :spec_variable, :floworder_mapping, :charztype_mapping
+  attr_reader :ip, :coretypes, :core_mapping, :spec_variable, :floworder_mapping, :search_granularity, :search, :charztype_mapping
 
   def initialize(options)
     @ip                = options[:ip]
@@ -177,8 +185,6 @@ class TestSettingsGenerator
     @spec_variable     = options[:spec_variable]
     @floworder_mapping = options[:floworder_mapping]
     @charztype_mapping = options[:charztype_mapping]
-    puts @floworder_mapping.inspect
-    puts @charztype_mapping.inspect
   end
 
   def generatesettings
@@ -216,6 +222,8 @@ class TestSettingsGenerator
         coretype: coretype,
         testtype: testtype,
         tp: config[:test_points],
+        binnable: config[:binnable],
+        softsetenable: config[:softsetenable],
         spec_variable: spec_variable
       )
       result[testtype] = param_obj.testsettings
@@ -238,7 +246,7 @@ class TestSettingsGenerator
               spec_variable: spec_variable,
               wl: wl,
               searchsettings: {
-                'offset' => (stype == :vmin ? 0.00625 : (stype == :fmax ? 50 : nil)),
+                'offset' => (stype == "vmin" ? 0.00625 : (stype == "fmax" ? 50 : nil)),
                 'search_settings' => config[:searchsettings]
               }
             )
@@ -262,7 +270,6 @@ end
 
 def charztype_mapping
   {
-  
   }
 end
 
