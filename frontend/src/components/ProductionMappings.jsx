@@ -107,6 +107,8 @@ const ProductionMappings = ({
           className={errors[`register_size_${order}`] ? 'error single-input' : 'single-input'}
           style={{ marginBottom: 4 }}
         />
+
+        {/* Binnable Checkbox Option */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
           <label htmlFor={`binnable_${order}`} style={{ marginRight: 8 }}>Binnable?</label>
           <input
@@ -117,6 +119,19 @@ const ProductionMappings = ({
             style={{ width: 18, height: 18, marginLeft: 'auto' }}
           />
         </div>
+
+        {/* SoftsetEnable Checkbox Option */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
+          <label htmlFor={`softset_enable_${order}`} style={{ marginRight: 8 }}>Softset Enable?</label>
+          <input
+            type="checkbox"
+            id={`softset_enable_${order}`}
+            checked={!!productionMappings[order]?.softset_enable}
+            onChange={e => handleProductionMappingChange(order, 'softset_enable', e.target.checked)}
+            style={{ width: 18, height: 18, marginLeft: 'auto' }}
+          />
+        </div>
+
         {/* Show errors if any */}
         {/* {['test_type', 'test_points', 'frequency', 'register_size', 'ore_enable'].map(field =>
           errors[`${field}_${order}`] && (
