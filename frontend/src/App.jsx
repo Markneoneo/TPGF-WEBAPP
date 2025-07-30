@@ -119,7 +119,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1 className='title'>Test Options Generator</h1>
+      <h1 className='title'>Test Settings Generator</h1>
       <p className='subheading'>Please select the IP types and configure options.</p>
 
       <div className="card">

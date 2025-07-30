@@ -23,8 +23,26 @@ const CharzParameters = ({
   ipType
 }) => {
   // Handlers
-  const handleGranularityChange = (e) => {
-    setCharzData(prev => ({ ...prev, search_granularity: e.target.value }));
+  // const handleGranularityChange = (e) => {
+  //   setCharzData(prev => ({ ...prev, search_granularity: e.target.value }));
+  // };
+  
+  // Updated handler for multiple granularity selection
+  const handleGranularityChange = (granularity) => {
+    setCharzData(prev => {
+      // Get current array or initialize empty array
+      const currentGranularities = prev.search_granularity || [];
+      
+      // Check if granularity is already selected
+      const isSelected = currentGranularities.includes(granularity);
+      
+      return {
+        ...prev,
+        search_granularity: isSelected
+          ? currentGranularities.filter(g => g !== granularity) // Remove if already selected
+          : [...currentGranularities, granularity] // Add if not selected
+      };
+    });
   };
 
   const handleSearchTypeChange = (type) => {
@@ -86,7 +104,7 @@ const CharzParameters = ({
         Charz Parameters
       </h4>
 
-      {/* Search Granularity */}
+      {/* Search Granularity
       <div className="form-group">
         <label>Search Granularity</label>
         <select
@@ -99,6 +117,27 @@ const CharzParameters = ({
             <option key={opt} value={opt}>{opt}</option>
           ))}
         </select>
+        {errors.search_granularity && <span className="error-message">{errors.search_granularity}</span>}
+      </div> */}
+
+      {/* Search Granularity - NOW WITH CHECKBOXES */}
+      <div className="form-group">
+        <label>Search Granularity</label>
+        <div className="input-hint">Select one or more granularity options</div>
+        <div className="checkbox-group">
+          {SEARCH_GRANULARITY_OPTIONS.map(granularity => (
+            <label key={granularity} className="checkbox-label">
+              <input
+                type="checkbox"
+                className="checkbox-input"
+                checked={(charzData.search_granularity || []).includes(granularity)}
+                onChange={() => handleGranularityChange(granularity)}
+              />
+              <span className="checkbox-custom"></span>
+              {granularity}
+            </label>
+          ))}
+        </div>
         {errors.search_granularity && <span className="error-message">{errors.search_granularity}</span>}
       </div>
 

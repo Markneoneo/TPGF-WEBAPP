@@ -98,7 +98,7 @@ const ProductionMappings = ({
         <div style={{ marginBottom: 4 }}>
           <input
             type="text"
-            placeholder="Insertion"
+            placeholder="Insertion List"
             value={productionMappings[order]?.insertion || ''}
             onChange={e => handleProductionMappingChange(order, 'insertion', e.target.value)}
             className={errors[`insertion_${order}`] ? 'error single-input insertion-input' : 'single-input insertion-input'}

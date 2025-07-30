@@ -97,7 +97,8 @@ class Test
   end 
 
   def softsetprofile
-    "SoftsetProfile_avfs_" + parameters.values.select { |v| v && !v.empty? }.join("_")
+    # Exclude wl from the profile name
+    "SoftsetProfile_avfs_#{ip}_#{coretype}_#{testtype}"
   end
 
   def testsettings
@@ -113,10 +114,15 @@ end
   
 class Parametric < Test
   include TestHelper
-  attr_accessor :spec_variable
+  attr_accessor :spec_variable, :insertionlist
   
   def post_initialize(options)
     @spec_variable  = options[:spec_variable] || ""
+    @insertionlist  = options[:insertionlist] || default_insertionlist
+  end
+
+  def default_insertionlist
+    ['ws1', 'ft1']
   end
 
   def gentp
@@ -130,6 +136,7 @@ class Parametric < Test
   def testsettings
     settings = tpsettings.merge(regreadsetup)
     settings['softsets'] = softsetprofile if softsetenable
+    settings['insertion_list'] = insertionlist
     settings
   end
 end
@@ -221,6 +228,7 @@ class TestSettingsGenerator
         coretype: coretype,
         testtype: testtype,
         tp: config[:test_points],
+        insertionlist: config[:insertionlist],
         binnable: config[:binnable],
         softsetenable: config[:softsetenable],
         spec_variable: spec_variable
@@ -245,7 +253,7 @@ class TestSettingsGenerator
               spec_variable: spec_variable,
               wl: wl,
               searchsettings: {
-                'offset' => (stype == "vmin" ? 0.00625 : (stype == "fmax" ? 50 : nil)),
+                'offset' => (stype.to_sym == :vmin ? 0.00625 : (stype.to_sym == :fmax ? 50 : nil)),
                 'search_settings' => config[:searchsettings]
               }
             )
@@ -259,16 +267,38 @@ end
 
 def core_mapping
   {
+    classic: { count: 4, supply: 'VDDCR_CCX0', clk: 'SMNCLK', freq: 1000 },
+    dense:   { count: 8, supply: 'VDDCR_CCX1', clk: 'SMNCLK', freq: 1000 }
   }
 end
 
 def floworder_mapping
   {
+    psm:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
+    mafdd:  { test_points: [0.9, 1.1], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
+    favfs:  { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true  , insertionlist: ['ws1', 'ws2']  },
+    cpo:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true,  insertionlist: ['ws1', 'ft1']  }
   }
 end
 
 def charztype_mapping
   {
+    granularity: ['allcore'],
+    searchtype: { vmin: {
+    testtype: {
+      crest: { wl_count: 7, wl: %w[a b c d e f g], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } },
+      bist:  { wl_count: 3, wl: %w[a b c], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } },
+      pbist: { wl_count: 1, wl: %w[a], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } }
+        }
+      },
+      fmax: {
+    testtype: {
+      crest: { wl_count: 7, wl: %w[a b c d e f g], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } },
+      bist:  { wl_count: 3, wl: %w[a b c], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } },
+      pbist: { wl_count: 1, wl: %w[a], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } }
+        }
+      }
+    }  
   }
 end
 

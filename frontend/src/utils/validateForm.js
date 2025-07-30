@@ -62,9 +62,14 @@ export default function validate({
   });
 
   // Charz parameters
-  if (!charzData.search_granularity || typeof charzData.search_granularity !== 'string' || charzData.search_granularity.trim() === '') {
-    newErrors.search_granularity = 'Search granularity is required.';
+  // if (!charzData.search_granularity || typeof charzData.search_granularity !== 'string' || charzData.search_granularity.trim() === '') {
+  //   newErrors.search_granularity = 'Search granularity is required.';
+  // }
+  
+  if (!charzData.search_granularity || !Array.isArray(charzData.search_granularity) || charzData.search_granularity.length === 0) {
+    newErrors.search_granularity = 'At least one search granularity must be selected.';
   }
+
   if (!Array.isArray(charzData.search_types) || charzData.search_types.length === 0) {
     newErrors.search_types = 'At least one search type is required.';
   }
