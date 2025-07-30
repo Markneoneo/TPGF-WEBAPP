@@ -49,7 +49,8 @@ function transformFormDataToBackend(formData) {
       ':frequency': Number(m.frequency),
       ':register_size': Number(m.register_size),
       ':binnable': !!m.binnable,
-      ':softsetenable': !!m.softsetenable 
+      ':softsetenable': !!m.softsetenable, 
+      ':fallbackenable': !!m.fallbackenable 
     };
   });
 

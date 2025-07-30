@@ -132,6 +132,18 @@ const ProductionMappings = ({
           />
         </div>
 
+        {/* FallbackEnable Checkbox Option */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
+          <label htmlFor={`fallbackenable_${order}`} style={{ marginRight: 8 }}>FallBack Enable?</label>
+          <input
+            type="checkbox"
+            id={`fallbackenable_${order}`}
+            checked={!!productionMappings[order]?.fallbackenable}
+            onChange={e => handleProductionMappingChange(order, 'fallbackenable', e.target.checked)}
+            style={{ width: 18, height: 18, marginLeft: 'auto' }}
+          />
+        </div>
+
         {/* Show errors if any */}
         {/* {['test_type', 'test_points', 'frequency', 'register_size', 'ore_enable'].map(field =>
           errors[`${field}_${order}`] && (
