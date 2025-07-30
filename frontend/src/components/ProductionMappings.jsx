@@ -31,10 +31,12 @@ const ProductionMappings = ({
       </div>
       {errors.flow_orders && <span className="error-message">{errors.flow_orders}</span>}
     </div>
+
     {/* Render mapping fields for each selected flow order */}
     {selectedFlowOrders.map(order => (
       <div key={order} className="production-mapping-block">
         <strong>{order.toUpperCase()} Mapping</strong>
+
         {/* Test Points Dropdown and Conditional Fields */}
         <div style={{ marginBottom: 4 }}>
           <select
@@ -91,6 +93,19 @@ const ProductionMappings = ({
             </div>
           )}
         </div>
+
+        {/* Insertion Field */}
+        <div style={{ marginBottom: 4 }}>
+          <input
+            type="text"
+            placeholder="Insertion"
+            value={productionMappings[order]?.insertion || ''}
+            onChange={e => handleProductionMappingChange(order, 'insertion', e.target.value)}
+            className={errors[`insertion_${order}`] ? 'error single-input insertion-input' : 'single-input insertion-input'}
+          />
+          <div className="input-hint">Fixed list separated by commas</div>
+        </div>
+
         <input
           type="text"
           placeholder="Frequency"
@@ -99,6 +114,7 @@ const ProductionMappings = ({
           className={errors[`frequency_${order}`] ? 'error single-input' : 'single-input'}
           style={{ marginBottom: 4 }}
         />
+
         <input
           type="text"
           placeholder="Register Size"

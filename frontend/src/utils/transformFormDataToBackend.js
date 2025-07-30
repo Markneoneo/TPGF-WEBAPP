@@ -48,6 +48,7 @@ function transformFormDataToBackend(formData) {
       ':test_points': parseFlowOrderTestPoints(m),
       ':frequency': Number(m.frequency),
       ':register_size': Number(m.register_size),
+      // ':test_points': parseFlowOrderTestPoints(m), // Change to Insertion
       ':binnable': !!m.binnable,
       ':softsetenable': !!m.softsetenable, 
       ':fallbackenable': !!m.fallbackenable 
