@@ -58,9 +58,12 @@ function transformFormDataToBackend(formData) {
 // 3. charztype_mapping
 const charz = formData.charz || {};
 const charztype_mapping = {
-  ':granularity': [charz.search_granularity],
+  // ':granularity': [charz.search_granularity],
+  // Use the array directly instead of wrapping in another array
+  ':granularity': charz.search_granularity || [],
   ':searchtype': {}
 };
+
 (charz.search_types || []).forEach(type => {
   charztype_mapping[':searchtype'][type] = { ':testtype': {} };
   ['CREST', 'BIST', 'PBIST'].forEach(testType => {

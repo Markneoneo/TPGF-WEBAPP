@@ -104,22 +104,6 @@ const CharzParameters = ({
         Charz Parameters
       </h4>
 
-      {/* Search Granularity
-      <div className="form-group">
-        <label>Search Granularity</label>
-        <select
-          value={charzData.search_granularity || ''}
-          onChange={handleGranularityChange}
-          className="single-input"
-        >
-          <option value="" disabled>Select one</option>
-          {SEARCH_GRANULARITY_OPTIONS.map(opt => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
-        </select>
-        {errors.search_granularity && <span className="error-message">{errors.search_granularity}</span>}
-      </div> */}
-
       {/* Search Granularity - NOW WITH CHECKBOXES */}
       <div className="form-group">
         <label>Search Granularity</label>
