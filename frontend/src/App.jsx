@@ -51,10 +51,11 @@ function App() {
     }
     
     setIsProcessing(true);
-    const combinedResults = {};
-    
+  
     try {
-      // Process each IP type sequentially
+      // NEW: Collect all form data first
+      const allIpData = {};
+      
       for (const ipType of selectedIpTypes) {
         const formRef = formRefs.current[ipType];
         if (!formRef) {
@@ -64,39 +65,40 @@ function App() {
         
         const formData = formRef.getFormData();
         console.log(`Form data for ${ipType}:`, formData);
+        
         // Transform formData to backend format
         const backendPayload = transformFormDataToBackend(formData);
-        // Set ip field to match backend expectation
         backendPayload.ip = ipType.toLowerCase();
-        console.log(`Backend payload for ${ipType}:`, backendPayload);
-        const response = await fetch('http://localhost:4567/api/process-data', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(backendPayload)
-        });
         
-        console.log(`Response status for ${ipType}:`, response.status);
-        if (!response.ok) {
-          console.error(`HTTP error for ${ipType}! status: ${response.status}`);
-          throw new Error(`HTTP error for ${ipType}! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log(`Result from backend for ${ipType}:`, result);
-        combinedResults[ipType] = result;
+        allIpData[ipType.toLowerCase()] = backendPayload;
       }
       
-      // Set combined results
-      setProcessResults(combinedResults);
-      // File is now generated on backend, show download link
+      console.log('Combined payload for all IPs:', allIpData);
+      
+      // NEW: Send single request with all IP data
+      const response = await fetch('http://localhost:4567/api/process-multiple-ips', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ip_configurations: allIpData })
+      });
+      
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('Combined result from backend:', result);
+      
+      setProcessResults(result);
       setFileReady(true);
       console.log('processAllForms: finished successfully');
       
     } catch (error) {
       console.error('Error processing data:', error);
-      // Set error state that can be displayed to user
     } finally {
       setIsProcessing(false);
       console.log('processAllForms: processing ended');
