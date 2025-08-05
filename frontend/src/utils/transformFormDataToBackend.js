@@ -17,16 +17,36 @@ function parseFlowOrderTestPoints(mapping) {
     const e = Number(mapping.test_points_stop);
     const st = Number(mapping.test_points_step);
     if (isNaN(s) || isNaN(e) || isNaN(st) || st === 0) return [];
+    
     const result = [];
+    
+    // Helper function to determine appropriate decimal places for rounding
+    const getDecimalPlaces = (num) => {
+      const numStr = num.toString();
+      if (numStr.indexOf('.') === -1) return 0;
+      return numStr.split('.')[1].length;
+    };
+    
+    const decimalPlaces = Math.max(getDecimalPlaces(s), getDecimalPlaces(e), getDecimalPlaces(st));
+    
     if (st > 0) {
-      for (let i = s; i <= e; i += st) result.push(i);
+      for (let i = s; i <= e; i += st) {
+        // Round to prevent floating point precision issues
+        const roundedValue = Number(i.toFixed(decimalPlaces));
+        result.push(roundedValue);
+      }
     } else {
-      for (let i = s; i >= e; i += st) result.push(i);
+      for (let i = s; i >= e; i += st) {
+        // Round to prevent floating point precision issues
+        const roundedValue = Number(i.toFixed(decimalPlaces));
+        result.push(roundedValue);
+      }
     }
     return result;
   }
   return [];
 }
+
 
 // Function to parse insertion list (mixed strings/numbers)
 function parseInsertionList(insertionString) {

@@ -13,6 +13,17 @@ function parseTestPointsList(input) {
 }
 
 /**
+ * Helper function to determine appropriate decimal places for rounding
+ * @param {number} step - The step value
+ * @returns {number} - Number of decimal places to round to
+ */
+function getDecimalPlaces(step) {
+  const stepStr = step.toString();
+  if (stepStr.indexOf('.') === -1) return 0;
+  return stepStr.split('.')[1].length;
+}
+
+/**
  * Generates an array of numbers from start to stop (inclusive) using the given step.
  * @param {string|number} start - Start value
  * @param {string|number} stop - Stop value
@@ -24,11 +35,22 @@ function parseTestPointsRange(start, stop, step) {
   const e = Number(stop);
   const st = Number(step);
   if (isNaN(s) || isNaN(e) || isNaN(st) || st === 0) return [];
+  
   const result = [];
+  const decimalPlaces = Math.max(getDecimalPlaces(s), getDecimalPlaces(e), getDecimalPlaces(st));
+  
   if (st > 0) {
-    for (let i = s; i <= e; i += st) result.push(i);
+    for (let i = s; i <= e; i += st) {
+      // Round to prevent floating point precision issues
+      const roundedValue = Number(i.toFixed(decimalPlaces));
+      result.push(roundedValue);
+    }
   } else {
-    for (let i = s; i >= e; i += st) result.push(i);
+    for (let i = s; i >= e; i += st) {
+      // Round to prevent floating point precision issues
+      const roundedValue = Number(i.toFixed(decimalPlaces));
+      result.push(roundedValue);
+    }
   }
   return result;
 }
