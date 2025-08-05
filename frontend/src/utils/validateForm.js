@@ -34,10 +34,14 @@ export default function validate({
   }
   selectedFlowOrders.forEach(order => {
     const mapping = productionMappings[order] || {};
+
     // Always validate test_points_type
-    if (!mapping.test_points_type || (mapping.test_points_type !== 'List' && mapping.test_points_type !== 'Range')) {
+    const testPointsType = mapping.test_points_type || 'Range'; // Default to 'Range' if not set
+
+    if (testPointsType !== 'List' && testPointsType !== 'Range') {
       newErrors[`test_points_type_${order}`] = 'Test Points Type is required for ' + order;
     }
+
     // Always validate range fields if type is missing or 'Range'
     if (!mapping.test_points_type || mapping.test_points_type === 'Range') {
       if (!mapping.test_points_start || isNaN(Number(mapping.test_points_start))) {

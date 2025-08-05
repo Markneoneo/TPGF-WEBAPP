@@ -53,15 +53,16 @@ end
   
   # Abstract base for tests
 class Test
-  attr_accessor :ip, :coretype, :testtype, :testpoints, :binnable, :softsetenable
+  attr_accessor :ip, :coretype, :testtype, :testpoints, :binnable, :softsetenable, :fallbackenable
 
-  def initialize(ip: default_ip, coretype: default_coretype, testtype: default_testtype, tp: default_testpoints, binnable: default_binnable, softsetenable: default_softsetenable, **options)
+  def initialize(ip: default_ip, coretype: default_coretype, testtype: default_testtype, tp: default_testpoints, binnable: default_binnable, softsetenable: default_softsetenable, fallbackenable: default_fallbackenable, **options)
     @ip         = ip
     @coretype   = coretype
     @testtype   = testtype
     @testpoints = tp
     @binnable   = binnable
     @softsetenable = softsetenable
+    @fallbackenable = fallbackenable
     post_initialize(options)
   end
 
@@ -70,6 +71,7 @@ class Test
   def default_testtype; "test"; end
   def default_binnable; false; end
   def default_softsetenable; true; end
+  def default_fallbackenable; false; end
   def default_testpoints; [0.6]; end
 
   def gentp
@@ -137,6 +139,7 @@ class Parametric < Test
     settings = tpsettings.merge(regreadsetup)
     settings['softsets'] = softsetprofile if softsetenable
     settings['insertion_list'] = insertionlist
+    settings['fallback_enable'] = fallbackenable
     settings
   end
 end
@@ -231,6 +234,7 @@ class TestSettingsGenerator
         insertionlist: config[:insertionlist],
         binnable: config[:binnable],
         softsetenable: config[:softsetenable],
+        fallbackenable: config[:fallbackenable],
         spec_variable: spec_variable
       )
       result[testtype] = param_obj.testsettings
@@ -274,10 +278,10 @@ end
 
 def floworder_mapping
   {
-    psm:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
-    mafdd:  { test_points: [0.9, 1.1], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
-    favfs:  { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true  , insertionlist: ['ws1', 'ws2']  },
-    cpo:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true,  insertionlist: ['ws1', 'ft1']  }
+    psm:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, fallbackenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
+    mafdd:  { test_points: [0.9, 1.1], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, fallbackenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
+    favfs:  { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true , fallbackenable: false, insertionlist: ['ws1', 'ws2']  },
+    cpo:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true,  fallbackenable: false, insertionlist: ['ws1', 'ft1']  }
   }
 end
 

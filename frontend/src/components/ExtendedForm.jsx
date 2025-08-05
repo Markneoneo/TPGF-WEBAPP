@@ -56,21 +56,40 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
     });
   };
 
-  // Handle flow order selection (multi-select)
-  const handleFlowOrderChange = (order) => {
-    setSelectedFlowOrders(prev => {
-      if (prev.includes(order)) {
-        setProductionMappings(mappings => {
-          const updated = { ...mappings };
-          delete updated[order];
-          return updated;
-        });
-        return prev.filter(o => o !== order);
-      } else {
-        return [...prev, order];
-      }
-    });
-  };
+// Handle flow order selection (multi-select)
+const handleFlowOrderChange = (order) => {
+  setSelectedFlowOrders(prev => {
+    if (prev.includes(order)) {
+      // Remove the order and its mapping
+      setProductionMappings(mappings => {
+        const updated = { ...mappings };
+        delete updated[order];
+        return updated;
+      });
+      return prev.filter(o => o !== order);
+    } else {
+      // Add the order and initialize its mapping with default values
+      setProductionMappings(mappings => ({
+        ...mappings,
+        [order]: {
+          ...mappings[order], // Keep any existing values
+          test_points_type: mappings[order]?.test_points_type || 'Range', // Set default
+          test_points_start: mappings[order]?.test_points_start || '',
+          test_points_stop: mappings[order]?.test_points_stop || '',
+          test_points_step: mappings[order]?.test_points_step || '',
+          frequency: mappings[order]?.frequency || '',
+          register_size: mappings[order]?.register_size || '',
+          insertion: mappings[order]?.insertion || '',
+          binnable: mappings[order]?.binnable || false,
+          softsetenable: mappings[order]?.softsetenable || false,
+          fallbackenable: mappings[order]?.fallbackenable || false
+        }
+      }));
+      return [...prev, order];
+    }
+  });
+};
+
 
   // Handle production mapping field change
   const handleProductionMappingChange = (order, field, value) => {

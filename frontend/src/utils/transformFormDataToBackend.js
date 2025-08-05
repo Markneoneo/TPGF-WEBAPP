@@ -28,6 +28,15 @@ function parseFlowOrderTestPoints(mapping) {
   return [];
 }
 
+// Function to parse insertion list (mixed strings/numbers)
+function parseInsertionList(insertionString) {
+  if (!insertionString || typeof insertionString !== 'string') return [];
+  return insertionString
+    .split(',')
+    .map(s => s.trim())
+    .filter(s => s !== ''); // Keep as strings, don't convert to numbers
+}
+
 function transformFormDataToBackend(formData) {
   // 1. core_mapping
   const core_mapping = {};
@@ -48,7 +57,7 @@ function transformFormDataToBackend(formData) {
       ':test_points': parseFlowOrderTestPoints(m),
       ':frequency': Number(m.frequency),
       ':register_size': Number(m.register_size),
-      // ':test_points': parseFlowOrderTestPoints(m), // Change to Insertion
+      ':insertionlist': parseInsertionList(m.insertion), // Change to Insertion
       ':binnable': !!m.binnable,
       ':softsetenable': !!m.softsetenable, 
       ':fallbackenable': !!m.fallbackenable 
