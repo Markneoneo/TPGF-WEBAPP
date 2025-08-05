@@ -60,37 +60,46 @@ const ProductionMappings = ({
                 }
               />
               <div className="input-hint">Fixed list separated by commas</div>
+              {errors[`test_points_${order}`] && <span className="error-message">{errors[`test_points_${order}`]}</span>}
             </>
           ) : (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <div style={{ flex: 1 }}>
-                <input
-                  type="text"
-                  placeholder="Start"
-                  value={productionMappings[order]?.test_points_start || ''}
-                  onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
-                  className={errors[`test_points_start_${order}`] ? 'error single-input' : 'single-input'}
-                />
+            <>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    placeholder="Start"
+                    value={productionMappings[order]?.test_points_start || ''}
+                    onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
+                    className={errors[`test_points_start_${order}`] ? 'error single-input' : 'single-input'}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    placeholder="Stop"
+                    value={productionMappings[order]?.test_points_stop || ''}
+                    onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
+                    className={errors[`test_points_stop_${order}`] ? 'error single-input' : 'single-input'}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    placeholder="Step"
+                    value={productionMappings[order]?.test_points_step || ''}
+                    onChange={e => handleProductionMappingChange(order, 'test_points_step', e.target.value)}
+                    className={errors[`test_points_step_${order}`] ? 'error single-input' : 'single-input'}
+                  />
+                </div>
               </div>
-              <div style={{ flex: 1 }}>
-                <input
-                  type="text"
-                  placeholder="Stop"
-                  value={productionMappings[order]?.test_points_stop || ''}
-                  onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
-                  className={errors[`test_points_stop_${order}`] ? 'error single-input' : 'single-input'}
-                />
-              </div>
-              <div style={{ flex: 1 }}>
-                <input
-                  type="text"
-                  placeholder="Step"
-                  value={productionMappings[order]?.test_points_step || ''}
-                  onChange={e => handleProductionMappingChange(order, 'test_points_step', e.target.value)}
-                  className={errors[`test_points_step_${order}`] ? 'error single-input' : 'single-input'}
-                />
-              </div>
-            </div>
+              {/* Display individual field errors */}
+              {errors[`test_points_start_${order}`] && <span className="error-message">{errors[`test_points_start_${order}`]}</span>}
+              {errors[`test_points_stop_${order}`] && <span className="error-message">{errors[`test_points_stop_${order}`]}</span>}
+              {errors[`test_points_step_${order}`] && <span className="error-message">{errors[`test_points_step_${order}`]}</span>}
+              {/* Display range validation error */}
+              {errors[`test_points_range_${order}`] && <span className="error-message">{errors[`test_points_range_${order}`]}</span>}
+            </>
           )}
         </div>
 

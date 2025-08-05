@@ -47,7 +47,6 @@ function parseFlowOrderTestPoints(mapping) {
   return [];
 }
 
-
 // Function to parse insertion list (mixed strings/numbers)
 function parseInsertionList(insertionString) {
   if (!insertionString || typeof insertionString !== 'string') return [];
