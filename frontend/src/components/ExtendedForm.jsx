@@ -16,11 +16,12 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
   const [specVariable, setSpecVariable] = useState('');
   const [selectedFlowOrders, setSelectedFlowOrders] = useState([]);
   const [productionMappings, setProductionMappings] = useState({});
+  const [showCharz, setShowCharz] = useState(false);
   const [charzData, setCharzData] = useState({
     search_granularity: '',
     search_types: [],
     table: {},
-    workloadTable: {}, // Added missing property
+    workloadTable: {}, 
     psm_register_size: '',
   });
 
@@ -132,7 +133,8 @@ const handleFlowOrderChange = (order) => {
       specVariable,
       selectedFlowOrders,
       productionMappings,
-      charzData
+      charzData,
+      charzEnabled: showCharz
     });
     setErrors(newErrors);
     // Debug: log all error keys and values for inspection
@@ -239,13 +241,30 @@ const handleFlowOrderChange = (order) => {
             handleProductionMappingChange={handleProductionMappingChange}
           />
         </div>
+
+        {/* Toggle for Charz Parameters */}
+        <div className="form-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={showCharz}
+              onChange={() => setShowCharz(prev => !prev)}
+              className="checkbox-input"
+            />
+            <span className="checkbox-custom"></span>
+            Charz Parameters
+          </label>
+        </div>
+
         {/* Charz Parameters */}
-        <CharzParameters
-          charzData={charzData}
-          setCharzData={setCharzData}
-          errors={errors}
-          ipType={ipType}
-        />
+        {showCharz && (
+          <CharzParameters
+            charzData={charzData}
+            setCharzData={setCharzData}
+            errors={errors}
+            ipType={ipType}
+          />
+        )}
 
         {errors.submit && <div className="error-message">{errors.submit}</div>}
 

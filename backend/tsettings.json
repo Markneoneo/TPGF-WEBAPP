@@ -1,82 +1,70 @@
 {
-  "gfx": {
+  "cpu": {
     "1": {
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_gfx_1_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_gfx_1_fwload"
+          "burst": "avfs_cpu_1_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_cpu_1_fwload"
         }
       },
       "prod_settings": {
         "minpsm": {
-          "burst": "avfs_gfx_1_minpsm_burst",
+          "burst": "avfs_cpu_1_minpsm_burst",
           "binnable": true,
           "test_points": {
             "spec_variable": "1",
             "values": {
               "tp0": {
-                "value": 1
+                "value": 12
               },
               "tp1": {
-                "value": 2
+                "value": 11
               },
               "tp2": {
+                "value": 10
+              },
+              "tp3": {
+                "value": 9
+              },
+              "tp4": {
+                "value": 8
+              },
+              "tp5": {
+                "value": 7
+              },
+              "tp6": {
+                "value": 6
+              },
+              "tp7": {
+                "value": 5
+              },
+              "tp8": {
+                "value": 4
+              },
+              "tp9": {
                 "value": 3
+              },
+              "tp10": {
+                "value": 2
+              },
+              "tp11": {
+                "value": 1
               }
             }
           },
           "register_setup": {
             "vector_variable": {
-              "avfs_gfx_1_minpsm": 512
+              "avfs_cpu_1_minpsm": 512
             }
           },
-          "softsets": "SoftsetProfile_avfs_gfx_1_minpsm",
+          "softsets": "SoftsetProfile_avfs_cpu_1_minpsm",
           "insertion_list": [
             "1"
           ],
           "fallback_enable": true
         }
       },
-      "charz_settings": {
-        "bycore": {
-          "vmin": {
-            "crest": {},
-            "bist": {
-              "1": {
-                "burst": "avfs_gfx_1_bist_1_burst",
-                "binnable": false,
-                "test_points": {
-                  "spec_variable": "1",
-                  "values": {
-                    "1": {
-                      "override_primaries": {},
-                      "softsets": {
-                        "profile_name": "SoftsetProfile_avfs_gfx_1_bist_1"
-                      }
-                    }
-                  }
-                },
-                "offset": 0.00625,
-                "search_settings": {
-                  "start": "1",
-                  "stop": "1",
-                  "res": "1",
-                  "step": "1"
-                },
-                "minpsm_settings": {
-                  "burst": "",
-                  "register_setup": {
-                    "vector_variable": {
-                      "avfs_gfx_1_bist_1_minPSM": 512
-                    }
-                  }
-                }
-              }
-            },
-            "pbist": {}
-          }
-        }
-      }
+      "charz_settings": {}
     }
   }
 }

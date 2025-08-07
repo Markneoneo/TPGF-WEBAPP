@@ -108,7 +108,8 @@ export default function validate({
   specVariable,
   selectedFlowOrders,
   productionMappings,
-  charzData
+  charzData,
+  charzEnabled
 }) {
   const newErrors = {};
 
@@ -188,70 +189,68 @@ export default function validate({
 
 
   // Charz parameters
-  // if (!charzData.search_granularity || typeof charzData.search_granularity !== 'string' || charzData.search_granularity.trim() === '') {
-  //   newErrors.search_granularity = 'Search granularity is required.';
-  // }
-  
-  if (!charzData.search_granularity || !Array.isArray(charzData.search_granularity) || charzData.search_granularity.length === 0) {
-    newErrors.search_granularity = 'At least one search granularity must be selected.';
-  }
-
-  if (!Array.isArray(charzData.search_types) || charzData.search_types.length === 0) {
-    newErrors.search_types = 'At least one search type is required.';
-  }
-
-  (charzData.search_types || []).forEach(searchType => {
-    // Get selected test types for this search type
-    const selectedTestTypes = charzData.selectedTestTypes?.[searchType] || [];
-    
-    // Check if at least one test type is selected
-    if (selectedTestTypes.length === 0) {
-      newErrors[`charz_${searchType}_test_types`] = `At least one test type must be selected for ${searchType}`;
-      return; // Skip further validation for this search type
+  if (charzEnabled) { // only validate if charz is enabled
+    if (!charzData.search_granularity || !Array.isArray(charzData.search_granularity) || charzData.search_granularity.length === 0) {
+      newErrors.search_granularity = 'At least one search granularity must be selected.';
     }
-    
-    // Only validate selected test types
-    selectedTestTypes.forEach(testType => {
-      const table = charzData.table?.[searchType]?.[testType] || {};
-      const wlCount = parseInt(table.wl_count, 10) || 0;
+
+    if (!Array.isArray(charzData.search_types) || charzData.search_types.length === 0) {
+      newErrors.search_types = 'At least one search type is required.';
+    }
+
+    (charzData.search_types || []).forEach(searchType => {
+      // Get selected test types for this search type
+      const selectedTestTypes = charzData.selectedTestTypes?.[searchType] || [];
       
-      // Validate test type table fields
-      if (!table.wl_count || isNaN(Number(table.wl_count))) {
-        newErrors[`charz_${searchType}_${testType}_wl_count`] = 'WL Count is required and must be a number for ' + searchType + ' / ' + testType;
+      // Check if at least one test type is selected
+      if (selectedTestTypes.length === 0) {
+        newErrors[`charz_${searchType}_test_types`] = `At least one test type must be selected for ${searchType}`;
+        return; // Skip further validation for this search type
       }
       
-      // Improved workload table validation
-      if (wlCount > 0) {
-        const workloadArray = charzData.workloadTable?.[searchType]?.[testType] || [];
-        // Always validate each workload field, even if array is missing or too short
-        for (let wlIdx = 0; wlIdx < wlCount; wlIdx++) {
-          const wlValue = workloadArray[wlIdx];
-          if (!wlValue || (typeof wlValue === 'string' && wlValue.trim() === '')) {
-            newErrors[`charz_${searchType}_${testType}_wl_${wlIdx}`] = `WL value #${wlIdx + 1} is required for ${searchType} / ${testType}`;
+      // Only validate selected test types
+      selectedTestTypes.forEach(testType => {
+        const table = charzData.table?.[searchType]?.[testType] || {};
+        const wlCount = parseInt(table.wl_count, 10) || 0;
+        
+        // Validate test type table fields
+        if (!table.wl_count || isNaN(Number(table.wl_count))) {
+          newErrors[`charz_${searchType}_${testType}_wl_count`] = 'WL Count is required and must be a number for ' + searchType + ' / ' + testType;
+        }
+        
+        // Improved workload table validation
+        if (wlCount > 0) {
+          const workloadArray = charzData.workloadTable?.[searchType]?.[testType] || [];
+          // Always validate each workload field, even if array is missing or too short
+          for (let wlIdx = 0; wlIdx < wlCount; wlIdx++) {
+            const wlValue = workloadArray[wlIdx];
+            if (!wlValue || (typeof wlValue === 'string' && wlValue.trim() === '')) {
+              newErrors[`charz_${searchType}_${testType}_wl_${wlIdx}`] = `WL value #${wlIdx + 1} is required for ${searchType} / ${testType}`;
+            }
           }
         }
-      }
-      
-      if (!table.tp || table.tp.trim() === '') {
-        newErrors[`charz_${searchType}_${testType}_tp`] = 'Test Points are required for ' + searchType + ' / ' + testType;
-      }
-      if (!table.search_start || isNaN(Number(table.search_start))) {
-        newErrors[`charz_${searchType}_${testType}_search_start`] = 'Search Start is required and must be a number for ' + searchType + ' / ' + testType;
-      }
-      if (!table.search_end || isNaN(Number(table.search_end))) {
-        newErrors[`charz_${searchType}_${testType}_search_end`] = 'Search End is required and must be a number for ' + searchType + ' / ' + testType;
-      }
-      if (!table.resolution || isNaN(Number(table.resolution))) {
-        newErrors[`charz_${searchType}_${testType}_resolution`] = 'Resolution is required and must be a number for ' + searchType + ' / ' + testType;
-      }
-      if (!table.search_step || isNaN(Number(table.search_step))) {
-        newErrors[`charz_${searchType}_${testType}_search_step`] = 'Search Step is required and must be a number for ' + searchType + ' / ' + testType;
-      }
+        
+        if (!table.tp || table.tp.trim() === '') {
+          newErrors[`charz_${searchType}_${testType}_tp`] = 'Test Points are required for ' + searchType + ' / ' + testType;
+        }
+        if (!table.search_start || isNaN(Number(table.search_start))) {
+          newErrors[`charz_${searchType}_${testType}_search_start`] = 'Search Start is required and must be a number for ' + searchType + ' / ' + testType;
+        }
+        if (!table.search_end || isNaN(Number(table.search_end))) {
+          newErrors[`charz_${searchType}_${testType}_search_end`] = 'Search End is required and must be a number for ' + searchType + ' / ' + testType;
+        }
+        if (!table.resolution || isNaN(Number(table.resolution))) {
+          newErrors[`charz_${searchType}_${testType}_resolution`] = 'Resolution is required and must be a number for ' + searchType + ' / ' + testType;
+        }
+        if (!table.search_step || isNaN(Number(table.search_step))) {
+          newErrors[`charz_${searchType}_${testType}_search_step`] = 'Search Step is required and must be a number for ' + searchType + ' / ' + testType;
+        }
+      });
     });
-  });
 
-  if (!charzData.psm_register_size || isNaN(Number(charzData.psm_register_size))) {
-    newErrors.psm_register_size = 'PSM Register Size is required and must be a number.';
+    if (!charzData.psm_register_size || isNaN(Number(charzData.psm_register_size))) {
+      newErrors.psm_register_size = 'PSM Register Size is required and must be a number.';
+    }
   }
 
   return newErrors;
