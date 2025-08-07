@@ -33,13 +33,13 @@ const CoreMappings = ({ coreMappings, errors, handleCoreMappingChange }) => (
           onChange={e => handleCoreMappingChange(idx, 'clock', e.target.value)}
           className={errors[`clock_${idx}`] ? 'error single-input' : 'single-input'}
         />
-        <input
+        {/* <input
           type="text"
           placeholder="Frequency"
           value={mapping.frequency || ''}
           onChange={e => handleCoreMappingChange(idx, 'frequency', e.target.value)}
           className={errors[`frequency_${idx}`] ? 'error single-input' : 'single-input'}
-        />
+        /> */}
       </div>
     ))}
   </div>

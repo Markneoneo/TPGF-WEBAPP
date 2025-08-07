@@ -2,11 +2,27 @@
 
 // Helper function to validate test point range
 function validateTestPointRange(start, stop, step) {
+  // Check for empty or whitespace-only strings first
+  if (start === '' || start === null || start === undefined || 
+      (typeof start === 'string' && start.trim() === '')) {
+    return { isValid: false, message: 'Start value cannot be empty' };
+  }
+  
+  if (stop === '' || stop === null || stop === undefined || 
+      (typeof stop === 'string' && stop.trim() === '')) {
+    return { isValid: false, message: 'Stop value cannot be empty' };
+  }
+  
+  if (step === '' || step === null || step === undefined || 
+      (typeof step === 'string' && step.trim() === '')) {
+    return { isValid: false, message: 'Step value cannot be empty' };
+  }
+
   const startNum = Number(start);
   const stopNum = Number(stop);
   const stepNum = Number(step);
   
-  // Basic numeric validation
+  // Basic numeric validation (after checking for empty values)
   if (isNaN(startNum) || isNaN(stopNum) || isNaN(stepNum) || stepNum === 0) {
     return { isValid: false, message: 'All values must be valid numbers and step cannot be zero' };
   }
@@ -16,18 +32,70 @@ function validateTestPointRange(start, stop, step) {
     return { isValid: false, message: 'Step direction must match start-stop direction' };
   }
   
-  // Check if stop value is reachable with the given step
-  const range = Math.abs(stopNum - startNum);
-  const absStep = Math.abs(stepNum);
+  // Helper function to determine appropriate decimal places for rounding
+  const getDecimalPlaces = (num) => {
+    const numStr = num.toString();
+    if (numStr.indexOf('.') === -1) return 0;
+    return numStr.split('.')[1].length;
+  };
   
-  // Use a small epsilon for floating point comparison
-  const epsilon = 1e-10;
-  const remainder = range % absStep;
+  // Determine the precision we need to work with
+  const decimalPlaces = Math.max(
+    getDecimalPlaces(startNum), 
+    getDecimalPlaces(stopNum), 
+    getDecimalPlaces(stepNum)
+  );
   
-  if (remainder > epsilon) {
+  // Round all values to avoid floating point precision issues
+  const roundedStart = Number(startNum.toFixed(decimalPlaces));
+  const roundedStop = Number(stopNum.toFixed(decimalPlaces));
+  const roundedStep = Number(Math.abs(stepNum).toFixed(decimalPlaces));
+  
+  // Calculate the range using rounded values
+  const range = Number(Math.abs(roundedStop - roundedStart).toFixed(decimalPlaces));
+  
+  // Check if the range is evenly divisible by the step
+  const expectedSteps = range / roundedStep;
+  const roundedSteps = Math.round(expectedSteps);
+  
+  // Use a reasonable epsilon based on the decimal precision
+  const epsilon = Math.pow(10, -(decimalPlaces + 2));
+  
+  if (Math.abs(expectedSteps - roundedSteps) > epsilon) {
     return { 
       isValid: false, 
       message: `Step ${stepNum} cannot generate steady intervals from ${startNum} to ${stopNum}. The range (${range}) is not evenly divisible by the step.`
+    };
+  }
+  
+  // Verify that we can actually reach the stop value by simulating the generation
+  let current = roundedStart;
+  const actualStep = stepNum > 0 ? roundedStep : -roundedStep;
+  let reachesStop = false;
+  
+  // Limit iterations to prevent infinite loops
+  const maxIterations = 1000;
+  let iterations = 0;
+  
+  while (iterations < maxIterations) {
+    current = Number((current + actualStep).toFixed(decimalPlaces));
+    iterations++;
+    
+    if (Math.abs(current - roundedStop) < epsilon) {
+      reachesStop = true;
+      break;
+    }
+    
+    // Check if we've gone past the stop value
+    if ((actualStep > 0 && current > roundedStop) || (actualStep < 0 && current < roundedStop)) {
+      break;
+    }
+  }
+  
+  if (!reachesStop) {
+    return { 
+      isValid: false, 
+      message: `Step ${stepNum} cannot reach the stop value ${stopNum} from start ${startNum}.`
     };
   }
   
@@ -54,7 +122,7 @@ export default function validate({
     if (!mapping.core || typeof mapping.core !== 'string' || mapping.core.trim() === '') newErrors[`core_${idx}`] = 'Core is required.';
     if (!mapping.core_count || isNaN(Number(mapping.core_count)) || Number(mapping.core_count) < 1) newErrors[`core_count_${idx}`] = 'Core Count is required and must be at least 1.';
     if (!mapping.supply || typeof mapping.supply !== 'string' || mapping.supply.trim() === '') newErrors[`supply_${idx}`] = 'Supply is required.';
-    if (!mapping.frequency || isNaN(Number(mapping.frequency))) newErrors[`frequency_${idx}`] = 'Frequency is required and must be a number.';
+    // if (!mapping.frequency || isNaN(Number(mapping.frequency))) newErrors[`frequency_${idx}`] = 'Frequency is required and must be a number.';
     if (!mapping.clock || typeof mapping.clock !== 'string' || mapping.clock.trim() === '') newErrors[`clock_${idx}`] = 'Clock is required.';
   });
 
@@ -188,3 +256,5 @@ export default function validate({
 
   return newErrors;
 }
+
+export { validateTestPointRange };

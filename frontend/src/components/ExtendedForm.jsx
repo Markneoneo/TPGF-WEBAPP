@@ -10,7 +10,8 @@ import validateForm from '../utils/validateForm';
 const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
   // Only keep state for fields you need
   const [errors, setErrors] = useState({});
-  const [coreMappings, setCoreMappings] = useState([{ core: '', core_count: '', supply: '', frequency: '', clock: '' }]);
+  // const [coreMappings, setCoreMappings] = useState([{ core: '', core_count: '', supply: '', frequency: '', clock: '' }]);
+  const [coreMappings, setCoreMappings] = useState([{ core: '', core_count: '', supply: '', clock: '' }]);
   const [numCoreTypes, setNumCoreTypes] = useState('1');
   const [specVariable, setSpecVariable] = useState('');
   const [selectedFlowOrders, setSelectedFlowOrders] = useState([]);
@@ -35,7 +36,8 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
         const arr = [...prev];
         if (arr.length < num) {
           // Add rows
-          while (arr.length < num) arr.push({ core: '', core_count: '', supply: '', frequency: '', clock: '' });
+          // while (arr.length < num) arr.push({ core: '', core_count: '', supply: '', frequency: '', clock: '' });
+          while (arr.length < num) arr.push({ core: '', core_count: '', supply: '', clock: '' });
         } else if (arr.length > num) {
           // Remove rows
           arr.length = num;
@@ -82,7 +84,9 @@ const handleFlowOrderChange = (order) => {
           insertion: mappings[order]?.insertion || '',
           binnable: mappings[order]?.binnable || false,
           softsetenable: mappings[order]?.softsetenable || false,
-          fallbackenable: mappings[order]?.fallbackenable || false
+          fallbackenable: mappings[order]?.fallbackenable || false,
+          read_type_jtag: mappings[order]?.read_type_jtag || false,
+          read_type_fw: mappings[order]?.read_type_fw || false
         }
       }));
       return [...prev, order];
@@ -105,7 +109,8 @@ const handleFlowOrderChange = (order) => {
   // Clear form data
   const clearForm = () => {
     setNumCoreTypes('1');
-    setCoreMappings([{ core: '', core_count: '', supply: '', frequency: '', clock: '' }]);
+    // setCoreMappings([{ core: '', core_count: '', supply: '', frequency: '', clock: '' }]);
+    setCoreMappings([{ core: '', core_count: '', supply: '', clock: '' }]);
     setSpecVariable('');
     setSelectedFlowOrders([]);
     setProductionMappings({});

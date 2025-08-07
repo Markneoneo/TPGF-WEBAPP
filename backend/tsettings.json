@@ -1,47 +1,38 @@
 {
-  "soc": {
+  "gfx": {
     "1": {
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_soc_1_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_soc_1_fwload"
+          "burst": "avfs_gfx_1_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_gfx_1_fwload"
         }
       },
       "prod_settings": {
         "minpsm": {
-          "burst": "avfs_soc_1_minpsm_burst",
+          "burst": "avfs_gfx_1_minpsm_burst",
           "binnable": true,
           "test_points": {
             "spec_variable": "1",
             "values": {
               "tp0": {
-                "value": 0
+                "value": 1
               },
               "tp1": {
                 "value": 2
               },
               "tp2": {
-                "value": 4
-              },
-              "tp3": {
-                "value": 6
-              },
-              "tp4": {
-                "value": 8
-              },
-              "tp5": {
-                "value": 10
+                "value": 3
               }
             }
           },
           "register_setup": {
             "vector_variable": {
-              "avfs_soc_1_minpsm": 512
+              "avfs_gfx_1_minpsm": 512
             }
           },
-          "softsets": "SoftsetProfile_avfs_soc_1_minpsm",
+          "softsets": "SoftsetProfile_avfs_gfx_1_minpsm",
           "insertion_list": [
-            "ws1"
+            "1"
           ],
           "fallback_enable": true
         }
@@ -50,10 +41,9 @@
         "bycore": {
           "vmin": {
             "crest": {},
-            "bist": {},
-            "pbist": {
+            "bist": {
               "1": {
-                "burst": "avfs_soc_1_pbist_1_burst",
+                "burst": "avfs_gfx_1_bist_1_burst",
                 "binnable": false,
                 "test_points": {
                   "spec_variable": "1",
@@ -61,7 +51,7 @@
                     "1": {
                       "override_primaries": {},
                       "softsets": {
-                        "profile_name": "SoftsetProfile_avfs_soc_1_pbist_1"
+                        "profile_name": "SoftsetProfile_avfs_gfx_1_bist_1"
                       }
                     }
                   }
@@ -77,12 +67,13 @@
                   "burst": "",
                   "register_setup": {
                     "vector_variable": {
-                      "avfs_soc_1_pbist_1_minPSM": 512
+                      "avfs_gfx_1_bist_1_minPSM": 512
                     }
                   }
                 }
               }
-            }
+            },
+            "pbist": {}
           }
         }
       }

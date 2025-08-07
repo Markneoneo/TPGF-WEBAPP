@@ -63,8 +63,8 @@ function transformFormDataToBackend(formData) {
     core_mapping[m.core] = {
       count: Number(m.core_count),
       supply: m.supply,
-      clk: m.clock,
-      freq: Number(m.frequency)
+      clk: m.clock
+      // freq: Number(m.frequency)
     };
   });
 
@@ -76,10 +76,12 @@ function transformFormDataToBackend(formData) {
       ':test_points': parseFlowOrderTestPoints(m),
       ':frequency': Number(m.frequency),
       ':register_size': Number(m.register_size),
-      ':insertionlist': parseInsertionList(m.insertion), // Change to Insertion
+      ':insertionlist': parseInsertionList(m.insertion), 
       ':binnable': !!m.binnable,
       ':softsetenable': !!m.softsetenable, 
-      ':fallbackenable': !!m.fallbackenable 
+      ':fallbackenable': !!m.fallbackenable,
+      ':read_type_jtag': !!m.read_type_jtag,
+      ':read_type_fw': !!m.read_type_fw
     };
   });
 

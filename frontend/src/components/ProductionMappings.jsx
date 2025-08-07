@@ -37,6 +37,33 @@ const ProductionMappings = ({
       <div key={order} className="production-mapping-block">
         <strong>{order.toUpperCase()} Mapping</strong>
 
+        {/* Read Type Checkboxes */}
+        <div className="form-group">
+          <label>Read Type</label>
+          <div className="checkbox-group">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                className="checkbox-input"
+                checked={!!productionMappings[order]?.read_type_jtag}
+                onChange={e => handleProductionMappingChange(order, 'read_type_jtag', e.target.checked)}
+              />
+              <span className="checkbox-custom"></span>
+              JTAG
+            </label>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                className="checkbox-input"
+                checked={!!productionMappings[order]?.read_type_fw}
+                onChange={e => handleProductionMappingChange(order, 'read_type_fw', e.target.checked)}
+              />
+              <span className="checkbox-custom"></span>
+              FW
+            </label>
+          </div>
+        </div>
+
         {/* Test Points Dropdown and Conditional Fields */}
         <div style={{ marginBottom: 4 }}>
           <select

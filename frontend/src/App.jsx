@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import ExtendedForm from './components/ExtendedForm'
 import transformFormDataToBackend from './utils/transformFormDataToBackend';
 import './App.css'
+import { runAllTests } from './utils/testPointValidation.test.js';
 
 function App() {
   const [selectedIpTypes, setSelectedIpTypes] = useState([]);
@@ -105,6 +106,20 @@ function App() {
     }
   };
 
+  const handleRunTests = () => {
+    console.log('🧪 Running validation tests...');
+    try {
+      const results = runAllTests();
+      console.log('✅ Test execution completed. Check console output above for detailed results.');
+      
+      // Optional: Show a brief alert with summary
+      alert(`Tests completed!\nOverall: ${results.overall.passed}/${results.overall.total} (${results.overall.successRate.toFixed(1)}%)\nCheck console for details.`);
+    } catch (error) {
+      console.error('❌ Error running tests:', error);
+      alert('Error running tests. Check console for details.');
+    }
+  };
+
   const clearAll = () => {
     // Clear all form data using refs
     selectedIpTypes.forEach(ipType => {
@@ -168,6 +183,23 @@ function App() {
               >
                 {isProcessing ? 'Generating Files...' : 'Generate Combined File'}
               </button>
+              
+              {/* Test Button - Only show in development */}
+              {process.env.NODE_ENV === 'development' && (
+                <button
+                  onClick={handleRunTests}
+                  className="secondary-button"
+                  style={{
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    border: '1px solid #007bff'
+                  }}
+                  title="Run validation tests for test point ranges"
+                >
+                  Run Tests
+                </button>
+              )}
+
               <button onClick={clearAll} className="secondary-button">
                 Clear All
               </button>
