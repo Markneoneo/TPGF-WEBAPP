@@ -248,7 +248,22 @@ const handleFlowOrderChange = (order) => {
             <input
               type="checkbox"
               checked={showCharz}
-              onChange={() => setShowCharz(prev => !prev)}
+              onChange={() => {
+                setShowCharz(prev => {
+                  const next = !prev;
+                  if (!next) {
+                    setCharzData({
+                      search_granularity: [],
+                      search_types: [],
+                      selectedTestTypes: {},
+                      table: {},
+                      workloadTable: {},
+                      psm_register_size: ''
+                    });
+                  }
+                  return next;
+                });
+              }}
               className="checkbox-input"
             />
             <span className="checkbox-custom"></span>

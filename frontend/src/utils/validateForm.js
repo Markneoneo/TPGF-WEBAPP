@@ -123,7 +123,6 @@ export default function validate({
     if (!mapping.core || typeof mapping.core !== 'string' || mapping.core.trim() === '') newErrors[`core_${idx}`] = 'Core is required.';
     if (!mapping.core_count || isNaN(Number(mapping.core_count)) || Number(mapping.core_count) < 1) newErrors[`core_count_${idx}`] = 'Core Count is required and must be at least 1.';
     if (!mapping.supply || typeof mapping.supply !== 'string' || mapping.supply.trim() === '') newErrors[`supply_${idx}`] = 'Supply is required.';
-    // if (!mapping.frequency || isNaN(Number(mapping.frequency))) newErrors[`frequency_${idx}`] = 'Frequency is required and must be a number.';
     if (!mapping.clock || typeof mapping.clock !== 'string' || mapping.clock.trim() === '') newErrors[`clock_${idx}`] = 'Clock is required.';
   });
 
@@ -140,6 +139,11 @@ export default function validate({
   selectedFlowOrders.forEach(order => {
     const mapping = productionMappings[order] || {};
     
+    // Require at least one of read_type_jtag or read_type_fw for each selected flow order
+    if (!mapping.read_type_jtag && !mapping.read_type_fw) {
+      newErrors[`read_type_${order}`] = 'At least one Read Type (JTAG or FW) must be selected for ' + order;
+    }
+
     // Always validate test_points_type
     if (!mapping.test_points_type || (mapping.test_points_type !== 'List' && mapping.test_points_type !== 'Range')) {
       newErrors[`test_points_type_${order}`] = 'Test Points Type is required for ' + order;

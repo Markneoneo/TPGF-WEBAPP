@@ -1,7 +1,7 @@
 import React from 'react';
 import './ProductionMappings.css';
 
-const FLOW_ORDERS = ['AVGPSM', 'MINPSM', 'DLDOAVGPSM', 'DLDOMINPSM', 'CPO', 'FAVFS', 'MAFDD', 'DFLL'];
+const FLOW_ORDERS = ['AVGPSM', 'MINPSM', 'DLDOAVGPSM', 'DLDOMINPSM', 'CPO', 'FAVFS', 'MAFDD', 'DFLL', 'XVMIN', 'XVMINDD'];
 
 const ProductionMappings = ({
   selectedFlowOrders,
@@ -40,6 +40,7 @@ const ProductionMappings = ({
         {/* Read Type Checkboxes */}
         <div className="form-group">
           <label>Read Type</label>
+          {errors[`read_type_${order}`] && (<span className="error-message">{errors[`read_type_${order}`]}</span>)}
           <div className="checkbox-group">
             <label className="checkbox-label">
               <input

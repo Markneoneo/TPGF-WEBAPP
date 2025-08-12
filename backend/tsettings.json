@@ -8,56 +8,26 @@
         }
       },
       "prod_settings": {
-        "minpsm": {
-          "burst": "avfs_cpu_1_minpsm_burst",
+        "xvmindd": {
+          "burst": "avfs_cpu_1_xvmindd_burst",
           "binnable": true,
           "test_points": {
             "spec_variable": "1",
             "values": {
               "tp0": {
-                "value": 12
+                "value": 1
               },
               "tp1": {
-                "value": 11
-              },
-              "tp2": {
-                "value": 10
-              },
-              "tp3": {
-                "value": 9
-              },
-              "tp4": {
-                "value": 8
-              },
-              "tp5": {
-                "value": 7
-              },
-              "tp6": {
-                "value": 6
-              },
-              "tp7": {
-                "value": 5
-              },
-              "tp8": {
-                "value": 4
-              },
-              "tp9": {
-                "value": 3
-              },
-              "tp10": {
                 "value": 2
-              },
-              "tp11": {
-                "value": 1
               }
             }
           },
           "register_setup": {
             "vector_variable": {
-              "avfs_cpu_1_minpsm": 512
+              "avfs_cpu_1_xvmindd": 512
             }
           },
-          "softsets": "SoftsetProfile_avfs_cpu_1_minpsm",
+          "softsets": "SoftsetProfile_avfs_cpu_1_xvmindd",
           "insertion_list": [
             "1"
           ],
