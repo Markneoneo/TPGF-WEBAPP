@@ -1,8 +1,5 @@
 .production-section {
   background: #f9f6ef;
-  border: 1.5px solid #ffe5b4;
-  border-radius: 10px;
-  padding: 1rem 1.2rem;
   margin-bottom: 1rem;
   box-shadow: 0 2px 8px rgba(255, 179, 0, 0.06);
 }

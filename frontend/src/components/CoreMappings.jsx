@@ -23,6 +23,8 @@ const CoreMappings = ({
 
         <div className="form-group" style={{ marginBottom: '0.75rem' }}>
           <label htmlFor={`spec_variable_${idx}`}>Core Type {idx + 1}</label>
+          <hr className="form-divider" />
+
           <input
             type="text"
             id={`spec_variable_${idx}`}
@@ -67,7 +69,7 @@ const CoreMappings = ({
         </div>
 
         {/* Production Parameters for this core type */}
-        <div className="production-section" style={{ marginTop: '1rem', marginBottom: '1rem', marginLeft: '1rem', border: '1px solid #b36b00', borderRadius: '4px', padding: '1rem' }}>
+        <div className="production-section" style={{ marginTop: '1rem', marginBottom: '1rem', border: '1px solid #b36b00', borderRadius: '4px', padding: '1rem' }}>
           <h5 style={{ borderBottom: '1px solid #b36b00', color: '#b36b00', marginBottom: '1rem' }}>
             Production Parameters for Core {idx + 1}
           </h5>
@@ -97,7 +99,7 @@ const CoreMappings = ({
 
         {/* Charz Parameters for this core type */}
         {showCharzForCore[idx] && (
-          <div style={{ marginLeft: '1rem', border: '1px solid #6f42c1', borderRadius: '4px', padding: '1rem', marginBottom: '1rem' }}>
+          <div style={{ borderRadius: '4px', padding: '1rem', marginBottom: '1rem' }}>
             <h5 style={{ borderBottom: '1px solid #6f42c1', color: '#6f42c1', marginBottom: '1rem' }}>
               Charz Parameters for Core {idx + 1}
             </h5>
@@ -110,6 +112,7 @@ const CoreMappings = ({
             />
           </div>
         )}
+
       </div>
     ))}
   </div>
