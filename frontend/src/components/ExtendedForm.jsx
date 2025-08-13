@@ -244,83 +244,79 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
     <div className="extended-form" data-ip-type={ipType}>
       <h3 className="form-title">{ipType} Configuration</h3>
       <div className="form-container">
-        {/* Common Parameters */}
-        <div className="core-mappings-section" style={{ marginBottom: '2rem' }}>
-          <h4 style={{ borderBottom: '1px solid #007bff', color: '#007bff', marginBottom: '1rem' }}>Common Parameters</h4>
 
-          {/* Number of Core Types as number input */}
-          <div className="form-group">
-            <label htmlFor={`num_core_types_${ipType}`}>Number of Core Types</label>
-            <div className="number-input-container">
-              <button
-                type="button"
-                className="number-btn"
-                onClick={() => {
-                  const current = parseInt(numCoreTypes || '0', 10);
-                  if (current > 1) {
-                    const e = { target: { value: String(current - 1) } };
-                    handleNumCoreTypesChange(e);
-                  }
-                }}
-                disabled={parseInt(numCoreTypes) <= 1}
-              >-</button>
-              <input
-                type="number"
-                min="1"
-                id={`num_core_types_${ipType}`}
-                name="num_core_types"
-                placeholder="1"
-                value={numCoreTypes}
-                onChange={handleNumCoreTypesChange}
-                className={errors.num_core_types ? 'error number-input' : 'number-input'}
-              />
-              <button
-                type="button"
-                className="number-btn"
-                onClick={() => {
-                  const current = parseInt(numCoreTypes || '0', 10);
-                  const e = { target: { value: String(current + 1) } };
+        {/* Number of Core Types as number input */}
+        <div className="form-group core-types-group">
+          <label htmlFor={`num_core_types_${ipType}`}>Number of Core Types: </label>
+          <div className="number-input-container">
+            <button
+              type="button"
+              className="number-btn"
+              onClick={() => {
+                const current = parseInt(numCoreTypes || '0', 10);
+                if (current > 1) {
+                  const e = { target: { value: String(current - 1) } };
                   handleNumCoreTypesChange(e);
-                }}
-              >+</button>
-            </div>
-            {errors.num_core_types && <span className="error-message">{errors.num_core_types}</span>}
+                }
+              }}
+              disabled={parseInt(numCoreTypes) <= 1}
+            >-</button>
+            <input
+              type="number"
+              min="1"
+              id={`num_core_types_${ipType}`}
+              name="num_core_types"
+              placeholder="1"
+              value={numCoreTypes}
+              onChange={handleNumCoreTypesChange}
+              className={errors.num_core_types ? 'error number-input' : 'number-input'}
+            />
+            <button
+              type="button"
+              className="number-btn"
+              onClick={() => {
+                const current = parseInt(numCoreTypes || '0', 10);
+                const e = { target: { value: String(current + 1) } };
+                handleNumCoreTypesChange(e);
+              }}
+            >+</button>
           </div>
+          {errors.num_core_types && <span className="error-message">{errors.num_core_types}</span>}
+        </div>
 
-          {/* Dynamic core mappings with production and charz parameters for each */}
-          {coreMappings.length > 0 && (
-            <div className="core-mappings-container">
-              <div className="section-header">
-                <h5>Core Mappings</h5>
-                <span className="section-badge">{coreMappings.length} core{coreMappings.length !== 1 ? 's' : ''}</span>
-              </div>
-              <CoreMappings
-                coreMappings={coreMappings}
-                errors={errors}
-                handleCoreMappingChange={handleCoreMappingChange}
-                productionMappings={productionMappings}
-                charzData={charzData}
-                selectedFlowOrders={selectedFlowOrders}
-                showCharzForCore={showCharzForCore}
-                handleFlowOrderChange={handleFlowOrderChange}
-                handleProductionMappingChange={handleProductionMappingChange}
-                handleCharzToggle={handleCharzToggle}
-                setCharzData={handleCharzDataChange}
-                ipType={ipType}
-              />
+        {/* Dynamic core mappings with production and charz parameters for each */}
+        {coreMappings.length > 0 && (
+          <div className="core-mappings-container">
+            <div className="section-header">
+              <h5>Core Mappings</h5>
+              <span className="section-badge">{coreMappings.length} core{coreMappings.length !== 1 ? 's' : ''}</span>
             </div>
-          )}
-        </div>
-
-        {errors.submit && <div className="error-message">{errors.submit}</div>}
-
-        <div className="form-actions">
-          <button onClick={clearForm} className="action-button clear-button">
-            <span>🗑️</span> Clear Form
-          </button>
-        </div>
-
+            <CoreMappings
+              coreMappings={coreMappings}
+              errors={errors}
+              handleCoreMappingChange={handleCoreMappingChange}
+              productionMappings={productionMappings}
+              charzData={charzData}
+              selectedFlowOrders={selectedFlowOrders}
+              showCharzForCore={showCharzForCore}
+              handleFlowOrderChange={handleFlowOrderChange}
+              handleProductionMappingChange={handleProductionMappingChange}
+              handleCharzToggle={handleCharzToggle}
+              setCharzData={handleCharzDataChange}
+              ipType={ipType}
+            />
+          </div>
+        )}
       </div>
+
+      {errors.submit && <div className="error-message">{errors.submit}</div>}
+
+      <div className="form-actions">
+        <button onClick={clearForm} className="action-button clear-button">
+          <span>🗑️</span> Clear Form
+        </button>
+      </div>
+
     </div>
   );
 });

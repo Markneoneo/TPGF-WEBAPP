@@ -1,3 +1,25 @@
+.form-group label {
+  color: black !important;
+  display: block;
+  padding-left: 3px;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  margin: 0; /* remove default bottom margin */
+  white-space: nowrap; /* keep label on one line */
+}
+
+.core-types-group {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centers horizontally */
+  gap: 0.5rem;
+  width: 100%; /* make sure it can center in the container */
+}
+
+.core-types-group .error-message {
+  margin-left: 0.5rem; /* optional spacing tweak */
+}
+
 /* Number input styling */
 .number-input-container {
   display: flex;
@@ -12,27 +34,34 @@
   border: none;
   padding: 0.5rem;
   text-align: center;
-  width: 80px;
+  width: 40px;
   font-size: 1rem;
+  background: white;
+  color: black ;
 }
 
-.number-input:focus {
+.number-btn:focus {
   outline: none;
-  background-color: #f8f9fa;
+}
+
+.number-btn:focus-visible {
+  outline: 2px solid #007bff; /* optional custom focus style for keyboard users */
 }
 
 .number-btn {
-  background: #f8f9fa;
+  background: #007bff;
   border: none;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   font-size: 1.1rem;
   font-weight: bold;
-  transition: background-color 0.2s;
+  width: 40px; /* fixed width so both buttons are same size */
+  text-align: center;
+  line-height: 1; /* centers symbol vertically better */
 }
 
 .number-btn:hover:not(:disabled) {
-  background: #e9ecef;
+  background: #0056b3;
 }
 
 .number-btn:disabled {

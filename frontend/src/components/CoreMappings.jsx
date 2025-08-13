@@ -22,11 +22,11 @@ const CoreMappings = ({
       <div key={idx} className="core-mapping-container">
 
         <div className="form-group" style={{ marginBottom: '0.75rem' }}>
-          <label htmlFor={`spec_variable_${idx}`}>Spec Variable for Core {idx + 1}</label>
+          <label htmlFor={`spec_variable_${idx}`}>Core Type {idx + 1}</label>
           <input
             type="text"
             id={`spec_variable_${idx}`}
-            placeholder="Enter spec variable"
+            placeholder="Spec variable"
             value={mapping.spec_variable || ''}
             onChange={e => handleCoreMappingChange(idx, 'spec_variable', e.target.value)}
             className={errors[`spec_variable_${idx}`] ? 'error single-input' : 'single-input'}
