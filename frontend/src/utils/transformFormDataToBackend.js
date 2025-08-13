@@ -63,62 +63,88 @@ function transformFormDataToBackend(formData) {
     core_mapping[m.core] = {
       count: Number(m.core_count),
       supply: m.supply,
-      clk: m.clock
-      // freq: Number(m.frequency)
+      clk: m.clock,
+      spec_variable: m.spec_variable
     };
   });
 
-  // 2. floworder_mapping (with symbol-like keys)
+  // 2. floworder_mapping - now needs to combine all core types
   const floworder_mapping = {};
-  (formData.flow_orders || []).forEach(order => {
-    const m = formData.production_mappings[order] || {};
-    floworder_mapping[order.toLowerCase()] = {
-      ':test_points': parseFlowOrderTestPoints(m),
-      ':frequency': Number(m.frequency),
-      ':register_size': Number(m.register_size),
-      ':insertionlist': parseInsertionList(m.insertion), 
-      ':binnable': !!m.binnable,
-      ':softsetenable': !!m.softsetenable, 
-      ':fallbackenable': !!m.fallbackenable,
-      ':read_type_jtag': !!m.read_type_jtag,
-      ':read_type_fw': !!m.read_type_fw
-    };
+  
+  // Loop through each core type's flow orders and production mappings
+  (formData.flow_orders || []).forEach((coreFlowOrders, coreIndex) => {
+    if (!Array.isArray(coreFlowOrders)) return;
+    
+    coreFlowOrders.forEach(order => {
+      const coreProductionMappings = formData.production_mappings[coreIndex] || {};
+      const m = coreProductionMappings[order] || {};
+      
+      // Create a unique key for this core-order combination
+      const orderKey = `${order.toLowerCase()}_core_${coreIndex}`;
+      
+      floworder_mapping[orderKey] = {
+        ':core_index': coreIndex,
+        ':core_name': formData.core_mappings[coreIndex]?.core || `core_${coreIndex}`,
+        ':spec_variable': formData.core_mappings[coreIndex]?.spec_variable || '', 
+        ':test_points': parseFlowOrderTestPoints(m),
+        ':frequency': Number(m.frequency),
+        ':register_size': Number(m.register_size),
+        ':insertionlist': parseInsertionList(m.insertion), 
+        ':binnable': !!m.binnable,
+        ':softsetenable': !!m.softsetenable, 
+        ':fallbackenable': !!m.fallbackenable,
+        ':read_type_jtag': !!m.read_type_jtag,
+        ':read_type_fw': !!m.read_type_fw
+      };
+    });
   });
 
-// 3. charztype_mapping
-const charz = formData.charz || {};
-const charztype_mapping = {
-  // ':granularity': [charz.search_granularity],
-  // Use the array directly instead of wrapping in another array
-  ':granularity': charz.search_granularity || [],
-  ':searchtype': {}
-};
-
-(charz.search_types || []).forEach(type => {
-  charztype_mapping[':searchtype'][type] = { ':testtype': {} };
-  ['CREST', 'BIST', 'PBIST'].forEach(testType => {
-    const table = charz.table?.[type]?.[testType] || {};
-    const wlArr = charz.workloadTable?.[type]?.[testType] || [];
-    charztype_mapping[':searchtype'][type][':testtype'][testType.toLowerCase()] = {
-      ':wl_count': Number(table.wl_count),
-      ':wl': wlArr,
-      ':test_points': (table.tp || '').split(',').map(Number).filter(n => !isNaN(n)),
-      ':searchsettings': {
-        ':start': table.search_start,
-        ':stop': table.search_end,
-        ':res': table.resolution,
-        ':step': table.search_step
-      }
+  // 3. charztype_mapping - now needs to handle per-core charz data
+  const charztype_mapping = {};
+  
+  // Loop through each core type's charz data
+  (formData.charz_data || []).forEach((charzData, coreIndex) => {
+    // Only process if charz is enabled for this core
+    if (!formData.show_charz_for_core || !formData.show_charz_for_core[coreIndex]) {
+      return;
+    }
+    
+    const charz = charzData || {};
+    const coreKey = `core_${coreIndex}`;
+    
+    charztype_mapping[coreKey] = {
+      ':core_index': coreIndex,
+      ':core_name': formData.core_mappings[coreIndex]?.core || `core_${coreIndex}`,
+      ':spec_variable': formData.core_mappings[coreIndex]?.spec_variable || '',
+      ':granularity': charz.search_granularity || [],
+      ':searchtype': {}
     };
+
+    (charz.search_types || []).forEach(type => {
+      charztype_mapping[coreKey][':searchtype'][type] = { ':testtype': {} };
+      ['CREST', 'BIST', 'PBIST'].forEach(testType => {
+        const table = charz.table?.[type]?.[testType] || {};
+        const wlArr = charz.workloadTable?.[type]?.[testType] || [];
+        charztype_mapping[coreKey][':searchtype'][type][':testtype'][testType.toLowerCase()] = {
+          ':wl_count': Number(table.wl_count),
+          ':wl': wlArr,
+          ':test_points': (table.tp || '').split(',').map(Number).filter(n => !isNaN(n)),
+          ':searchsettings': {
+            ':start': table.search_start,
+            ':stop': table.search_end,
+            ':res': table.resolution,
+            ':step': table.search_step
+          }
+        };
+      });
+    });
   });
-});
 
   // 4. Compose final object
   return {
     ip: 'cpu', // or from formData if available
     coretypes: Number(formData.num_core_types),
     core_mapping,
-    spec_variable: formData.spec_variable,
     floworder_mapping,
     charztype_mapping
   };

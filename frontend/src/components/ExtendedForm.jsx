@@ -1,29 +1,26 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
 import { getStandardizedTestPoints } from '../utils/testPointParser';
 import CoreMappings from './CoreMappings';
-import ProductionMappings from './ProductionMappings';
-import CharzParameters from './CharzParameters';
 import './ExtendedForm.css';
 import './CharzParameters.css';
 import validateForm from '../utils/validateForm';
 
 const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
-  // Only keep state for fields you need
   const [errors, setErrors] = useState({});
-  // const [coreMappings, setCoreMappings] = useState([{ core: '', core_count: '', supply: '', frequency: '', clock: '' }]);
-  const [coreMappings, setCoreMappings] = useState([{ core: '', core_count: '', supply: '', clock: '' }]);
+  const [coreMappings, setCoreMappings] = useState([{ core: '', core_count: '', supply: '', clock: '', spec_variable: '' }]);
   const [numCoreTypes, setNumCoreTypes] = useState('1');
-  const [specVariable, setSpecVariable] = useState('');
-  const [selectedFlowOrders, setSelectedFlowOrders] = useState([]);
-  const [productionMappings, setProductionMappings] = useState({});
-  const [showCharz, setShowCharz] = useState(false);
-  const [charzData, setCharzData] = useState({
+
+  // Changed: Now arrays indexed by core type
+  const [selectedFlowOrders, setSelectedFlowOrders] = useState([[]]);
+  const [productionMappings, setProductionMappings] = useState([{}]);
+  const [showCharzForCore, setShowCharzForCore] = useState([false]);
+  const [charzData, setCharzData] = useState([{
     search_granularity: '',
     search_types: [],
     table: {},
-    workloadTable: {}, 
+    workloadTable: {},
     psm_register_size: '',
-  });
+  }]);
 
   // Handle number of core types change
   const handleNumCoreTypesChange = (e) => {
@@ -36,17 +33,53 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
       setCoreMappings(prev => {
         const arr = [...prev];
         if (arr.length < num) {
-          // Add rows
-          // while (arr.length < num) arr.push({ core: '', core_count: '', supply: '', frequency: '', clock: '' });
-          while (arr.length < num) arr.push({ core: '', core_count: '', supply: '', clock: '' });
+          while (arr.length < num) arr.push({ core: '', core_count: '', supply: '', clock: '', spec_variable: '' });
         } else if (arr.length > num) {
-          // Remove rows
           arr.length = num;
         }
         return arr;
       });
+
+      // Resize other arrays to match
+      setSelectedFlowOrders(prev => {
+        const arr = [...prev];
+        while (arr.length < num) arr.push([]);
+        if (arr.length > num) arr.length = num;
+        return arr;
+      });
+
+      setProductionMappings(prev => {
+        const arr = [...prev];
+        while (arr.length < num) arr.push({});
+        if (arr.length > num) arr.length = num;
+        return arr;
+      });
+
+      setShowCharzForCore(prev => {
+        const arr = [...prev];
+        while (arr.length < num) arr.push(false);
+        if (arr.length > num) arr.length = num;
+        return arr;
+      });
+
+      setCharzData(prev => {
+        const arr = [...prev];
+        while (arr.length < num) arr.push({
+          search_granularity: '',
+          search_types: [],
+          table: {},
+          workloadTable: {},
+          psm_register_size: '',
+        });
+        if (arr.length > num) arr.length = num;
+        return arr;
+      });
     } else {
       setCoreMappings([]);
+      setSelectedFlowOrders([]);
+      setProductionMappings([]);
+      setShowCharzForCore([]);
+      setCharzData([]);
     }
   };
 
@@ -59,69 +92,117 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
     });
   };
 
-// Handle flow order selection (multi-select)
-const handleFlowOrderChange = (order) => {
-  setSelectedFlowOrders(prev => {
-    if (prev.includes(order)) {
-      // Remove the order and its mapping
-      setProductionMappings(mappings => {
-        const updated = { ...mappings };
-        delete updated[order];
-        return updated;
-      });
-      return prev.filter(o => o !== order);
-    } else {
-      // Add the order and initialize its mapping with default values
-      setProductionMappings(mappings => ({
-        ...mappings,
-        [order]: {
-          ...mappings[order], // Keep any existing values
-          test_points_type: mappings[order]?.test_points_type || 'Range', // Set default
-          test_points_start: mappings[order]?.test_points_start || '',
-          test_points_stop: mappings[order]?.test_points_stop || '',
-          test_points_step: mappings[order]?.test_points_step || '',
-          frequency: mappings[order]?.frequency || '',
-          register_size: mappings[order]?.register_size || '',
-          insertion: mappings[order]?.insertion || '',
-          binnable: mappings[order]?.binnable || false,
-          softsetenable: mappings[order]?.softsetenable || false,
-          fallbackenable: mappings[order]?.fallbackenable || false,
-          read_type_jtag: mappings[order]?.read_type_jtag || false,
-          read_type_fw: mappings[order]?.read_type_fw || false
-        }
-      }));
-      return [...prev, order];
-    }
-  });
-};
-
-
-  // Handle production mapping field change
-  const handleProductionMappingChange = (order, field, value) => {
-    setProductionMappings(prev => ({
-      ...prev,
-      [order]: {
-        ...prev[order],
-        [field]: value
+  // Handle flow order selection for specific core type
+  const handleFlowOrderChange = (coreIndex, order) => {
+    setSelectedFlowOrders(prev => {
+      const newFlowOrders = [...prev];
+      if (!newFlowOrders[coreIndex]) {
+        newFlowOrders[coreIndex] = [];
       }
-    }));
+
+      if (newFlowOrders[coreIndex].includes(order)) {
+        // Remove the order and its mapping
+        newFlowOrders[coreIndex] = newFlowOrders[coreIndex].filter(o => o !== order);
+        setProductionMappings(mappings => {
+          const updated = [...mappings];
+          if (updated[coreIndex]) {
+            delete updated[coreIndex][order];
+          }
+          return updated;
+        });
+      } else {
+        // Add the order and initialize its mapping
+        newFlowOrders[coreIndex] = [...newFlowOrders[coreIndex], order];
+        setProductionMappings(mappings => {
+          const updated = [...mappings];
+          if (!updated[coreIndex]) {
+            updated[coreIndex] = {};
+          }
+          updated[coreIndex][order] = {
+            ...updated[coreIndex][order],
+            test_points_type: updated[coreIndex][order]?.test_points_type || 'Range',
+            test_points_start: updated[coreIndex][order]?.test_points_start || '',
+            test_points_stop: updated[coreIndex][order]?.test_points_stop || '',
+            test_points_step: updated[coreIndex][order]?.test_points_step || '',
+            frequency: updated[coreIndex][order]?.frequency || '',
+            register_size: updated[coreIndex][order]?.register_size || '',
+            insertion: updated[coreIndex][order]?.insertion || '',
+            binnable: updated[coreIndex][order]?.binnable || false,
+            softsetenable: updated[coreIndex][order]?.softsetenable || false,
+            fallbackenable: updated[coreIndex][order]?.fallbackenable || false,
+            read_type_jtag: updated[coreIndex][order]?.read_type_jtag || false,
+            read_type_fw: updated[coreIndex][order]?.read_type_fw || false
+          };
+          return updated;
+        });
+      }
+      return newFlowOrders;
+    });
+  };
+
+  // Handle production mapping field change for specific core type
+  const handleProductionMappingChange = (coreIndex, order, field, value) => {
+    setProductionMappings(prev => {
+      const updated = [...prev];
+      if (!updated[coreIndex]) {
+        updated[coreIndex] = {};
+      }
+      if (!updated[coreIndex][order]) {
+        updated[coreIndex][order] = {};
+      }
+      updated[coreIndex][order][field] = value;
+      return updated;
+    });
+  };
+
+  // Handle charz toggle for specific core type
+  const handleCharzToggle = (coreIndex) => {
+    setShowCharzForCore(prev => {
+      const updated = [...prev];
+      updated[coreIndex] = !updated[coreIndex];
+
+      // Clear charz data if disabling
+      if (!updated[coreIndex]) {
+        setCharzData(charzPrev => {
+          const charzUpdated = [...charzPrev];
+          charzUpdated[coreIndex] = {
+            search_granularity: '',
+            search_types: [],
+            table: {},
+            workloadTable: {},
+            psm_register_size: ''
+          };
+          return charzUpdated;
+        });
+      }
+      return updated;
+    });
+  };
+
+  // Handle charz data change for specific core type
+  const handleCharzDataChange = (coreIndex, data) => {
+    setCharzData(prev => {
+      const updated = [...prev];
+      updated[coreIndex] = data;
+      return updated;
+    });
   };
 
   // Clear form data
   const clearForm = () => {
     setNumCoreTypes('1');
-    // setCoreMappings([{ core: '', core_count: '', supply: '', frequency: '', clock: '' }]);
-    setCoreMappings([{ core: '', core_count: '', supply: '', clock: '' }]);
+    setCoreMappings([{ core: '', core_count: '', supply: '', clock: '', spec_variable: '' }]);
     setSpecVariable('');
-    setSelectedFlowOrders([]);
-    setProductionMappings({});
-    setCharzData({
+    setSelectedFlowOrders([[]]);
+    setProductionMappings([{}]);
+    setShowCharzForCore([false]);
+    setCharzData([{
       search_granularity: '',
       search_types: [],
       table: {},
-      workloadTable: {}, // Added this line
+      workloadTable: {},
       psm_register_size: '',
-    });
+    }]);
     setErrors({});
   };
 
@@ -130,11 +211,10 @@ const handleFlowOrderChange = (order) => {
     const newErrors = validateForm({
       numCoreTypes,
       coreMappings,
-      specVariable,
       selectedFlowOrders,
       productionMappings,
       charzData,
-      charzEnabled: showCharz
+      showCharzForCore
     });
     setErrors(newErrors);
     // Debug: log all error keys and values for inspection
@@ -152,12 +232,12 @@ const handleFlowOrderChange = (order) => {
     getFormData: () => ({
       num_core_types: numCoreTypes,
       core_mappings: coreMappings,
-      spec_variable: specVariable,
       flow_orders: selectedFlowOrders,
       production_mappings: productionMappings,
-      charz: charzData,
+      charz_data: charzData,
+      show_charz_for_core: showCharzForCore,
     }),
-    getErrors: () => errors // <-- Ensure this always returns the latest errors
+    getErrors: () => errors
   }));
 
   return (
@@ -167,153 +247,83 @@ const handleFlowOrderChange = (order) => {
         {/* Common Parameters */}
         <div className="core-mappings-section" style={{ marginBottom: '2rem' }}>
           <h4 style={{ borderBottom: '1px solid #007bff', color: '#007bff', marginBottom: '1rem' }}>Common Parameters</h4>
+
           {/* Number of Core Types as number input */}
-          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', maxWidth: '100%' }}>
-            <label htmlFor={`num_core_types_${ipType}`} style={{ flex: 1 }}>Number of Core Types</label>
-            <button
-              type="button"
-              className="core-type-btn"
-              onClick={() => {
-                const current = parseInt(numCoreTypes || '0', 10);
-                if (current > 1) {
-                  const e = { target: { value: String(current - 1) } };
+          <div className="form-group">
+            <label htmlFor={`num_core_types_${ipType}`}>Number of Core Types</label>
+            <div className="number-input-container">
+              <button
+                type="button"
+                className="number-btn"
+                onClick={() => {
+                  const current = parseInt(numCoreTypes || '0', 10);
+                  if (current > 1) {
+                    const e = { target: { value: String(current - 1) } };
+                    handleNumCoreTypesChange(e);
+                  }
+                }}
+                disabled={parseInt(numCoreTypes) <= 1}
+              >-</button>
+              <input
+                type="number"
+                min="1"
+                id={`num_core_types_${ipType}`}
+                name="num_core_types"
+                placeholder="1"
+                value={numCoreTypes}
+                onChange={handleNumCoreTypesChange}
+                className={errors.num_core_types ? 'error number-input' : 'number-input'}
+              />
+              <button
+                type="button"
+                className="number-btn"
+                onClick={() => {
+                  const current = parseInt(numCoreTypes || '0', 10);
+                  const e = { target: { value: String(current + 1) } };
                   handleNumCoreTypesChange(e);
-                }
-              }}
-              style={{ minWidth: 32 }}
-            >-</button>
-            <input
-              type="number"
-              min="1"
-              id={`num_core_types_${ipType}`}
-              name="num_core_types"
-              placeholder="Enter number of core types"
-              value={numCoreTypes}
-              onChange={handleNumCoreTypesChange}
-              className={errors.num_core_types ? 'error single-input' : 'single-input'}
-              style={{ textAlign: 'center' }}
-            />
-            <button
-              type="button"
-              className="core-type-btn"
-              onClick={() => {
-                const current = parseInt(numCoreTypes || '0', 10);
-                const e = { target: { value: String(current + 1) } };
-                handleNumCoreTypesChange(e);
-              }}
-              style={{ minWidth: 32 }}
-            >+</button>
+                }}
+              >+</button>
+            </div>
+            {errors.num_core_types && <span className="error-message">{errors.num_core_types}</span>}
           </div>
-          {errors.num_core_types && <span className="error-message">{errors.num_core_types}</span>}
-          {/* Dynamic core mappings */}
+
+          {/* Dynamic core mappings with production and charz parameters for each */}
           {coreMappings.length > 0 && (
-            <div style={{ marginBottom: 16 }}>
-              <label>Core Mappings</label>
+            <div className="core-mappings-container">
+              <div className="section-header">
+                <h5>Core Mappings</h5>
+                <span className="section-badge">{coreMappings.length} core{coreMappings.length !== 1 ? 's' : ''}</span>
+              </div>
               <CoreMappings
                 coreMappings={coreMappings}
                 errors={errors}
                 handleCoreMappingChange={handleCoreMappingChange}
+                productionMappings={productionMappings}
+                charzData={charzData}
+                selectedFlowOrders={selectedFlowOrders}
+                showCharzForCore={showCharzForCore}
+                handleFlowOrderChange={handleFlowOrderChange}
+                handleProductionMappingChange={handleProductionMappingChange}
+                handleCharzToggle={handleCharzToggle}
+                setCharzData={handleCharzDataChange}
+                ipType={ipType}
               />
             </div>
           )}
-          {/* Single input for Spec Variable */}
-          <div className="form-group">
-            <label htmlFor={`spec_variable_${ipType}`}>Spec Variable</label>
-            <input
-              type="text"
-              id={`spec_variable_${ipType}`}
-              name="spec_variable"
-              value={specVariable}
-              onChange={e => setSpecVariable(e.target.value)}
-              className={errors.spec_variable ? 'error single-input' : 'single-input'}
-            />
-            {errors.spec_variable && <span className="error-message">{errors.spec_variable}</span>}
-          </div>
         </div>
-        {/* Production Parameters with dynamic mapping */}
-        <div className="production-section" style={{ marginBottom: '2rem' }}>
-          <h4 style={{ borderBottom: '1px solid #b36b00', color: '#b36b00', marginBottom: '1rem' }}>Production Parameters</h4>
-          <ProductionMappings
-            selectedFlowOrders={selectedFlowOrders}
-            productionMappings={productionMappings}
-            errors={errors}
-            handleFlowOrderChange={handleFlowOrderChange}
-            handleProductionMappingChange={handleProductionMappingChange}
-          />
-        </div>
-
-        {/* Toggle for Charz Parameters */}
-        <div className="form-group">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={showCharz}
-              onChange={() => {
-                setShowCharz(prev => {
-                  const next = !prev;
-                  if (!next) {
-                    setCharzData({
-                      search_granularity: [],
-                      search_types: [],
-                      selectedTestTypes: {},
-                      table: {},
-                      workloadTable: {},
-                      psm_register_size: ''
-                    });
-                  }
-                  return next;
-                });
-              }}
-              className="checkbox-input"
-            />
-            <span className="checkbox-custom"></span>
-            Charz Parameters
-          </label>
-        </div>
-
-        {/* Charz Parameters */}
-        {showCharz && (
-          <CharzParameters
-            charzData={charzData}
-            setCharzData={setCharzData}
-            errors={errors}
-            ipType={ipType}
-          />
-        )}
 
         {errors.submit && <div className="error-message">{errors.submit}</div>}
 
-        <div className="button-group">
-          <button
-            type="button"
-            className="secondary-button"
-            style={{ background: '#ffc107', color: '#222', marginRight: 8 }}
-            onClick={() => {
-              // Show transformed backend data for this IP type
-              const formData = {
-                num_core_types: numCoreTypes,
-                core_mappings: coreMappings,
-                spec_variable: specVariable,
-                flow_orders: selectedFlowOrders,
-                production_mappings: productionMappings,
-                charz: charzData,
-              };
-              // Use the transformation utility
-              import('../utils/transformFormDataToBackend').then(module => {
-                const transformed = module.default(formData);
-                console.log('Transformed backend data for', ipType, transformed);
-              });
-            }}
-          >
-            Show Form Data
-          </button>
-          <button onClick={clearForm} className="secondary-button">
-            Clear {ipType} Form
+        <div className="form-actions">
+          <button onClick={clearForm} className="action-button clear-button">
+            <span>🗑️</span> Clear Form
           </button>
         </div>
+
       </div>
     </div>
   );
 });
 
 export default ExtendedForm;
+

@@ -3,113 +3,112 @@
 // Helper function to validate test point range
 function validateTestPointRange(start, stop, step) {
   // Check for empty or whitespace-only strings first
-  if (start === '' || start === null || start === undefined || 
-      (typeof start === 'string' && start.trim() === '')) {
+  if (start === '' || start === null || start === undefined ||
+    (typeof start === 'string' && start.trim() === '')) {
     return { isValid: false, message: 'Start value cannot be empty' };
   }
-  
-  if (stop === '' || stop === null || stop === undefined || 
-      (typeof stop === 'string' && stop.trim() === '')) {
+
+  if (stop === '' || stop === null || stop === undefined ||
+    (typeof stop === 'string' && stop.trim() === '')) {
     return { isValid: false, message: 'Stop value cannot be empty' };
   }
-  
-  if (step === '' || step === null || step === undefined || 
-      (typeof step === 'string' && step.trim() === '')) {
+
+  if (step === '' || step === null || step === undefined ||
+    (typeof step === 'string' && step.trim() === '')) {
     return { isValid: false, message: 'Step value cannot be empty' };
   }
 
   const startNum = Number(start);
   const stopNum = Number(stop);
   const stepNum = Number(step);
-  
+
   // Basic numeric validation (after checking for empty values)
   if (isNaN(startNum) || isNaN(stopNum) || isNaN(stepNum) || stepNum === 0) {
     return { isValid: false, message: 'All values must be valid numbers and step cannot be zero' };
   }
-  
+
   // Step direction validation
   if ((stopNum > startNum && stepNum < 0) || (stopNum < startNum && stepNum > 0)) {
     return { isValid: false, message: 'Step direction must match start-stop direction' };
   }
-  
+
   // Helper function to determine appropriate decimal places for rounding
   const getDecimalPlaces = (num) => {
     const numStr = num.toString();
     if (numStr.indexOf('.') === -1) return 0;
     return numStr.split('.')[1].length;
   };
-  
+
   // Determine the precision we need to work with
   const decimalPlaces = Math.max(
-    getDecimalPlaces(startNum), 
-    getDecimalPlaces(stopNum), 
+    getDecimalPlaces(startNum),
+    getDecimalPlaces(stopNum),
     getDecimalPlaces(stepNum)
   );
-  
+
   // Round all values to avoid floating point precision issues
   const roundedStart = Number(startNum.toFixed(decimalPlaces));
   const roundedStop = Number(stopNum.toFixed(decimalPlaces));
   const roundedStep = Number(Math.abs(stepNum).toFixed(decimalPlaces));
-  
+
   // Calculate the range using rounded values
   const range = Number(Math.abs(roundedStop - roundedStart).toFixed(decimalPlaces));
-  
+
   // Check if the range is evenly divisible by the step
   const expectedSteps = range / roundedStep;
   const roundedSteps = Math.round(expectedSteps);
-  
+
   // Use a reasonable epsilon based on the decimal precision
   const epsilon = Math.pow(10, -(decimalPlaces + 2));
-  
+
   if (Math.abs(expectedSteps - roundedSteps) > epsilon) {
-    return { 
-      isValid: false, 
+    return {
+      isValid: false,
       message: `Step ${stepNum} cannot generate steady intervals from ${startNum} to ${stopNum}. The range (${range}) is not evenly divisible by the step.`
     };
   }
-  
+
   // Verify that we can actually reach the stop value by simulating the generation
   let current = roundedStart;
   const actualStep = stepNum > 0 ? roundedStep : -roundedStep;
   let reachesStop = false;
-  
+
   // Limit iterations to prevent infinite loops
   const maxIterations = 1000;
   let iterations = 0;
-  
+
   while (iterations < maxIterations) {
     current = Number((current + actualStep).toFixed(decimalPlaces));
     iterations++;
-    
+
     if (Math.abs(current - roundedStop) < epsilon) {
       reachesStop = true;
       break;
     }
-    
+
     // Check if we've gone past the stop value
     if ((actualStep > 0 && current > roundedStop) || (actualStep < 0 && current < roundedStop)) {
       break;
     }
   }
-  
+
   if (!reachesStop) {
-    return { 
-      isValid: false, 
+    return {
+      isValid: false,
       message: `Step ${stepNum} cannot reach the stop value ${stopNum} from start ${startNum}.`
     };
   }
-  
+
   return { isValid: true, message: null };
 }
 
 export default function validate({
   numCoreTypes,
   coreMappings,
-  specVariable,
   selectedFlowOrders,
   productionMappings,
   charzData,
-  charzEnabled
+  showCharzForCore
 }) {
   const newErrors = {};
 
@@ -120,142 +119,170 @@ export default function validate({
 
   // Core mappings
   coreMappings.forEach((mapping, idx) => {
+    if (!mapping.spec_variable || typeof mapping.spec_variable !== 'string' || mapping.spec_variable.trim() === '') {
+      newErrors[`spec_variable_${idx}`] = `Spec Variable is required for Core ${idx + 1}.`;
+    }
     if (!mapping.core || typeof mapping.core !== 'string' || mapping.core.trim() === '') newErrors[`core_${idx}`] = 'Core is required.';
     if (!mapping.core_count || isNaN(Number(mapping.core_count)) || Number(mapping.core_count) < 1) newErrors[`core_count_${idx}`] = 'Core Count is required and must be at least 1.';
     if (!mapping.supply || typeof mapping.supply !== 'string' || mapping.supply.trim() === '') newErrors[`supply_${idx}`] = 'Supply is required.';
     if (!mapping.clock || typeof mapping.clock !== 'string' || mapping.clock.trim() === '') newErrors[`clock_${idx}`] = 'Clock is required.';
   });
 
-  // Spec variable
-  if (!specVariable || typeof specVariable !== 'string' || specVariable.trim() === '') {
-    newErrors.spec_variable = 'Spec Variable is required.';
-  }
+  // Production mappings - now validate per core type
+  selectedFlowOrders.forEach((coreFlowOrders, coreIndex) => {
+    if (!Array.isArray(coreFlowOrders)) return;
 
-  // Production mappings
-  if (selectedFlowOrders.length === 0) {
-    newErrors.flow_orders = 'At least one flow order must be selected.';
-  }
-
-  selectedFlowOrders.forEach(order => {
-    const mapping = productionMappings[order] || {};
-    
-    // Require at least one of read_type_jtag or read_type_fw for each selected flow order
-    if (!mapping.read_type_jtag && !mapping.read_type_fw) {
-      newErrors[`read_type_${order}`] = 'At least one Read Type (JTAG or FW) must be selected for ' + order;
+    // Check if at least one flow order is selected for this core
+    if (coreFlowOrders.length === 0) {
+      newErrors[`flow_orders_core_${coreIndex}`] = `At least one flow order must be selected for Core ${coreIndex + 1}.`;
+      return;
     }
 
-    // Always validate test_points_type
-    if (!mapping.test_points_type || (mapping.test_points_type !== 'List' && mapping.test_points_type !== 'Range')) {
-      newErrors[`test_points_type_${order}`] = 'Test Points Type is required for ' + order;
-    }
-    
-    // Always validate range fields if type is missing or 'Range'
-    if (!mapping.test_points_type || mapping.test_points_type === 'Range') {
-      if (!mapping.test_points_start || isNaN(Number(mapping.test_points_start))) {
-        newErrors[`test_points_start_${order}`] = 'Test Points Start is required and must be a number for ' + order;
+    const coreProductionMappings = productionMappings[coreIndex] || {};
+
+    coreFlowOrders.forEach(order => {
+      const mapping = coreProductionMappings[order] || {};
+
+      // Helper function to create error field names with core index
+      const getErrorField = (field) => `${field}_${order}_core_${coreIndex}`;
+
+      // Require at least one of read_type_jtag or read_type_fw for each selected flow order
+      if (!mapping.read_type_jtag && !mapping.read_type_fw) {
+        newErrors[getErrorField('read_type')] = `At least one Read Type (JTAG or FW) must be selected for ${order} in Core ${coreIndex + 1}`;
       }
-      if (!mapping.test_points_stop || isNaN(Number(mapping.test_points_stop))) {
-        newErrors[`test_points_stop_${order}`] = 'Test Points Stop is required and must be a number for ' + order;
+
+      // Always validate test_points_type
+      if (!mapping.test_points_type || (mapping.test_points_type !== 'List' && mapping.test_points_type !== 'Range')) {
+        newErrors[getErrorField('test_points_type')] = `Test Points Type is required for ${order} in Core ${coreIndex + 1}`;
       }
-      if (!mapping.test_points_step || isNaN(Number(mapping.test_points_step)) || Number(mapping.test_points_step) === 0) {
-        newErrors[`test_points_step_${order}`] = 'Test Points Step is required and must be a non-zero number for ' + order;
-      }
-      
-      // Enhanced range validation - only if all three values are valid numbers
-      if (mapping.test_points_start && mapping.test_points_stop && mapping.test_points_step &&
-          !isNaN(Number(mapping.test_points_start)) && 
-          !isNaN(Number(mapping.test_points_stop)) && 
-          !isNaN(Number(mapping.test_points_step)) && 
+
+      // Always validate range fields if type is missing or 'Range'
+      if (!mapping.test_points_type || mapping.test_points_type === 'Range') {
+        if (!mapping.test_points_start || isNaN(Number(mapping.test_points_start))) {
+          newErrors[getErrorField('test_points_start')] = `Test Points Start is required and must be a number for ${order} in Core ${coreIndex + 1}`;
+        }
+        if (!mapping.test_points_stop || isNaN(Number(mapping.test_points_stop))) {
+          newErrors[getErrorField('test_points_stop')] = `Test Points Stop is required and must be a number for ${order} in Core ${coreIndex + 1}`;
+        }
+        if (!mapping.test_points_step || isNaN(Number(mapping.test_points_step)) || Number(mapping.test_points_step) === 0) {
+          newErrors[getErrorField('test_points_step')] = `Test Points Step is required and must be a non-zero number for ${order} in Core ${coreIndex + 1}`;
+        }
+
+        // Enhanced range validation - only if all three values are valid numbers
+        if (mapping.test_points_start && mapping.test_points_stop && mapping.test_points_step &&
+          !isNaN(Number(mapping.test_points_start)) &&
+          !isNaN(Number(mapping.test_points_stop)) &&
+          !isNaN(Number(mapping.test_points_step)) &&
           Number(mapping.test_points_step) !== 0) {
-        
-        const rangeValidation = validateTestPointRange(
-          mapping.test_points_start,
-          mapping.test_points_stop,
-          mapping.test_points_step
-        );
-        
-        if (!rangeValidation.isValid) {
-          newErrors[`test_points_range_${order}`] = rangeValidation.message + ' for ' + order;
+
+          const rangeValidation = validateTestPointRange(
+            mapping.test_points_start,
+            mapping.test_points_stop,
+            mapping.test_points_step
+          );
+
+          if (!rangeValidation.isValid) {
+            newErrors[getErrorField('test_points_range')] = `${rangeValidation.message} for ${order} in Core ${coreIndex + 1}`;
+          }
         }
       }
-    }
-    
-    // Validate list field if type is 'List'
-    if (mapping.test_points_type === 'List') {
-      if (!mapping.test_points || mapping.test_points.trim() === '') {
-        newErrors[`test_points_${order}`] = 'Test Points (List) is required for ' + order;
+
+      // Validate list field if type is 'List'
+      if (mapping.test_points_type === 'List') {
+        if (!mapping.test_points || mapping.test_points.trim() === '') {
+          newErrors[getErrorField('test_points')] = `Test Points (List) is required for ${order} in Core ${coreIndex + 1}`;
+        }
       }
-    }
-    
-    if (!mapping.frequency || isNaN(Number(mapping.frequency))) newErrors[`frequency_${order}`] = 'Frequency is required and must be a number for ' + order;
-    if (!mapping.register_size || isNaN(Number(mapping.register_size))) newErrors[`register_size_${order}`] = 'Register Size is required and must be a number for ' + order;
+
+      if (!mapping.frequency || isNaN(Number(mapping.frequency))) {
+        newErrors[getErrorField('frequency')] = `Frequency is required and must be a number for ${order} in Core ${coreIndex + 1}`;
+      }
+      if (!mapping.register_size || isNaN(Number(mapping.register_size))) {
+        newErrors[getErrorField('register_size')] = `Register Size is required and must be a number for ${order} in Core ${coreIndex + 1}`;
+      }
+
+      // Validate insertion field if provided
+      if (mapping.insertion && mapping.insertion.trim() !== '') {
+        // Optional: Add any specific insertion validation logic here
+      }
+    });
   });
 
-
-  // Charz parameters
-  if (charzEnabled) { // only validate if charz is enabled
-    if (!charzData.search_granularity || !Array.isArray(charzData.search_granularity) || charzData.search_granularity.length === 0) {
-      newErrors.search_granularity = 'At least one search granularity must be selected.';
+  // Charz parameters - now validate per core type
+  charzData.forEach((coreCharzData, coreIndex) => {
+    // Only validate if charz is enabled for this core
+    if (!showCharzForCore || !showCharzForCore[coreIndex]) {
+      return;
     }
 
-    if (!Array.isArray(charzData.search_types) || charzData.search_types.length === 0) {
-      newErrors.search_types = 'At least one search type is required.';
+    const charz = coreCharzData || {};
+    const getCoreErrorField = (field) => `charz_${field}_core_${coreIndex}`;
+
+    if (!charz.search_granularity || !Array.isArray(charz.search_granularity) || charz.search_granularity.length === 0) {
+      newErrors[getCoreErrorField('search_granularity')] = `At least one search granularity must be selected for Core ${coreIndex + 1}.`;
     }
 
-    (charzData.search_types || []).forEach(searchType => {
+    if (!Array.isArray(charz.search_types) || charz.search_types.length === 0) {
+      newErrors[getCoreErrorField('search_types')] = `At least one search type is required for Core ${coreIndex + 1}.`;
+    }
+
+    (charz.search_types || []).forEach(searchType => {
       // Get selected test types for this search type
-      const selectedTestTypes = charzData.selectedTestTypes?.[searchType] || [];
-      
+      const selectedTestTypes = charz.selectedTestTypes?.[searchType] || [];
+
       // Check if at least one test type is selected
       if (selectedTestTypes.length === 0) {
-        newErrors[`charz_${searchType}_test_types`] = `At least one test type must be selected for ${searchType}`;
+        newErrors[getCoreErrorField(`${searchType}_test_types`)] = `At least one test type must be selected for ${searchType} in Core ${coreIndex + 1}`;
         return; // Skip further validation for this search type
       }
-      
+
       // Only validate selected test types
       selectedTestTypes.forEach(testType => {
-        const table = charzData.table?.[searchType]?.[testType] || {};
+        const table = charz.table?.[searchType]?.[testType] || {};
         const wlCount = parseInt(table.wl_count, 10) || 0;
-        
+
+        // Helper function for charz error field names
+        const getCharzErrorField = (field) => getCoreErrorField(`${searchType}_${testType}_${field}`);
+
         // Validate test type table fields
         if (!table.wl_count || isNaN(Number(table.wl_count))) {
-          newErrors[`charz_${searchType}_${testType}_wl_count`] = 'WL Count is required and must be a number for ' + searchType + ' / ' + testType;
+          newErrors[getCharzErrorField('wl_count')] = `WL Count is required and must be a number for ${searchType} / ${testType} in Core ${coreIndex + 1}`;
         }
-        
+
         // Improved workload table validation
         if (wlCount > 0) {
-          const workloadArray = charzData.workloadTable?.[searchType]?.[testType] || [];
+          const workloadArray = charz.workloadTable?.[searchType]?.[testType] || [];
           // Always validate each workload field, even if array is missing or too short
           for (let wlIdx = 0; wlIdx < wlCount; wlIdx++) {
             const wlValue = workloadArray[wlIdx];
             if (!wlValue || (typeof wlValue === 'string' && wlValue.trim() === '')) {
-              newErrors[`charz_${searchType}_${testType}_wl_${wlIdx}`] = `WL value #${wlIdx + 1} is required for ${searchType} / ${testType}`;
+              newErrors[getCharzErrorField(`wl_${wlIdx}`)] = `WL value #${wlIdx + 1} is required for ${searchType} / ${testType} in Core ${coreIndex + 1}`;
             }
           }
         }
-        
+
         if (!table.tp || table.tp.trim() === '') {
-          newErrors[`charz_${searchType}_${testType}_tp`] = 'Test Points are required for ' + searchType + ' / ' + testType;
+          newErrors[getCharzErrorField('tp')] = `Test Points are required for ${searchType} / ${testType} in Core ${coreIndex + 1}`;
         }
         if (!table.search_start || isNaN(Number(table.search_start))) {
-          newErrors[`charz_${searchType}_${testType}_search_start`] = 'Search Start is required and must be a number for ' + searchType + ' / ' + testType;
+          newErrors[getCharzErrorField('search_start')] = `Search Start is required and must be a number for ${searchType} / ${testType} in Core ${coreIndex + 1}`;
         }
         if (!table.search_end || isNaN(Number(table.search_end))) {
-          newErrors[`charz_${searchType}_${testType}_search_end`] = 'Search End is required and must be a number for ' + searchType + ' / ' + testType;
+          newErrors[getCharzErrorField('search_end')] = `Search End is required and must be a number for ${searchType} / ${testType} in Core ${coreIndex + 1}`;
         }
         if (!table.resolution || isNaN(Number(table.resolution))) {
-          newErrors[`charz_${searchType}_${testType}_resolution`] = 'Resolution is required and must be a number for ' + searchType + ' / ' + testType;
+          newErrors[getCharzErrorField('resolution')] = `Resolution is required and must be a number for ${searchType} / ${testType} in Core ${coreIndex + 1}`;
         }
         if (!table.search_step || isNaN(Number(table.search_step))) {
-          newErrors[`charz_${searchType}_${testType}_search_step`] = 'Search Step is required and must be a number for ' + searchType + ' / ' + testType;
+          newErrors[getCharzErrorField('search_step')] = `Search Step is required and must be a number for ${searchType} / ${testType} in Core ${coreIndex + 1}`;
         }
       });
     });
 
-    if (!charzData.psm_register_size || isNaN(Number(charzData.psm_register_size))) {
-      newErrors.psm_register_size = 'PSM Register Size is required and must be a number.';
+    if (!charz.psm_register_size || isNaN(Number(charz.psm_register_size))) {
+      newErrors[getCoreErrorField('psm_register_size')] = `PSM Register Size is required and must be a number for Core ${coreIndex + 1}.`;
     }
-  }
+  });
 
   return newErrors;
 }

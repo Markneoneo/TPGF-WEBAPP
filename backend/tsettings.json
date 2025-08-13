@@ -1,40 +1,1902 @@
 {
-  "cpu": {
-    "1": {
-      "fwload_settings": {
-        "fwload": {
-          "burst": "avfs_cpu_1_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_cpu_1_fwload"
-        }
+  "classic": {
+    "fwload_settings": {
+      "fwload": {
+        "burst": "avfs_cpu_classic_fwload_burst",
+        "softsets": "SoftsetProfile_avfs_cpu_classic_fwload"
+      }
+    },
+    "prod_settings": {
+      "psm": {
+        "burst": "avfs_cpu_classic_psm_burst",
+        "binnable": true,
+        "test_points": {
+          "spec_variable": "LEV.36.VDDCR[V]",
+          "values": {
+            "tp0": {
+              "value": 0.6
+            },
+            "tp1": {
+              "value": 1.2
+            }
+          }
+        },
+        "register_setup": {
+          "vector_variable": {
+            "avfs_cpu_classic_psm": 512
+          }
+        },
+        "insertion_list": [
+          "ws1",
+          "ws2",
+          "ft1"
+        ],
+        "fallback_enable": false
       },
-      "prod_settings": {
-        "xvmindd": {
-          "burst": "avfs_cpu_1_xvmindd_burst",
-          "binnable": true,
-          "test_points": {
-            "spec_variable": "1",
-            "values": {
-              "tp0": {
-                "value": 1
+      "mafdd": {
+        "burst": "avfs_cpu_classic_mafdd_burst",
+        "binnable": true,
+        "test_points": {
+          "spec_variable": "LEV.36.VDDCR[V]",
+          "values": {
+            "tp0": {
+              "value": 0.9
+            },
+            "tp1": {
+              "value": 1.1
+            }
+          }
+        },
+        "register_setup": {
+          "vector_variable": {
+            "avfs_cpu_classic_mafdd": 512
+          }
+        },
+        "insertion_list": [
+          "ws1",
+          "ws2",
+          "ft1"
+        ],
+        "fallback_enable": false
+      },
+      "favfs": {
+        "burst": "",
+        "binnable": true,
+        "test_points": {
+          "spec_variable": "LEV.36.VDDCR[V]",
+          "values": {
+            "tp0": {
+              "value": 0.6,
+              "burst": "avfs_cpu_classic_favfs_tp0_burst"
+            },
+            "tp1": {
+              "value": 1.2,
+              "burst": "avfs_cpu_classic_favfs_tp1_burst"
+            }
+          }
+        },
+        "register_setup": {
+          "vector_variable": {
+            "avfs_cpu_classic_favfs": 512
+          }
+        },
+        "softsets": "SoftsetProfile_avfs_cpu_classic_favfs",
+        "insertion_list": [
+          "ws1",
+          "ws2"
+        ],
+        "fallback_enable": false
+      },
+      "cpo": {
+        "burst": "avfs_cpu_classic_cpo_burst",
+        "binnable": true,
+        "test_points": {
+          "spec_variable": "LEV.36.VDDCR[V]",
+          "values": {
+            "tp0": {
+              "value": 0.6
+            },
+            "tp1": {
+              "value": 1.2
+            }
+          }
+        },
+        "register_setup": {
+          "vector_variable": {
+            "avfs_cpu_classic_cpo": 512
+          }
+        },
+        "softsets": "SoftsetProfile_avfs_cpu_classic_cpo",
+        "insertion_list": [
+          "ws1",
+          "ft1"
+        ],
+        "fallback_enable": false
+      }
+    },
+    "charz_settings": {
+      "allcore": {
+        "vmin": {
+          "crest": {
+            "a": {
+              "burst": "avfs_cpu_classic_crest_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_200"
+                    }
+                  }
+                }
               },
-              "tp1": {
-                "value": 2
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_a_minPSM": 512
+                  }
+                }
+              }
+            },
+            "b": {
+              "burst": "avfs_cpu_classic_crest_b_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_b_minPSM": 512
+                  }
+                }
+              }
+            },
+            "c": {
+              "burst": "avfs_cpu_classic_crest_c_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_c_minPSM": 512
+                  }
+                }
+              }
+            },
+            "d": {
+              "burst": "avfs_cpu_classic_crest_d_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_d_minPSM": 512
+                  }
+                }
+              }
+            },
+            "e": {
+              "burst": "avfs_cpu_classic_crest_e_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_e_minPSM": 512
+                  }
+                }
+              }
+            },
+            "f": {
+              "burst": "avfs_cpu_classic_crest_f_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_f_minPSM": 512
+                  }
+                }
+              }
+            },
+            "g": {
+              "burst": "avfs_cpu_classic_crest_g_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_g_minPSM": 512
+                  }
+                }
               }
             }
           },
-          "register_setup": {
-            "vector_variable": {
-              "avfs_cpu_1_xvmindd": 512
+          "bist": {
+            "a": {
+              "burst": "avfs_cpu_classic_bist_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_bist_a_minPSM": 512
+                  }
+                }
+              }
+            },
+            "b": {
+              "burst": "avfs_cpu_classic_bist_b_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_bist_b_minPSM": 512
+                  }
+                }
+              }
+            },
+            "c": {
+              "burst": "avfs_cpu_classic_bist_c_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_bist_c_minPSM": 512
+                  }
+                }
+              }
             }
           },
-          "softsets": "SoftsetProfile_avfs_cpu_1_xvmindd",
-          "insertion_list": [
-            "1"
-          ],
-          "fallback_enable": true
+          "pbist": {
+            "a": {
+              "burst": "avfs_cpu_classic_pbist_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_pbist_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_pbist_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_pbist_a_minPSM": 512
+                  }
+                }
+              }
+            }
+          }
+        },
+        "fmax": {
+          "crest": {
+            "a": {
+              "burst": "avfs_cpu_classic_crest_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_a_minPSM": 512
+                  }
+                }
+              }
+            },
+            "b": {
+              "burst": "avfs_cpu_classic_crest_b_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_b_minPSM": 512
+                  }
+                }
+              }
+            },
+            "c": {
+              "burst": "avfs_cpu_classic_crest_c_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_c_minPSM": 512
+                  }
+                }
+              }
+            },
+            "d": {
+              "burst": "avfs_cpu_classic_crest_d_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_d_minPSM": 512
+                  }
+                }
+              }
+            },
+            "e": {
+              "burst": "avfs_cpu_classic_crest_e_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_e_minPSM": 512
+                  }
+                }
+              }
+            },
+            "f": {
+              "burst": "avfs_cpu_classic_crest_f_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_f_minPSM": 512
+                  }
+                }
+              }
+            },
+            "g": {
+              "burst": "avfs_cpu_classic_crest_g_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_crest_g_minPSM": 512
+                  }
+                }
+              }
+            }
+          },
+          "bist": {
+            "a": {
+              "burst": "avfs_cpu_classic_bist_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_bist_a_minPSM": 512
+                  }
+                }
+              }
+            },
+            "b": {
+              "burst": "avfs_cpu_classic_bist_b_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_bist_b_minPSM": 512
+                  }
+                }
+              }
+            },
+            "c": {
+              "burst": "avfs_cpu_classic_bist_c_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_bist_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_bist_c_minPSM": 512
+                  }
+                }
+              }
+            }
+          },
+          "pbist": {
+            "a": {
+              "burst": "avfs_cpu_classic_pbist_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_pbist_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_classic_pbist_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_classic_pbist_a_minPSM": 512
+                  }
+                }
+              }
+            }
+          }
         }
+      }
+    }
+  },
+  "dense": {
+    "fwload_settings": {
+      "fwload": {
+        "burst": "avfs_cpu_dense_fwload_burst",
+        "softsets": "SoftsetProfile_avfs_cpu_dense_fwload"
+      }
+    },
+    "prod_settings": {
+      "psm": {
+        "burst": "avfs_cpu_dense_psm_burst",
+        "binnable": true,
+        "test_points": {
+          "spec_variable": "LEV.36.VDDCR[V]",
+          "values": {
+            "tp0": {
+              "value": 0.6
+            },
+            "tp1": {
+              "value": 1.2
+            }
+          }
+        },
+        "register_setup": {
+          "vector_variable": {
+            "avfs_cpu_dense_psm": 512
+          }
+        },
+        "insertion_list": [
+          "ws1",
+          "ws2",
+          "ft1"
+        ],
+        "fallback_enable": false
       },
-      "charz_settings": {}
+      "mafdd": {
+        "burst": "avfs_cpu_dense_mafdd_burst",
+        "binnable": true,
+        "test_points": {
+          "spec_variable": "LEV.36.VDDCR[V]",
+          "values": {
+            "tp0": {
+              "value": 0.9
+            },
+            "tp1": {
+              "value": 1.1
+            }
+          }
+        },
+        "register_setup": {
+          "vector_variable": {
+            "avfs_cpu_dense_mafdd": 512
+          }
+        },
+        "insertion_list": [
+          "ws1",
+          "ws2",
+          "ft1"
+        ],
+        "fallback_enable": false
+      },
+      "favfs": {
+        "burst": "",
+        "binnable": true,
+        "test_points": {
+          "spec_variable": "LEV.36.VDDCR[V]",
+          "values": {
+            "tp0": {
+              "value": 0.6,
+              "burst": "avfs_cpu_dense_favfs_tp0_burst"
+            },
+            "tp1": {
+              "value": 1.2,
+              "burst": "avfs_cpu_dense_favfs_tp1_burst"
+            }
+          }
+        },
+        "register_setup": {
+          "vector_variable": {
+            "avfs_cpu_dense_favfs": 512
+          }
+        },
+        "softsets": "SoftsetProfile_avfs_cpu_dense_favfs",
+        "insertion_list": [
+          "ws1",
+          "ws2"
+        ],
+        "fallback_enable": false
+      },
+      "cpo": {
+        "burst": "avfs_cpu_dense_cpo_burst",
+        "binnable": true,
+        "test_points": {
+          "spec_variable": "LEV.36.VDDCR[V]",
+          "values": {
+            "tp0": {
+              "value": 0.6
+            },
+            "tp1": {
+              "value": 1.2
+            }
+          }
+        },
+        "register_setup": {
+          "vector_variable": {
+            "avfs_cpu_dense_cpo": 512
+          }
+        },
+        "softsets": "SoftsetProfile_avfs_cpu_dense_cpo",
+        "insertion_list": [
+          "ws1",
+          "ft1"
+        ],
+        "fallback_enable": false
+      }
+    },
+    "charz_settings": {
+      "allcore": {
+        "vmin": {
+          "crest": {
+            "a": {
+              "burst": "avfs_cpu_dense_crest_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_a_minPSM": 512
+                  }
+                }
+              }
+            },
+            "b": {
+              "burst": "avfs_cpu_dense_crest_b_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_b_minPSM": 512
+                  }
+                }
+              }
+            },
+            "c": {
+              "burst": "avfs_cpu_dense_crest_c_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_c_minPSM": 512
+                  }
+                }
+              }
+            },
+            "d": {
+              "burst": "avfs_cpu_dense_crest_d_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_d_minPSM": 512
+                  }
+                }
+              }
+            },
+            "e": {
+              "burst": "avfs_cpu_dense_crest_e_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_e_minPSM": 512
+                  }
+                }
+              }
+            },
+            "f": {
+              "burst": "avfs_cpu_dense_crest_f_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_f_minPSM": 512
+                  }
+                }
+              }
+            },
+            "g": {
+              "burst": "avfs_cpu_dense_crest_g_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_g_minPSM": 512
+                  }
+                }
+              }
+            }
+          },
+          "bist": {
+            "a": {
+              "burst": "avfs_cpu_dense_bist_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_bist_a_minPSM": 512
+                  }
+                }
+              }
+            },
+            "b": {
+              "burst": "avfs_cpu_dense_bist_b_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_bist_b_minPSM": 512
+                  }
+                }
+              }
+            },
+            "c": {
+              "burst": "avfs_cpu_dense_bist_c_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_bist_c_minPSM": 512
+                  }
+                }
+              }
+            }
+          },
+          "pbist": {
+            "a": {
+              "burst": "avfs_cpu_dense_pbist_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "100": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_pbist_100"
+                    }
+                  },
+                  "200": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_pbist_200"
+                    }
+                  }
+                }
+              },
+              "offset": 0.00625,
+              "search_settings": {
+                "start": "0.9",
+                "stop": "0.4",
+                "mode": "LinBin",
+                "res": "0.025",
+                "step": "0.1"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_pbist_a_minPSM": 512
+                  }
+                }
+              }
+            }
+          }
+        },
+        "fmax": {
+          "crest": {
+            "a": {
+              "burst": "avfs_cpu_dense_crest_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_a_minPSM": 512
+                  }
+                }
+              }
+            },
+            "b": {
+              "burst": "avfs_cpu_dense_crest_b_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_b_minPSM": 512
+                  }
+                }
+              }
+            },
+            "c": {
+              "burst": "avfs_cpu_dense_crest_c_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_c_minPSM": 512
+                  }
+                }
+              }
+            },
+            "d": {
+              "burst": "avfs_cpu_dense_crest_d_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_d_minPSM": 512
+                  }
+                }
+              }
+            },
+            "e": {
+              "burst": "avfs_cpu_dense_crest_e_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_e_minPSM": 512
+                  }
+                }
+              }
+            },
+            "f": {
+              "burst": "avfs_cpu_dense_crest_f_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_f_minPSM": 512
+                  }
+                }
+              }
+            },
+            "g": {
+              "burst": "avfs_cpu_dense_crest_g_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_crest_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_crest_g_minPSM": 512
+                  }
+                }
+              }
+            }
+          },
+          "bist": {
+            "a": {
+              "burst": "avfs_cpu_dense_bist_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_bist_a_minPSM": 512
+                  }
+                }
+              }
+            },
+            "b": {
+              "burst": "avfs_cpu_dense_bist_b_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_bist_b_minPSM": 512
+                  }
+                }
+              }
+            },
+            "c": {
+              "burst": "avfs_cpu_dense_bist_c_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_bist_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_bist_c_minPSM": 512
+                  }
+                }
+              }
+            }
+          },
+          "pbist": {
+            "a": {
+              "burst": "avfs_cpu_dense_pbist_a_burst",
+              "binnable": false,
+              "test_points": {
+                "spec_variable": "LEV.36.VDDCR[V]",
+                "values": {
+                  "0.9": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_pbist_0.9"
+                    }
+                  },
+                  "1.2": {
+                    "override_primaries": {},
+                    "softsets": {
+                      "profile_name": "SoftsetProfile_avfs_cpu_dense_pbist_1.2"
+                    }
+                  }
+                }
+              },
+              "offset": 50,
+              "search_settings": {
+                "start": "50",
+                "stop": "200",
+                "mode": "Linear",
+                "res": "10",
+                "step": "10"
+              },
+              "minpsm_settings": {
+                "burst": "",
+                "register_setup": {
+                  "vector_variable": {
+                    "avfs_cpu_dense_pbist_a_minPSM": 512
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
