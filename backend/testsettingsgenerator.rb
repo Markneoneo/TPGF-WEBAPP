@@ -185,63 +185,56 @@ class Search < Test
 end
 
 class TestSettingsGenerator
-  attr_reader :ip, :coretypes, :core_mapping, :spec_variable, :floworder_mapping, :search_granularity, :search, :charztype_mapping
+  attr_reader :ip, :coretypes, :core_mapping, :floworder_mapping, :charztype_mapping
 
   def initialize(options)
     @ip                = options[:ip]
     @coretypes         = options[:coretypes]
     @core_mapping      = options[:core_mapping]
-    @spec_variable     = options[:spec_variable]
     @floworder_mapping = options[:floworder_mapping]
     @charztype_mapping = options[:charztype_mapping]
   end
 
   def generatesettings
-    core_result = {}
-
-    core_mapping.each_key do |coretype|
-      fwload_result = fwload_settings(coretype)
-      prod_result   = generate_prod_settings(coretype)
-      charz_result  = generate_charz_settings(coretype)
-
+    core_mapping.each_with_object({}) do |(coretype, coretype_config), core_result|
       core_result[coretype] = {
-        fwload_settings: fwload_result,
-        prod_settings: prod_result,
-        charz_settings: charz_result
+        supply: coretype_config[:supply],
+        clk: coretype_config[:clk],
+        fwload_settings: generate_fwload_settings(coretype),
+        prod_settings: generate_prod_settings(coretype, coretype_config[:spec_variable]),
+        charz_settings: generate_charz_settings(coretype, coretype_config[:spec_variable])
       }
     end
-
-    core_result
   end
 
   private
 
-  def fwload_settings(coretype)
+  # Single Responsibility: Generate fwload settings for a coretype
+  def generate_fwload_settings(coretype)
     fwload_test = Test.new(
       ip: ip,
       coretype: coretype,
-      testtype: 'fwload')
+      testtype: 'fwload'
+    )
     fwload_test.testsettings
   end
 
-  def generate_prod_settings(coretype)
+  # Single Responsibility: Generate production settings for a coretype
+  def generate_prod_settings(coretype, spec_variable)
     floworder_mapping.each_with_object({}) do |(testtype, config), result|
       param_obj = Parametric.new(
         ip: ip,
         coretype: coretype,
         testtype: testtype,
         tp: config[:test_points],
-        insertionlist: config[:insertionlist],
-        binnable: config[:binnable],
-        softsetenable: config[:softsetenable],
-        fallbackenable: config[:fallbackenable],
         spec_variable: spec_variable
       )
       result[testtype] = param_obj.testsettings
     end
   end
 
-  def generate_charz_settings(coretype)
+  # Single Responsibility: Generate characterization settings for a coretype
+  def generate_charz_settings(coretype, spec_variable)
     charztype_mapping[:granularity].each_with_object({}) do |gran, gran_hash|
       gran_hash[gran] = {}
       charztype_mapping[:searchtype].each do |stype, stype_config|
@@ -256,29 +249,36 @@ class TestSettingsGenerator
               tp: config[:test_points],
               spec_variable: spec_variable,
               wl: wl,
-              searchsettings: {
-                'offset' => (stype.to_sym == :vmin ? 0.00625 : (stype.to_sym == :fmax ? 50 : nil)),
-                'search_settings' => config[:searchsettings]
-              }
+              searchsettings: config[:searchsettings]
             )
-            gran_hash[gran][stype][testtype][wl] = (search_obj.testsettings)
+            offset = calculate_offset(stype)
+            gran_hash[gran][stype][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
           end
         end
       end
+    end
+  end
+
+  # Open/Closed: Easily extendable for new search types
+  def calculate_offset(search_type)
+    case search_type
+    when :vmin then 0.00625
+    when :fmax then 50
+    else nil
     end
   end
 end
 
 def core_mapping
   {
-    classic: { count: 4, supply: 'VDDCR_CCX0', clk: 'SMNCLK', freq: 1000 },
-    dense:   { count: 8, supply: 'VDDCR_CCX1', clk: 'SMNCLK', freq: 1000 }
+    classic: { count: 4, supply: 'VDDCR_CCX0', clk: 'SMNCLK', freq: 1000, specvariable: 'LEV.36.VDDCR[V]' },
+    dense:   { count: 8, supply: 'VDDCR_CCX1', clk: 'SMNCLK', freq: 1000, specvariable: 'LEV.36.VDDPR[V]' }
   }
 end
 
 def floworder_mapping
   {
-    psm:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, fallbackenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
+    psm:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, fallbackenable: true, insertionlist: ['ws1', 'ws2', 'ft1']},
     mafdd:  { test_points: [0.9, 1.1], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, fallbackenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
     favfs:  { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true , fallbackenable: false, insertionlist: ['ws1', 'ws2']  },
     cpo:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true,  fallbackenable: false, insertionlist: ['ws1', 'ft1']  }
@@ -310,7 +310,6 @@ tsettings = TestSettingsGenerator.new({
       ip: :cpu,
       coretypes: 2,
       core_mapping: core_mapping,
-      spec_variable: 'LEV.36.VDDCR[V]',
       floworder_mapping: floworder_mapping,
       charztype_mapping: charztype_mapping
     }).generatesettings
