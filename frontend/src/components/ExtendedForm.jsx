@@ -286,11 +286,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
 
         {/* Dynamic core mappings with production and charz parameters for each */}
         {coreMappings.length > 0 && (
-          <div className="core-mappings-container">
-            <div className="section-header">
-              <h5>Core Mappings</h5>
-              <span className="section-badge">{coreMappings.length} core{coreMappings.length !== 1 ? 's' : ''}</span>
-            </div>
+          <div>
             <CoreMappings
               coreMappings={coreMappings}
               errors={errors}

@@ -112,10 +112,7 @@ const CharzParameters = ({
 
   // Render
   return (
-    <div className="charz-section" style={{ marginBottom: '2rem' }}>
-      <h4 style={{ borderBottom: '1px solid #6b00b3', color: '#6b00b3', marginBottom: '1rem' }}>
-        Charz Parameters
-      </h4>
+    <div style={{ marginBottom: '2rem' }}>
 
       {/* Search Granularity - NOW WITH CHECKBOXES */}
       <div className="form-group">

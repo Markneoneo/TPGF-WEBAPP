@@ -1,17 +1,30 @@
+/* Wrapper for all core mappings (no outer box) */
 .core-mappings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* spacing between each core type box */
+}
+
+.core-mapping-label {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Outer box for each core type */
+.core-mapping-container {
   background: #f0f7ff;
   border: 1.5px solid #b6d4fe;
   border-radius: 8px;
-  padding: 1rem 1rem;
-  margin-bottom: 1.5rem;
+  padding: 1rem;
 }
 
-.core-mappings-section label {
-  font-weight: 600;
-  color: #0056b3;
+/* Label styling */
+.core-mapping-container label {
+  font-weight: 100;
   min-width: 50%;
 }
 
+/* Row of core mapping inputs */
 .core-mapping-row {
   display: flex;
   gap: 1rem;
@@ -19,9 +32,52 @@
   align-items: center;
 }
 
+/* Divider line under the spec variable label */
 .form-divider {
   border: none;
   border-top: 1px solid #000000;
-  margin: 1rem 0; /* spacing above/below */
+  margin: 1rem 0;
   width: 100%;
+}
+
+/* Production parameters section */
+.production-section {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  padding: 1rem;
+  border: 1px solid #b36b00;
+  background: #f9f6ef;
+}
+
+.production-section-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.production-section h5 {
+  border-bottom: 1px solid #b36b00;
+  color: #b36b00;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* Charz section styling */
+.charz-section {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.charz-section-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.charz-section h5 {
+  border-bottom: 1px solid #6f42c1;
+  color: #6f42c1;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }

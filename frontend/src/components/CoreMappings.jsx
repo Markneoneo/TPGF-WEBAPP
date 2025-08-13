@@ -19,10 +19,17 @@ const CoreMappings = ({
 }) => (
   <div className="core-mappings-section">
     {coreMappings.map((mapping, idx) => (
-      <div key={idx} className="core-mapping-container">
 
+      <div key={idx} className="core-mapping-container">
         <div className="form-group" style={{ marginBottom: '0.75rem' }}>
-          <label htmlFor={`spec_variable_${idx}`}>Core Type {idx + 1}</label>
+
+          <label
+            htmlFor={`spec_variable_${idx}`}
+            className="core-mapping-label"
+          >
+            <strong>Core Type {idx + 1}</strong>
+          </label>
+
           <hr className="form-divider" />
 
           <input
@@ -69,9 +76,9 @@ const CoreMappings = ({
         </div>
 
         {/* Production Parameters for this core type */}
-        <div className="production-section" style={{ marginTop: '1rem', marginBottom: '1rem', border: '1px solid #b36b00', borderRadius: '4px', padding: '1rem' }}>
-          <h5 style={{ borderBottom: '1px solid #b36b00', color: '#b36b00', marginBottom: '1rem' }}>
-            Production Parameters for Core {idx + 1}
+        <div className="production-section">
+          <h5 className="production-section-label">
+            <strong>Production Parameters for Core {idx + 1}</strong>
           </h5>
           <ProductionMappings
             selectedFlowOrders={selectedFlowOrders[idx] || []}
@@ -99,9 +106,9 @@ const CoreMappings = ({
 
         {/* Charz Parameters for this core type */}
         {showCharzForCore[idx] && (
-          <div style={{ borderRadius: '4px', padding: '1rem', marginBottom: '1rem' }}>
-            <h5 style={{ borderBottom: '1px solid #6f42c1', color: '#6f42c1', marginBottom: '1rem' }}>
-              Charz Parameters for Core {idx + 1}
+          <div className="charz-section">
+            <h5 className="charz-section-label">
+              <strong>Charz Parameters for Core {idx + 1}</strong>
             </h5>
             <CharzParameters
               charzData={charzData[idx] || {}}

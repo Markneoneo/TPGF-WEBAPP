@@ -55,9 +55,15 @@ h4 {
   padding: 0;
 }
 
+/* Full-bleed layout */
+html, body, #root, .App {
+  width: 100%;
+  min-height: 100vh; /* optional */
+}
+
 /* Layout */
 #root {
-  max-width: 80%;
+  max-width: 90%;
   margin: 0 auto;
   padding: var(--spacing-xl);
   text-align: left;

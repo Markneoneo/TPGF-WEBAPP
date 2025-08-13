@@ -1,10 +1,10 @@
-.production-section {
+.production-mappings {
   background: #f9f6ef;
   margin-bottom: 1rem;
   box-shadow: 0 2px 8px rgba(255, 179, 0, 0.06);
 }
 
-.production-section label {
+.production-mappings label {
   font-weight: 600;
   color: #b36b00;
 }
@@ -20,8 +20,9 @@
 
 .production-mapping-block strong {
   color: #b36b00;
-  font-size: 1.13rem;
+  font-size: 1.1rem;
   letter-spacing: 0.01em;
+  font-weight: 700;
 }
 
 .production-mapping-block input {
@@ -41,14 +42,14 @@
   box-shadow: 0 0 0 2px #ffe5b4;
 }
 
-.production-section .error-message {
+.production-mappings .error-message {
   color: #d32f2f;
   font-size: 0.92rem;
   margin-top: 0.2rem;
   display: block;
 }
 
-.production-section .input-hint {
+.production-mappings .input-hint {
   font-size: 0.85rem;
   color: #b36b00;
   margin-top: 0.1rem;
@@ -65,7 +66,7 @@
 
 .production-mapping-block .binnable-row label {
   margin-right: 8px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .production-mapping-block .binnable-row input[type="checkbox"] {

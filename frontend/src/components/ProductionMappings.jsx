@@ -15,7 +15,7 @@ const ProductionMappings = ({
   const getErrorField = (order, field) => `${field}_${order}_core_${coreIndex}`;
 
   return (
-    <div className="production-section">
+    <div className="production-mappings">
       {/* Flow order selection as checkboxes */}
       <div className="form-group">
         <label>Flow Orders</label>
@@ -40,11 +40,13 @@ const ProductionMappings = ({
       {/* Render mapping fields for each selected flow order */}
       {selectedFlowOrders.map(order => (
         <div key={order} className="production-mapping-block">
-          <strong>{order.toUpperCase()} Mapping</strong>
+
+          <h5><strong>{order.toUpperCase()} Mapping</strong></h5>
 
           {/* Read Type Checkboxes */}
           <div className="form-group">
             <label>Read Type</label>
+            <div className="input-hint">Select one or more read types</div>
             {errors[getErrorField(order, 'read_type')] && (<span className="error-message">{errors[getErrorField(order, 'read_type')]}</span>)}
             <div className="checkbox-group">
               <label className="checkbox-label">
@@ -136,19 +138,6 @@ const ProductionMappings = ({
             )}
           </div>
 
-          {/* Insertion Field */}
-          <div style={{ marginBottom: 4 }}>
-            <input
-              type="text"
-              placeholder="Insertion List"
-              value={productionMappings[order]?.insertion || ''}
-              onChange={e => handleProductionMappingChange(order, 'insertion', e.target.value)}
-              className={errors[getErrorField(order, 'insertion')] ? 'error single-input insertion-input' : 'single-input insertion-input'}
-            />
-            <div className="input-hint">Fixed list separated by commas</div>
-            {errors[getErrorField(order, 'insertion')] && <span className="error-message">{errors[getErrorField(order, 'insertion')]}</span>}
-          </div>
-
           <input
             type="text"
             placeholder="Frequency"
@@ -169,8 +158,21 @@ const ProductionMappings = ({
           />
           {errors[getErrorField(order, 'register_size')] && <span className="error-message">{errors[getErrorField(order, 'register_size')]}</span>}
 
+          {/* Insertion Field */}
+          <div style={{ marginBottom: 4 }}>
+            <input
+              type="text"
+              placeholder="Insertion List"
+              value={productionMappings[order]?.insertion || ''}
+              onChange={e => handleProductionMappingChange(order, 'insertion', e.target.value)}
+              className={errors[getErrorField(order, 'insertion')] ? 'error single-input insertion-input' : 'single-input insertion-input'}
+            />
+            <div className="input-hint">Fixed list separated by commas</div>
+            {errors[getErrorField(order, 'insertion')] && <span className="error-message">{errors[getErrorField(order, 'insertion')]}</span>}
+          </div>
+          
           {/* Binnable Checkbox Option */}
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
+          <div className="binnable-row" style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
             <label htmlFor={`binnable_${order}_core_${coreIndex}`} style={{ marginRight: 8 }}>Binnable?</label>
             <input
               type="checkbox"
@@ -182,7 +184,7 @@ const ProductionMappings = ({
           </div>
 
           {/* SoftsetEnable Checkbox Option */}
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
+          <div className="binnable-row" style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
             <label htmlFor={`softsetenable_${order}_core_${coreIndex}`} style={{ marginRight: 8 }}>Softset Enable?</label>
             <input
               type="checkbox"
@@ -194,7 +196,7 @@ const ProductionMappings = ({
           </div>
 
           {/* FallbackEnable Checkbox Option */}
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
+          <div className="binnable-row" style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
             <label htmlFor={`fallbackenable_${order}_core_${coreIndex}`} style={{ marginRight: 8 }}>FallBack Enable?</label>
             <input
               type="checkbox"
