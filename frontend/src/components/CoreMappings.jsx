@@ -78,7 +78,7 @@ const CoreMappings = ({
         {/* Production Parameters for this core type */}
         <div className="production-section">
           <h5 className="production-section-label">
-            <strong>Production Parameters for Core {idx + 1}</strong>
+            <strong>Production Parameters for Core Type {idx + 1}</strong>
           </h5>
           <ProductionMappings
             selectedFlowOrders={selectedFlowOrders[idx] || []}
@@ -100,7 +100,7 @@ const CoreMappings = ({
               className="checkbox-input"
             />
             <span className="checkbox-custom"></span>
-            Charz Parameters for Core {idx + 1}
+            Charz Parameters for Core Type {idx + 1}
           </label>
         </div>
 
@@ -108,7 +108,7 @@ const CoreMappings = ({
         {showCharzForCore[idx] && (
           <div className="charz-section">
             <h5 className="charz-section-label">
-              <strong>Charz Parameters for Core {idx + 1}</strong>
+              <strong>Charz Parameters for Core Type {idx + 1}</strong>
             </h5>
             <CharzParameters
               charzData={charzData[idx] || {}}

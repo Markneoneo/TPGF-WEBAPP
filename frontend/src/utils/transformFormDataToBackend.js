@@ -145,6 +145,7 @@ function transformFormDataToBackend(formData) {
     ip: 'cpu', // or from formData if available
     coretypes: Number(formData.num_core_types),
     core_mapping,
+    spec_variable: formData.spec_variable ?? '',
     floworder_mapping,
     charztype_mapping
   };
