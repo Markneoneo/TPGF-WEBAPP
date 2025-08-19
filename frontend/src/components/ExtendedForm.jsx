@@ -192,7 +192,6 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
   const clearForm = () => {
     setNumCoreTypes('1');
     setCoreMappings([{ core: '', core_count: '', supply: '', clock: '', spec_variable: '' }]);
-    setSpecVariable('');
     setSelectedFlowOrders([[]]);
     setProductionMappings([{}]);
     setShowCharzForCore([false]);

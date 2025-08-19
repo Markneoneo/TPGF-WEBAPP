@@ -1,6 +1,8 @@
 # Helper module for shared test logic
 module TestHelper
   def tpsettings
+    test_points_values = gentp
+    puts "Generated test points: #{test_points_values.inspect}"  # Debug line
     {
       'burst' => pertpburst? ? "": burst ,
       'binnable' => binnable,
@@ -128,20 +130,25 @@ class Parametric < Test
   end
 
   def gentp
-    @testpoints.each_with_index.each_with_object({}) do |(tp, idx), values|
+    puts "Generating test points for testpoints: #{@testpoints.inspect}"
+    result = @testpoints.each_with_index.each_with_object({}) do |(tp, idx), values|
       tpnum = "tp#{idx}"
       unique_item = pertpburst? ? "#{tname}_#{tpnum}" : nil
       values[tpnum] = ParametricTestPoint.new(tp, unique_item).generate
     end
-  end
+    puts "Generated test points result: #{result.inspect}"
+    result
+  end  
 
   def testsettings
     settings = tpsettings.merge(regreadsetup)
-    settings['softsets'] = softsetprofile if softsetenable
     settings['insertion_list'] = insertionlist
+    settings['binnable'] = binnable 
+    settings['softsets'] = softsetprofile if softsetenable
     settings['fallback_enable'] = fallbackenable
+    puts "Final parametric settings: #{settings.inspect}"
     settings
-  end
+  end  
 end
   
 class Search < Test
@@ -197,10 +204,10 @@ class TestSettingsGenerator
     puts "TestSettingsGenerator initialized with:"
     puts "  IP: #{@ip}"
     puts "  Coretypes: #{@coretypes}"
-    puts "  Core mapping keys: #{@core_mapping.keys}"
-    puts "  Floworder mapping keys: #{@floworder_mapping.keys}"
-    puts "  Charztype mapping keys: #{@charztype_mapping.keys}"
-  end
+    puts "  Core mapping: #{@core_mapping.inspect}"
+    puts "  Floworder mapping: #{@floworder_mapping.inspect}"
+    puts "  Charztype mapping: #{@charztype_mapping.inspect}"
+  end  
 
   def generatesettings
     result = {}
@@ -238,46 +245,76 @@ class TestSettingsGenerator
   def generate_prod_settings(coretype, spec_variable)
     result = {}
     
-    # Filter floworder_mapping for this specific coretype
     floworder_mapping.each do |flow_key, config|
-      # Extract the actual test type from the flow key (remove core info)
       testtype = extract_testtype_from_key(flow_key)
       
-      # Check if this flow belongs to the current coretype
       if flow_belongs_to_coretype?(flow_key, coretype)
         puts "Generating prod settings for #{coretype}, testtype: #{testtype}"
+        puts "Config for #{flow_key}: #{config.inspect}"
+        
+        puts "DEBUG: Checking key access methods:"
+        puts "  config[':test_points'] = #{config[':test_points'].inspect}"
+        puts "  config[:test_points] = #{config[:test_points].inspect}"
+        puts "  config[':binnable'] = #{config[':binnable'].inspect}"
+        puts "  config[:binnable] = #{config[:binnable].inspect}"
+
+        # Use symbols without colons
+        test_points = config[:test_points] || []
+        binnable = config[:binnable] || false
+        softsetenable = config[:softsetenable] || false
+        fallbackenable = config[:fallbackenable] || false
+        insertionlist = config[:insertionlist] || []
+
+        puts "Extracted values: test_points=#{test_points.inspect}, binnable=#{binnable}, fallback=#{fallbackenable}"
         
         param_obj = Parametric.new(
           ip: ip,
           coretype: coretype,
           testtype: testtype,
-          tp: config[:test_points] || [],
+          tp: test_points,
           spec_variable: spec_variable || "",
-          binnable: config[:binnable] || false,
-          softsetenable: config[:softsetenable] || false,
-          fallbackenable: config[:fallbackenable] || false,
-          insertionlist: config[:insertionlist] || []
+          binnable: binnable,
+          softsetenable: softsetenable,
+          fallbackenable: fallbackenable,
+          insertionlist: insertionlist
         )
         result[testtype] = param_obj.testsettings
       end
     end
     
     result
-  end
+  end  
 
   # Single Responsibility: Generate characterization settings for a coretype
   def generate_charz_settings(coretype, spec_variable)
     result = {}
     
-    # Find charz config for this coretype
     charz_config = find_charz_config_for_coretype(coretype)
-    return result unless charz_config
+    
+    if charz_config.nil?
+      puts "No charz config found for coretype: #{coretype}"
+      return result
+    end
     
     puts "Generating charz settings for #{coretype}"
     puts "Charz config: #{charz_config.inspect}"
     
+    # Use symbols without colons
     granularity_list = charz_config[:granularity] || []
     searchtype_hash = charz_config[:searchtype] || {}
+    
+    puts "Granularity list: #{granularity_list.inspect}"
+    puts "Search types: #{searchtype_hash.keys.inspect}"
+    
+    if granularity_list.empty?
+      puts "Warning: granularity_list is empty for #{coretype}"
+      return result
+    end
+    
+    if searchtype_hash.empty?
+      puts "Warning: searchtype_hash is empty for #{coretype}"
+      return result
+    end
     
     granularity_list.each do |gran|
       result[gran] = {}
@@ -285,11 +322,19 @@ class TestSettingsGenerator
       searchtype_hash.each do |stype, stype_config|
         result[gran][stype] = {}
         
+        # Use string keys with colons
         testtype_hash = stype_config[:testtype] || {}
         testtype_hash.each do |testtype, config|
           result[gran][stype][testtype] = {}
           
+          # Use string keys with colons
           wl_list = config[:wl] || []
+          
+          if wl_list.empty?
+            puts "Warning: wl_list is empty for #{coretype}, #{stype}, #{testtype}"
+            next
+          end
+          
           wl_list.each do |wl|
             search_obj = Search.new(
               ip: ip,
@@ -307,8 +352,9 @@ class TestSettingsGenerator
       end
     end
     
+    puts "Final charz result for #{coretype}: #{result.inspect}"
     result
-  end
+  end    
 
   # Helper method to extract testtype from flow key
   def extract_testtype_from_key(flow_key)
@@ -335,7 +381,6 @@ class TestSettingsGenerator
 
   # Helper method to find charz config for a specific coretype
   def find_charz_config_for_coretype(coretype)
-    # Look for charz config by core index
     core_mapping_array = core_mapping.to_a
     core_index = core_mapping_array.find_index { |ct, _| ct.to_s == coretype.to_s }
     
@@ -343,8 +388,13 @@ class TestSettingsGenerator
     
     # Look for charz config with key like "core_0", "core_1", etc.
     core_key = "core_#{core_index}"
-    charztype_mapping[core_key.to_sym] || charztype_mapping[core_key]
-  end
+    config = charztype_mapping[core_key.to_sym] || charztype_mapping[core_key]
+    
+    puts "Looking for charz config with key: #{core_key}"
+    puts "Found config: #{config.inspect}"
+    
+    config
+  end  
 
   # Open/Closed: Easily extendable for new search types
   def calculate_offset(search_type)

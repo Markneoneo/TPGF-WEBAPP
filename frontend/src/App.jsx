@@ -69,6 +69,7 @@ function App() {
         
         // Transform formData to backend format
         const backendPayload = transformFormDataToBackend(formData);
+        console.log(`Backend payload for ${ipType}:`, JSON.stringify(backendPayload, null, 2));
         backendPayload.ip = ipType.toLowerCase();
         
         allIpData[ipType.toLowerCase()] = backendPayload;
