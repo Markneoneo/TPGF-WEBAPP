@@ -26,16 +26,22 @@ options "*" do
 end
 
 def symbolize_keys(hash)
-  hash.each_with_object({}) do |(k, v), memo|
-    # Convert string keys that start with ':' to symbols
-    key = if k.is_a?(String) && k.start_with?(':')
-            k[1..-1].to_sym
-          elsif k.is_a?(String)
-            k.to_sym
-          else
-            k
-          end
-    memo[key] = v.is_a?(Hash) ? symbolize_keys(v) : v
+  case hash
+  when Hash
+    hash.each_with_object({}) do |(k, v), memo|
+      key = if k.is_a?(String) && k.start_with?(':')
+              k[1..-1].to_sym
+            elsif k.is_a?(String)
+              k.to_sym
+            else
+              k
+            end
+      memo[key] = symbolize_keys(v)
+    end
+  when Array
+    hash.map { |v| symbolize_keys(v) }
+  else
+    hash
   end
 end
 
@@ -79,7 +85,6 @@ post '/api/process-multiple-ips' do
   normalized_map =
     case ip_configurations
     when Array
-      # Expect each element has 'ip' key to use as name
       map = {}
       ip_configurations.each_with_index do |cfg, idx|
         ip_name = (cfg['ip'] || "ip_#{idx}").to_s
@@ -101,7 +106,7 @@ post '/api/process-multiple-ips' do
       obj.map { |v| snake_keys(v) }
     when Hash
       obj.each_with_object({}) do |(k, v), h|
-        key = k.to_s.gsub(/([A-Z])/, '_\1').downcase # camelCase/PascalCase -> snake_case
+        key = k.to_s.gsub(/([A-Z])/, '_\1').downcase
         h[key] = snake_keys(v)
       end
     else
@@ -109,49 +114,29 @@ post '/api/process-multiple-ips' do
     end
   end
 
-  def symbolize_keys(hash)
-    hash.each_with_object({}) do |(k, v), memo|
-      # Convert string keys that start with ':' to symbols
-      key = if k.is_a?(String) && k.start_with?(':')
-              k[1..-1].to_sym  # This removes the ':' and converts to symbol
-            elsif k.is_a?(String)
-              k.to_sym
-            else
-              k
-            end
-      memo[key] = v.is_a?(Hash) ? symbolize_keys(v) : v
-    end
-  end  
-
   combined_results = {}
 
   normalized_map.each do |ip_name, config|
     begin
       puts "Processing IP: #{ip_name}"
-      cfg = snake_keys(config) # accept camelCase inputs
+      cfg = snake_keys(config)
 
-      # Build the exact structure needed by TestSettingsGenerator
+      # Build the simplified structure needed by TestSettingsGenerator
       symbolized_config = {
         'ip' => cfg['ip'] || ip_name,
-        'coretypes' => cfg['coretypes'],
-        'core_mapping' => symbolize_keys(cfg['core_mapping'] || {}),
-        'floworder_mapping' => symbolize_keys(cfg['floworder_mapping'] || {}),
-        'charztype_mapping' => symbolize_keys(cfg['charztype_mapping'] || {})
+        'core_mapping' => symbolize_keys(cfg['core_mapping'] || {})
       }
 
       # Validate required fields
-      if symbolized_config['coretypes'].nil? || symbolized_config['ip'].nil?
+      if symbolized_config['ip'].nil? || symbolized_config['core_mapping'].empty?
         status 400
         return({ error: "Missing required fields for '#{ip_name}'",
-                 details: "ip: #{symbolized_config['ip'].inspect}, coretypes: #{symbolized_config['coretypes'].inspect}" }.to_json)
+                 details: "ip: #{symbolized_config['ip'].inspect}, core_mapping: #{symbolized_config['core_mapping'].inspect}" }.to_json)
       end
 
       tsettings = TestSettingsGenerator.new({
         ip: symbolized_config['ip'],
-        coretypes: symbolized_config['coretypes'],
-        core_mapping: symbolized_config['core_mapping'],
-        floworder_mapping: symbolized_config['floworder_mapping'],
-        charztype_mapping: symbolized_config['charztype_mapping']
+        core_mapping: symbolized_config['core_mapping']
       }).generatesettings
 
       combined_results[ip_name] = tsettings
@@ -176,4 +161,3 @@ post '/api/process-multiple-ips' do
     data: combined_results
   }.to_json
 end
-

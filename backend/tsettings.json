@@ -1,20 +1,20 @@
 {
-  "cpu": {
-    "999": {
-      "supply": "999",
-      "clk": "999",
+  "soc": {
+    "1": {
+      "supply": "1",
+      "clk": "1",
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_cpu_999_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_cpu_999_fwload"
+          "burst": "avfs_soc_1_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_soc_1_fwload"
         }
       },
       "prod_settings": {
-        "cpo": {
-          "burst": "avfs_cpu_999_cpo_burst",
+        "avgpsm": {
+          "burst": "avfs_soc_1_avgpsm_burst",
           "binnable": true,
           "test_points": {
-            "spec_variable": "999",
+            "spec_variable": "1",
             "values": {
               "tp0": {
                 "value": 1
@@ -24,94 +24,22 @@
               },
               "tp2": {
                 "value": 3
-              },
-              "tp3": {
-                "value": 4
               }
             }
           },
           "register_setup": {
             "vector_variable": {
-              "avfs_cpu_999_cpo": 512
+              "avfs_soc_1_avgpsm": 512
             }
           },
           "insertion_list": [
-            "999"
+            "1"
           ],
-          "softsets": "SoftsetProfile_avfs_cpu_999_cpo",
+          "softsets": "SoftsetProfile_avfs_soc_1_avgpsm",
           "fallback_enable": true
         }
       },
-      "charz_settings": {
-        "allcore": {
-          "fmax": {
-            "bist": {
-              "999": {
-                "burst": "avfs_cpu_999_bist_999_burst",
-                "binnable": false,
-                "test_points": {
-                  "spec_variable": "999",
-                  "values": {
-                    "999": {
-                      "override_primaries": {},
-                      "softsets": {
-                        "profile_name": "SoftsetProfile_avfs_cpu_999_bist_999"
-                      }
-                    }
-                  }
-                },
-                "start": "999",
-                "stop": "999",
-                "res": "999",
-                "step": "999",
-                "minpsm_settings": {
-                  "burst": "",
-                  "register_setup": {
-                    "vector_variable": {
-                      "avfs_cpu_999_bist_999_minPSM": 512
-                    }
-                  }
-                },
-                "offset": 50
-              }
-            }
-          }
-        },
-        "bycore": {
-          "fmax": {
-            "bist": {
-              "999": {
-                "burst": "avfs_cpu_999_bist_999_burst",
-                "binnable": false,
-                "test_points": {
-                  "spec_variable": "999",
-                  "values": {
-                    "999": {
-                      "override_primaries": {},
-                      "softsets": {
-                        "profile_name": "SoftsetProfile_avfs_cpu_999_bist_999"
-                      }
-                    }
-                  }
-                },
-                "start": "999",
-                "stop": "999",
-                "res": "999",
-                "step": "999",
-                "minpsm_settings": {
-                  "burst": "",
-                  "register_setup": {
-                    "vector_variable": {
-                      "avfs_cpu_999_bist_999_minPSM": 512
-                    }
-                  }
-                },
-                "offset": 50
-              }
-            }
-          }
-        }
-      }
+      "charz_settings": {}
     }
   }
 }

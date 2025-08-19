@@ -1,3 +1,20 @@
+/* CSS Class Breakdown:
+Layout & Structure:
+.App - Main app container (inherits full width from html/body/#root)
+#root - Page wrapper with max-width 90%, auto margins, and 2rem padding
+.card - Main content container with background, shadow, rounded corners, and large padding
+
+Typography:
+.title - Main heading (center-aligned, large font)
+.subheading - Subtitle text (center-aligned, muted color)
+.form-title - Form section headers with bottom border
+
+Form Layout:
+.ip-selection-container - IP type selection section with background and padding
+.forms-container - Flexbox container for multiple forms
+.extended-form - Individual form wrapper with padding and shadow
+.global-actions - Bottom action buttons container with background and padding */
+
 /* CSS Custom Properties for consistent theming */
 :root {
   --primary-color: #007bff;
@@ -183,26 +200,32 @@ label {
   background-color: var(--secondary-hover);
 }
 
-.download-button {
-  @extend .btn;
+.download-link-container {
   margin-top: var(--spacing-lg);
+  text-align: center;
+}
+
+.download-link-container a {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
   background-color: var(--success-color);
   color: white;
+  text-decoration: none;
+  border-radius: var(--border-radius-small);
+  font-size: var(--font-size-base);
+  transition: background-color var(--transition-fast);
+  border: none;
+  cursor: pointer;
 }
 
-.download-button:hover {
+.download-link-container a:hover {
   background-color: var(--success-hover);
-}
-
-.download-button:active {
-  transform: translateY(1px);
 }
 
 /* Layout Components */
 .button-group,
 .global-button-group {
   width: 100%;
-  margin-top: var(--spacing-xl);
   display: flex;
   justify-content: space-between;
 }
@@ -211,38 +234,23 @@ label {
   justify-content: space-around;
 }
 
-.download-section,
-.download-link-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.download-link-container {
-  margin-top: var(--spacing-lg);
-}
-
 .forms-container {
   display: flex;
   gap: var(--spacing-lg);
   flex-wrap: wrap;
-  margin-bottom: var(--spacing-xl);
 }
 
 .extended-form {
-  margin-bottom: var(--spacing-xl);
   padding: var(--spacing-lg);
   background-color: var(--bg-card);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-card);
   flex: 1;
   min-width: 350px;
   width: 800px;
 }
 
 .global-actions {
-  margin-top: var(--spacing-xl);
   padding: var(--spacing-lg);
   background-color: var(--bg-section);
   border-radius: var(--border-radius);
