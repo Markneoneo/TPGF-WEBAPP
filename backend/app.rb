@@ -26,16 +26,22 @@ options "*" do
 end
 
 def symbolize_keys(hash)
-  hash.each_with_object({}) do |(k, v), memo|
-    # Convert string keys that start with ':' to symbols
-    key = if k.is_a?(String) && k.start_with?(':')
-            k[1..-1].to_sym
-          elsif k.is_a?(String)
-            k.to_sym
-          else
-            k
-          end
-    memo[key] = v.is_a?(Hash) ? symbolize_keys(v) : v
+  case hash
+  when Hash
+    hash.each_with_object({}) do |(k, v), memo|
+      key = if k.is_a?(String) && k.start_with?(':')
+              k[1..-1].to_sym
+            elsif k.is_a?(String)
+              k.to_sym
+            else
+              k
+            end
+      memo[key] = symbolize_keys(v)
+    end
+  when Array
+    hash.map { |v| symbolize_keys(v) }
+  else
+    hash
   end
 end
 
@@ -60,107 +66,98 @@ end
 # NEW: Multiple IP processing endpoint
 post '/api/process-multiple-ips' do
   content_type :json
-  
+  request.body.rewind
+
   begin
-    request.body.rewind
     request_data = JSON.parse(request.body.read)
-    ip_configurations = request_data['ip_configurations']
-    
-    puts "Received multiple IP configurations: #{ip_configurations.keys}"
-    
-    combined_results = {}
-    
-    # Process each IP configuration
-    ip_configurations.each do |ip_name, config|
+  rescue JSON::ParserError => e
+    status 400
+    return({ error: 'Invalid JSON format', details: e.message }.to_json)
+  end
+
+  ip_configurations = request_data['ip_configurations']
+  if ip_configurations.nil?
+    status 400
+    return({ error: "Missing 'ip_configurations' in request body" }.to_json)
+  end
+
+  # Normalize to a Hash keyed by ip_name => config
+  normalized_map =
+    case ip_configurations
+    when Array
+      map = {}
+      ip_configurations.each_with_index do |cfg, idx|
+        ip_name = (cfg['ip'] || "ip_#{idx}").to_s
+        map[ip_name] = cfg
+      end
+      map
+    when Hash
+      ip_configurations
+    else
+      status 400
+      return({ error: "'ip_configurations' must be an object or array" }.to_json)
+    end
+
+  puts "Received multiple IP configurations: #{normalized_map.keys}"
+
+  def snake_keys(obj)
+    case obj
+    when Array
+      obj.map { |v| snake_keys(v) }
+    when Hash
+      obj.each_with_object({}) do |(k, v), h|
+        key = k.to_s.gsub(/([A-Z])/, '_\1').downcase
+        h[key] = snake_keys(v)
+      end
+    else
+      obj
+    end
+  end
+
+  combined_results = {}
+
+  normalized_map.each do |ip_name, config|
+    begin
       puts "Processing IP: #{ip_name}"
-      puts "Config: #{config.inspect}"
-      
-      # Symbolize keys for this configuration
+      cfg = snake_keys(config)
+
+      # Build the simplified structure needed by TestSettingsGenerator
       symbolized_config = {
-        'ip' => config['ip'],
-        'coretypes' => config['coretypes'],
-        'core_mapping' => symbolize_keys(config['core_mapping'] || {}),
-        'spec_variable' => config['spec_variable'],
-        'floworder_mapping' => symbolize_keys(config['floworder_mapping'] || {}),
-        'charztype_mapping' => symbolize_keys(config['charztype_mapping'] || {})
+        'ip' => cfg['ip'] || ip_name,
+        'core_mapping' => symbolize_keys(cfg['core_mapping'] || {})
       }
-      
-      # Generate settings for this IP
+
+      # Validate required fields
+      if symbolized_config['ip'].nil? || symbolized_config['core_mapping'].empty?
+        status 400
+        return({ error: "Missing required fields for '#{ip_name}'",
+                 details: "ip: #{symbolized_config['ip'].inspect}, core_mapping: #{symbolized_config['core_mapping'].inspect}" }.to_json)
+      end
+
       tsettings = TestSettingsGenerator.new({
         ip: symbolized_config['ip'],
-        coretypes: symbolized_config['coretypes'],
-        core_mapping: symbolized_config['core_mapping'],
-        spec_variable: symbolized_config['spec_variable'],
-        floworder_mapping: symbolized_config['floworder_mapping'],
-        charztype_mapping: symbolized_config['charztype_mapping']
-      }).generatesettings
-      
-      # Add to combined results
+        core_mapping: symbolized_config['core_mapping']
+      }).generate_settings
+
       combined_results[ip_name] = tsettings
       puts "Generated settings for #{ip_name}"
+    rescue => e
+      puts "Error generating settings for #{ip_name}: #{e.message}"
+      puts e.backtrace
+      status 500
+      return({ error: 'Internal server error', ip: ip_name, details: e.message }.to_json)
     end
-    
-    # Write combined results to file
-    File.open('tsettings.json', 'w') do |file|
-      file.write(JSON.pretty_generate(combined_results))
-    end
-    
-    puts "Combined results written to tsettings.json"
-    puts "Final structure: #{combined_results.keys}"
-    
-    # Return success response
-    response_data = { 
-      status: 'success', 
-      message: 'Combined settings generated successfully',
-      ip_types_processed: combined_results.keys,
-      data: combined_results 
-    }
-    
-    response_data.to_json
-    
-  rescue JSON::ParserError => e
-    puts "JSON parsing error: #{e.message}"
-    status 400
-    { error: 'Invalid JSON format', details: e.message }.to_json
-  rescue => e
-    puts "General error: #{e.message}"
-    puts e.backtrace
-    status 500
-    { error: 'Internal server error', details: e.message }.to_json
   end
-end
 
-# Updated data processing endpoint
-post '/api/process-data' do
-  request.body.rewind
-  data = JSON.parse(request.body.read)
-  data['charztype_mapping'] = symbolize_keys(data['charztype_mapping'])
-  data['floworder_mapping'] = symbolize_keys(data['floworder_mapping'])
-  data['core_mapping'] = symbolize_keys(data['core_mapping'])
-  
-  # Log input from frontend
-  puts "Received from frontend: #{data.inspect}"
-
-  # Use TestSettingsGenerator instead of AvfsCharz
-  tsettings = TestSettingsGenerator.new({
-    ip: data['ip'],
-    coretypes: data['coretypes'],
-    core_mapping: data['core_mapping'],
-    spec_variable: data['spec_variable'],
-    floworder_mapping: data['floworder_mapping'],
-    charztype_mapping: data['charztype_mapping']
-  }).generatesettings
-
-  # Write to tsettings.json for frontend download
   File.open('tsettings.json', 'w') do |file|
-    file.write(JSON.pretty_generate(tsettings))
+    file.write(JSON.pretty_generate(combined_results))
   end
+  puts "Combined results written to tsettings.json"
 
-  response_data = { result: tsettings }
-
-  # Log output to frontend
-  puts "Sending to frontend: #{response_data.inspect}"
-
-  content_type :json
-  response_data.to_json
+  {
+    status: 'success',
+    message: 'Combined settings generated successfully',
+    ip_types_processed: combined_results.keys,
+    data: combined_results
+  }.to_json
 end

@@ -2,7 +2,7 @@
 module TestHelper
   def tpsettings
     {
-      'burst' => pertpburst? ? "": burst ,
+      'burst' => pertpburst? ? "" : burst,
       'binnable' => binnable,
       'test_points' => {
         'spec_variable' => spec_variable,
@@ -15,13 +15,13 @@ module TestHelper
     key = name ? "#{tname}_#{name}" : tname
     {
       'register_setup' => {
-        'vector_variable' => { key => 512 }
+        'pattern' => { key => 512 }
       }
     }
   end
 end
-  
-  # Abstract base for test points
+
+# Abstract base for test points
 class TestPoint
   attr_reader :base_point, :unique_item
 
@@ -34,14 +34,14 @@ class TestPoint
     raise NotImplementedError, "Subclasses must implement the `generate` method"
   end
 end
-  
+
 class ParametricTestPoint < TestPoint
   def generate
     { "value" => base_point }
-    .tap { |h| h["burst"] = "#{unique_item}_burst" if unique_item }   
+      .tap { |h| h["burst"] = "#{unique_item}_burst" if unique_item }
   end
 end
-  
+
 class SearchTestPoint < TestPoint
   def generate
     {
@@ -50,17 +50,17 @@ class SearchTestPoint < TestPoint
     }
   end
 end
-  
-  # Abstract base for tests
+
+# Abstract base for tests
 class Test
   attr_accessor :ip, :coretype, :testtype, :testpoints, :binnable, :softsetenable, :fallbackenable
 
   def initialize(ip: default_ip, coretype: default_coretype, testtype: default_testtype, tp: default_testpoints, binnable: default_binnable, softsetenable: default_softsetenable, fallbackenable: default_fallbackenable, **options)
-    @ip         = ip
-    @coretype   = coretype
-    @testtype   = testtype
+    @ip = ip
+    @coretype = coretype
+    @testtype = testtype
     @testpoints = tp
-    @binnable   = binnable
+    @binnable = binnable
     @softsetenable = softsetenable
     @fallbackenable = fallbackenable
     post_initialize(options)
@@ -96,11 +96,11 @@ class Test
 
   def pertpburst?
     testtype.to_sym == :favfs
-  end 
+  end
 
   def softsetprofile
-    # Exclude wl from the profile name
-    "SoftsetProfile_avfs_#{ip}_#{coretype}_#{testtype}"
+    components = ["SoftsetProfile_avfs", ip, coretype, testtype]
+    components.reject(&:empty?).join("_")
   end
 
   def testsettings
@@ -113,14 +113,15 @@ class Test
     settings
   end
 end
-  
+
 class Parametric < Test
   include TestHelper
-  attr_accessor :spec_variable, :insertionlist
-  
+  attr_accessor :spec_variable, :insertionlist, :readtype
+
   def post_initialize(options)
-    @spec_variable  = options[:spec_variable] || ""
-    @insertionlist  = options[:insertionlist] || default_insertionlist
+    @spec_variable = options[:spec_variable] || ""
+    @insertionlist = options[:insertionlist] || default_insertionlist
+    @readtype = options[:readtype] || ['fw']
   end
 
   def default_insertionlist
@@ -143,14 +144,14 @@ class Parametric < Test
     settings
   end
 end
-  
+
 class Search < Test
   include TestHelper
   attr_accessor :spec_variable, :wl, :searchsettings
 
   def post_initialize(options)
-    @spec_variable  = options[:spec_variable] || ""
-    @wl             = options[:wl] || default_wl
+    @spec_variable = options[:spec_variable] || ""
+    @wl = options[:wl] || default_wl
     @searchsettings = options[:searchsettings] || {}
   end
 
@@ -167,17 +168,19 @@ class Search < Test
   end
 
   def searchsettings
-      @searchsettings
+    {
+      'search_settings' => @searchsettings
+    }
   end
 
   def minpsmsettings
-      {
-        "minpsm_settings" => {
-          "burst" => "",
-          "register_setup" => regreadsetup('minPSM')["register_setup"]
-        }
+    {
+      "minpsm_settings" => {
+        "burst" => "",
+        "register_setup" => regreadsetup('minPSM')["register_setup"]
       }
-    end
+    }
+  end
 
   def testsettings
     tpsettings.merge(searchsettings).merge(minpsmsettings)
@@ -185,140 +188,116 @@ class Search < Test
 end
 
 class TestSettingsGenerator
-  attr_reader :ip, :coretypes, :core_mapping, :spec_variable, :floworder_mapping, :search_granularity, :search, :charztype_mapping
+  attr_reader :ip, :core_mapping
 
   def initialize(options)
-    @ip                = options[:ip]
-    @coretypes         = options[:coretypes]
-    @core_mapping      = options[:core_mapping]
-    @spec_variable     = options[:spec_variable]
-    @floworder_mapping = options[:floworder_mapping]
-    @charztype_mapping = options[:charztype_mapping]
+    @ip = options[:ip]
+    @core_mapping = options[:core_mapping]
   end
 
-  def generatesettings
-    core_result = {}
-
-    core_mapping.each_key do |coretype|
-      fwload_result = fwload_settings(coretype)
-      prod_result   = generate_prod_settings(coretype)
-      charz_result  = generate_charz_settings(coretype)
-
-      core_result[coretype] = {
-        fwload_settings: fwload_result,
-        prod_settings: prod_result,
-        charz_settings: charz_result
-      }
+  def generate_settings
+    if core_mapping.size == 1
+      generate_single_core_settings
+    else
+      generate_multiple_core_settings
     end
-
-    core_result
   end
 
   private
 
-  def fwload_settings(coretype)
-    fwload_test = Test.new(
-      ip: ip,
-      coretype: coretype,
-      testtype: 'fwload')
-    fwload_test.testsettings
+  def generate_single_core_settings
+    coretype, coretype_config = core_mapping.first
+    {
+      coretype => generate_core_settings("", coretype_config)
+    }
   end
 
-  def generate_prod_settings(coretype)
-    floworder_mapping.each_with_object({}) do |(testtype, config), result|
-      param_obj = Parametric.new(
-        ip: ip,
-        coretype: coretype,
-        testtype: testtype,
-        tp: config[:test_points],
-        insertionlist: config[:insertionlist],
-        binnable: config[:binnable],
-        softsetenable: config[:softsetenable],
-        fallbackenable: config[:fallbackenable],
-        spec_variable: spec_variable
-      )
-      result[testtype] = param_obj.testsettings
+  def generate_multiple_core_settings
+    core_mapping.each_with_object({}) do |(coretype, coretype_config), result|
+      result[coretype] = generate_core_settings(coretype, coretype_config)
     end
   end
 
-  def generate_charz_settings(coretype)
+  def generate_core_settings(coretype, coretype_config)
+    {
+      supply: coretype_config[:supply],
+      clk: coretype_config[:clk],
+      fwload_settings: generate_fwload_settings(coretype),
+      prod_settings: generate_prod_settings(coretype, coretype_config),
+      charz_settings: generate_charz_settings(coretype, coretype_config)
+    }
+  end
+
+  def generate_fwload_settings(coretype)
+    fwload_test = Test.new(
+      ip: ip,
+      coretype: coretype,
+      testtype: 'fwload'
+    )
+    fwload_test.testsettings
+  end
+
+  def generate_prod_settings(coretype, coretype_config)
+    return {} unless coretype_config[:floworder_mapping]
+    
+    spec_variable = coretype_config[:specvariable] || coretype_config[:spec_variable] || ""
+    coretype_config[:floworder_mapping].each_with_object({}) do |(testtype, config), result|
+      param_obj = Parametric.new(
+        ip: ip,
+        coretype: coretype,
+        testtype: testtype.to_s,
+        tp: config[:test_points] || [],
+        spec_variable: spec_variable,
+        binnable: config[:binnable] || false,
+        softsetenable: config[:softsetenable] || false,
+        fallbackenable: config[:fallbackenable] || false,
+        insertionlist: config[:insertionlist] || [],
+        readtype: config[:readtype] || ['fw']
+      )
+      result[testtype.to_s] = param_obj.testsettings
+    end
+  end
+
+  def generate_charz_settings(coretype, coretype_config)
+    charztype_mapping = coretype_config[:charztype_mapping]
+    return {} unless charztype_mapping && charztype_mapping[:granularity] && charztype_mapping[:searchtype]
+    
+    spec_variable = coretype_config[:specvariable] || coretype_config[:spec_variable] || ""
     charztype_mapping[:granularity].each_with_object({}) do |gran, gran_hash|
       gran_hash[gran] = {}
       charztype_mapping[:searchtype].each do |stype, stype_config|
         gran_hash[gran][stype] = {}
+        next unless stype_config[:testtype]
+        
         stype_config[:testtype].each do |testtype, config|
           gran_hash[gran][stype][testtype] = {}
-          config[:wl].each do |wl|
+          wl_list = config[:wl] || []
+          next if wl_list.empty?
+          
+          wl_list.each do |wl|
             search_obj = Search.new(
               ip: ip,
               coretype: coretype,
-              testtype: testtype,
-              tp: config[:test_points],
+              testtype: testtype.to_s,
+              tp: config[:test_points] || [],
               spec_variable: spec_variable,
               wl: wl,
-              searchsettings: {
-                'offset' => (stype.to_sym == :vmin ? 0.00625 : (stype.to_sym == :fmax ? 50 : nil)),
-                'search_settings' => config[:searchsettings]
-              }
+              searchsettings: config[:searchsettings] || {}
             )
-            gran_hash[gran][stype][testtype][wl] = (search_obj.testsettings)
+            offset = calculate_offset(stype)
+            gran_hash[gran][stype][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
           end
         end
       end
     end
   end
+
+  def calculate_offset(search_type)
+    case search_type
+    when :vmin then 0.00625
+    when :fmax then 50
+    else nil
+    end
+  end
 end
 
-def core_mapping
-  {
-    classic: { count: 4, supply: 'VDDCR_CCX0', clk: 'SMNCLK', freq: 1000 },
-    dense:   { count: 8, supply: 'VDDCR_CCX1', clk: 'SMNCLK', freq: 1000 }
-  }
-end
-
-def floworder_mapping
-  {
-    psm:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, fallbackenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
-    mafdd:  { test_points: [0.9, 1.1], frequency: 1000, register_size: 14, binnable: true, softsetenable: false, fallbackenable: false, insertionlist: ['ws1', 'ws2', 'ft1'] },
-    favfs:  { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true , fallbackenable: false, insertionlist: ['ws1', 'ws2']  },
-    cpo:    { test_points: [0.6, 1.2], frequency: 1000, register_size: 14, binnable: true, softsetenable: true,  fallbackenable: false, insertionlist: ['ws1', 'ft1']  }
-  }
-end
-
-def charztype_mapping
-  {
-    granularity: ['allcore'],
-    searchtype: { vmin: {
-    testtype: {
-      crest: { wl_count: 7, wl: %w[a b c d e f g], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } },
-      bist:  { wl_count: 3, wl: %w[a b c], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } },
-      pbist: { wl_count: 1, wl: %w[a], test_points: [100, 200], searchsettings: { start: '0.9', stop: '0.4', mode: 'LinBin', res: '0.025', step: '0.1' } }
-        }
-      },
-      fmax: {
-    testtype: {
-      crest: { wl_count: 7, wl: %w[a b c d e f g], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } },
-      bist:  { wl_count: 3, wl: %w[a b c], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } },
-      pbist: { wl_count: 1, wl: %w[a], test_points: [0.9, 1.2], searchsettings: { start: '50', stop: '200', mode: 'Linear', res: '10', step: '10' } }
-        }
-      }
-    }  
-  }
-end
-
-tsettings = TestSettingsGenerator.new({
-      ip: :cpu,
-      coretypes: 2,
-      core_mapping: core_mapping,
-      spec_variable: 'LEV.36.VDDCR[V]',
-      floworder_mapping: floworder_mapping,
-      charztype_mapping: charztype_mapping
-    }).generatesettings
-
-puts tsettings.inspect
-
-require 'json'
-
-File.open('tsettings.json', 'w') do |file|
-  file.write(JSON.pretty_generate(tsettings))
-end

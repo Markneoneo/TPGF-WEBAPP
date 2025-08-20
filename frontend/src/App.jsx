@@ -34,7 +34,7 @@ function App() {
     // Validate all forms first
     let hasValidationErrors = false;
     const errors = {};
-    
+
     for (const ipType of selectedIpTypes) {
       const formRef = formRefs.current[ipType];
       console.log(`Validating form for ${ipType}...`, formRef);
@@ -44,39 +44,40 @@ function App() {
         errors[ipType] = formRef.getErrors ? formRef.getErrors() : {};
       }
     }
-    
+
     if (hasValidationErrors) {
       console.log('processAllForms: validation errors found, aborting');
       console.log('Validation errors:', JSON.stringify(errors, null, 2));
       return;
     }
-    
+
     setIsProcessing(true);
-  
+
     try {
-      // NEW: Collect all form data first
+      // Collect all form data first
       const allIpData = {};
-      
+
       for (const ipType of selectedIpTypes) {
         const formRef = formRefs.current[ipType];
         if (!formRef) {
           console.log(`No formRef for ${ipType}, skipping.`);
           continue;
         }
-        
+
         const formData = formRef.getFormData();
         console.log(`Form data for ${ipType}:`, formData);
-        
+
         // Transform formData to backend format
         const backendPayload = transformFormDataToBackend(formData);
+        console.log(`Backend payload for ${ipType}:`, JSON.stringify(backendPayload, null, 2));
         backendPayload.ip = ipType.toLowerCase();
-        
+
         allIpData[ipType.toLowerCase()] = backendPayload;
       }
-      
+
       console.log('Combined payload for all IPs:', allIpData);
-      
-      // NEW: Send single request with all IP data
+
+      // Send single request with all IP data
       const response = await fetch('http://localhost:4567/api/process-multiple-ips', {
         method: 'POST',
         headers: {
@@ -84,20 +85,20 @@ function App() {
         },
         body: JSON.stringify({ ip_configurations: allIpData })
       });
-      
+
       console.log('Response status:', response.status);
       if (!response.ok) {
         console.error(`HTTP error! status: ${response.status}`);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const result = await response.json();
       console.log('Combined result from backend:', result);
-      
+
       setProcessResults(result);
       setFileReady(true);
       console.log('processAllForms: finished successfully');
-      
+
     } catch (error) {
       console.error('Error processing data:', error);
     } finally {
@@ -111,7 +112,7 @@ function App() {
     try {
       const results = runAllTests();
       console.log('✅ Test execution completed. Check console output above for detailed results.');
-      
+
       // Optional: Show a brief alert with summary
       alert(`Tests completed!\nOverall: ${results.overall.passed}/${results.overall.total} (${results.overall.successRate.toFixed(1)}%)\nCheck console for details.`);
     } catch (error) {
@@ -128,7 +129,7 @@ function App() {
         formRef.clearForm();
       }
     });
-    
+
     setSelectedIpTypes([]);
     setProcessResults({});
     setFileReady(false);
@@ -145,7 +146,7 @@ function App() {
           <h3>Select IP Types</h3>
           <div className="checkbox-group">
             {ipOptions.map(ipType => (
-              <label key={ipType} className="checkbox-label">
+              <label key={ipType} className="checkbox-label ip-checkbox">
                 <input
                   type="checkbox"
                   checked={selectedIpTypes.includes(ipType)}
@@ -179,13 +180,25 @@ function App() {
               <button
                 onClick={processAllForms}
                 disabled={isProcessing}
-                className="primary-button"
+                className="btn btn-primary"
               >
-                {isProcessing ? 'Generating Files...' : 'Generate Combined File'}
+                {isProcessing ? 'Generating Files...' : 'Generate Combined Test Settings'}
               </button>
-              
+
+              {fileReady && (
+                <a
+                  href="http://localhost:4567/tsettings.json"
+                  download
+                  className="btn btn-success"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download JSON
+                </a>
+              )}
+
               {/* Test Button - Only show in development */}
-              {process.env.NODE_ENV === 'development' && (
+              {/* {process.env.NODE_ENV === 'development' && (
                 <button
                   onClick={handleRunTests}
                   className="secondary-button"
@@ -198,27 +211,12 @@ function App() {
                 >
                   Run Tests
                 </button>
-              )}
+              )} */}
 
-              <button onClick={clearAll} className="secondary-button">
+              <button onClick={clearAll} className="btn btn-secondary">
                 Clear All
               </button>
             </div>
-            {/* Show download link if file is ready */}
-            {fileReady && (
-              <div className="download-link-container">
-                <a
-                  href="http://localhost:4567/tsettings.json"
-                  // href="http://localhost:5173/tsettings.json"
-                  download
-                  className="primary-button"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Download Generated Test Settings JSON
-                </a>
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -227,3 +225,4 @@ function App() {
 }
 
 export default App;
+

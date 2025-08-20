@@ -9,203 +9,208 @@ const ProductionMappings = ({
   errors,
   handleFlowOrderChange,
   handleProductionMappingChange,
-}) => (
-  <div className="production-section">
-    {/* Flow order selection as checkboxes */}
-    <div className="form-group">
-      <label>Flow Orders</label>
-      <div className="input-hint">Select one or more flow orders</div>
-      <div className="checkbox-group">
-        {FLOW_ORDERS.map(order => (
-          <label key={order} className="checkbox-label">
-            <input
-              type="checkbox"
-              className="checkbox-input"
-              checked={selectedFlowOrders.includes(order)}
-              onChange={() => handleFlowOrderChange(order)}
-            />
-            <span className="checkbox-custom"></span>
-            {order}
-          </label>
-        ))}
+  coreIndex = 0 // Default to 0 for backward compatibility
+}) => {
+  // Update error field names to include core index
+  const getErrorField = (order, field) => `${field}_${order}_core_${coreIndex}`;
+
+  return (
+    <div className="production-mappings">
+      {/* Flow order selection as checkboxes */}
+      <div className="form-group">
+        <label>Flow Orders</label>
+        <div className="input-hint">Select one or more flow orders</div>
+        <div className="checkbox-group">
+          {FLOW_ORDERS.map(order => (
+            <label key={order} className="checkbox-label">
+              <input
+                type="checkbox"
+                className="checkbox-input"
+                checked={selectedFlowOrders.includes(order)}
+                onChange={() => handleFlowOrderChange(order)}
+              />
+              <span className="checkbox-custom"></span>
+              {order}
+            </label>
+          ))}
+        </div>
+        {errors[`flow_orders_core_${coreIndex}`] && <span className="error-message">{errors[`flow_orders_core_${coreIndex}`]}</span>}
       </div>
-      {errors.flow_orders && <span className="error-message">{errors.flow_orders}</span>}
-    </div>
 
-    {/* Render mapping fields for each selected flow order */}
-    {selectedFlowOrders.map(order => (
-      <div key={order} className="production-mapping-block">
-        <strong>{order.toUpperCase()} Mapping</strong>
+      {/* Render mapping fields for each selected flow order */}
+      {selectedFlowOrders.map(order => (
+        <div key={order} className="production-mapping-block">
 
-        {/* Read Type Checkboxes */}
-        <div className="form-group">
-          <label>Read Type</label>
-          {errors[`read_type_${order}`] && (<span className="error-message">{errors[`read_type_${order}`]}</span>)}
-          <div className="checkbox-group">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                className="checkbox-input"
-                checked={!!productionMappings[order]?.read_type_jtag}
-                onChange={e => handleProductionMappingChange(order, 'read_type_jtag', e.target.checked)}
-              />
-              <span className="checkbox-custom"></span>
-              JTAG
-            </label>
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                className="checkbox-input"
-                checked={!!productionMappings[order]?.read_type_fw}
-                onChange={e => handleProductionMappingChange(order, 'read_type_fw', e.target.checked)}
-              />
-              <span className="checkbox-custom"></span>
-              FW
-            </label>
+          <h5><strong>{order.toUpperCase()} Mapping</strong></h5>
+
+          {/* Read Type Checkboxes */}
+          <div className="form-group">
+            <label>Read Type</label>
+            <div className="input-hint">Select one read type (JTAG or FW)</div>
+            {errors[getErrorField(order, 'read_type')] && (<span className="error-message">{errors[getErrorField(order, 'read_type')]}</span>)}
+            <div className="checkbox-group">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  className="checkbox-input"
+                  checked={!!productionMappings[order]?.read_type_jtag}
+                  onChange={e => handleProductionMappingChange(order, 'read_type_jtag', e.target.checked)}
+                />
+                <span className="checkbox-custom"></span>
+                JTAG
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  className="checkbox-input"
+                  checked={!!productionMappings[order]?.read_type_fw}
+                  onChange={e => handleProductionMappingChange(order, 'read_type_fw', e.target.checked)}
+                />
+                <span className="checkbox-custom"></span>
+                FW
+              </label>
+            </div>
           </div>
-        </div>
 
-        {/* Test Points Dropdown and Conditional Fields */}
-        <div style={{ marginBottom: 4 }}>
-          <select
-            value={productionMappings[order]?.test_points_type || 'Range'}
-            onChange={e => handleProductionMappingChange(order, 'test_points_type', e.target.value)}
-            className="single-input"
-            style={{ marginBottom: 4 }}
-          >
-            <option value="Range">Test Point Range</option>
-            <option value="List">Test Point List</option>
-          </select>
-          {productionMappings[order]?.test_points_type === 'List' ? (
-            <>
-              <input
-                type="text"
-                placeholder="Fixed List"
-                value={productionMappings[order]?.test_points || ''}
-                onChange={e => handleProductionMappingChange(order, 'test_points', e.target.value)}
-                className={
-                  (errors[`test_points_${order}`] ? 'error ' : '') + 'single-input test-points-list-input'
-                }
-              />
-              <div className="input-hint">Fixed list separated by commas</div>
-              {errors[`test_points_${order}`] && <span className="error-message">{errors[`test_points_${order}`]}</span>}
-            </>
-          ) : (
-            <>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ flex: 1 }}>
-                  <input
-                    type="text"
-                    placeholder="Start"
-                    value={productionMappings[order]?.test_points_start || ''}
-                    onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
-                    className={errors[`test_points_start_${order}`] ? 'error single-input' : 'single-input'}
-                  />
+          {/* Test Points Dropdown and Conditional Fields */}
+          <div style={{ marginBottom: 4 }}>
+            <select
+              value={productionMappings[order]?.test_points_type || 'Range'}
+              onChange={e => handleProductionMappingChange(order, 'test_points_type', e.target.value)}
+              className="single-input"
+              style={{ marginBottom: 4 }}
+            >
+              <option value="Range">Test Point Range</option>
+              <option value="List">Test Point List</option>
+            </select>
+            {productionMappings[order]?.test_points_type === 'List' ? (
+              <>
+                <input
+                  type="text"
+                  placeholder="Fixed List"
+                  value={productionMappings[order]?.test_points || ''}
+                  onChange={e => handleProductionMappingChange(order, 'test_points', e.target.value)}
+                  className={
+                    (errors[getErrorField(order, 'test_points')] ? 'error ' : '') + 'single-input test-points-list-input'
+                  }
+                />
+                <div className="input-hint">Fixed list separated by commas</div>
+                {errors[getErrorField(order, 'test_points')] && <span className="error-message">{errors[getErrorField(order, 'test_points')]}</span>}
+              </>
+            ) : (
+              <>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ flex: 1 }}>
+                    <input
+                      type="text"
+                      placeholder="Start Point"
+                      value={productionMappings[order]?.test_points_start || ''}
+                      onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
+                      className={errors[getErrorField(order, 'test_points_start')] ? 'error single-input' : 'single-input'}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <input
+                      type="text"
+                      placeholder="Stop Point"
+                      value={productionMappings[order]?.test_points_stop || ''}
+                      onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
+                      className={errors[getErrorField(order, 'test_points_stop')] ? 'error single-input' : 'single-input'}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <input
+                      type="text"
+                      placeholder="Step"
+                      value={productionMappings[order]?.test_points_step || ''}
+                      onChange={e => handleProductionMappingChange(order, 'test_points_step', e.target.value)}
+                      className={errors[getErrorField(order, 'test_points_step')] ? 'error single-input' : 'single-input'}
+                    />
+                  </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <input
-                    type="text"
-                    placeholder="Stop"
-                    value={productionMappings[order]?.test_points_stop || ''}
-                    onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
-                    className={errors[`test_points_stop_${order}`] ? 'error single-input' : 'single-input'}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <input
-                    type="text"
-                    placeholder="Step"
-                    value={productionMappings[order]?.test_points_step || ''}
-                    onChange={e => handleProductionMappingChange(order, 'test_points_step', e.target.value)}
-                    className={errors[`test_points_step_${order}`] ? 'error single-input' : 'single-input'}
-                  />
-                </div>
-              </div>
-              {/* Display individual field errors */}
-              {errors[`test_points_start_${order}`] && <span className="error-message">{errors[`test_points_start_${order}`]}</span>}
-              {errors[`test_points_stop_${order}`] && <span className="error-message">{errors[`test_points_stop_${order}`]}</span>}
-              {errors[`test_points_step_${order}`] && <span className="error-message">{errors[`test_points_step_${order}`]}</span>}
-              {/* Display range validation error */}
-              {errors[`test_points_range_${order}`] && <span className="error-message">{errors[`test_points_range_${order}`]}</span>}
-            </>
-          )}
-        </div>
+                {/* Display individual field errors */}
+                {errors[getErrorField(order, 'test_points_start')] && <span className="error-message">{errors[getErrorField(order, 'test_points_start')]}</span>}
+                {errors[getErrorField(order, 'test_points_stop')] && <span className="error-message">{errors[getErrorField(order, 'test_points_stop')]}</span>}
+                {errors[getErrorField(order, 'test_points_step')] && <span className="error-message">{errors[getErrorField(order, 'test_points_step')]}</span>}
+                {/* Display range validation error */}
+                {errors[getErrorField(order, 'test_points_range')] && <span className="error-message">{errors[getErrorField(order, 'test_points_range')]}</span>}
+              </>
+            )}
+          </div>
 
-        {/* Insertion Field */}
-        <div style={{ marginBottom: 4 }}>
           <input
             type="text"
-            placeholder="Insertion List"
-            value={productionMappings[order]?.insertion || ''}
-            onChange={e => handleProductionMappingChange(order, 'insertion', e.target.value)}
-            className={errors[`insertion_${order}`] ? 'error single-input insertion-input' : 'single-input insertion-input'}
+            placeholder="Frequency"
+            value={productionMappings[order]?.frequency || ''}
+            onChange={e => handleProductionMappingChange(order, 'frequency', e.target.value)}
+            className={errors[getErrorField(order, 'frequency')] ? 'error single-input' : 'single-input'}
+            style={{ marginBottom: 4 }}
           />
-          <div className="input-hint">Fixed list separated by commas</div>
-        </div>
+          {errors[getErrorField(order, 'frequency')] && <span className="error-message">{errors[getErrorField(order, 'frequency')]}</span>}
 
-        <input
-          type="text"
-          placeholder="Frequency"
-          value={productionMappings[order]?.frequency || ''}
-          onChange={e => handleProductionMappingChange(order, 'frequency', e.target.value)}
-          className={errors[`frequency_${order}`] ? 'error single-input' : 'single-input'}
-          style={{ marginBottom: 4 }}
-        />
-
-        <input
-          type="text"
-          placeholder="Register Size"
-          value={productionMappings[order]?.register_size || ''}
-          onChange={e => handleProductionMappingChange(order, 'register_size', e.target.value)}
-          className={errors[`register_size_${order}`] ? 'error single-input' : 'single-input'}
-          style={{ marginBottom: 4 }}
-        />
-
-        {/* Binnable Checkbox Option */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
-          <label htmlFor={`binnable_${order}`} style={{ marginRight: 8 }}>Binnable?</label>
           <input
-            type="checkbox"
-            id={`binnable_${order}`}
-            checked={!!productionMappings[order]?.binnable}
-            onChange={e => handleProductionMappingChange(order, 'binnable', e.target.checked)}
-            style={{ width: 18, height: 18, marginLeft: 'auto' }}
+            type="text"
+            placeholder="Register Size"
+            value={productionMappings[order]?.register_size || ''}
+            onChange={e => handleProductionMappingChange(order, 'register_size', e.target.value)}
+            className={errors[getErrorField(order, 'register_size')] ? 'error single-input' : 'single-input'}
+            style={{ marginBottom: 4 }}
           />
-        </div>
+          {errors[getErrorField(order, 'register_size')] && <span className="error-message">{errors[getErrorField(order, 'register_size')]}</span>}
 
-        {/* SoftsetEnable Checkbox Option */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
-          <label htmlFor={`softsetenable_${order}`} style={{ marginRight: 8 }}>Softset Enable?</label>
-          <input
-            type="checkbox"
-            id={`softsetenable_${order}`}
-            checked={!!productionMappings[order]?.softsetenable}
-            onChange={e => handleProductionMappingChange(order, 'softsetenable', e.target.checked)}
-            style={{ width: 18, height: 18, marginLeft: 'auto' }}
-          />
-        </div>
+          {/* Insertion Field */}
+          <div style={{ marginBottom: 4 }}>
+            <input
+              type="text"
+              placeholder="Insertion List"
+              value={productionMappings[order]?.insertion || ''}
+              onChange={e => handleProductionMappingChange(order, 'insertion', e.target.value)}
+              className={errors[getErrorField(order, 'insertion')] ? 'error single-input insertion-input' : 'single-input insertion-input'}
+            />
+            <div className="input-hint">Fixed list separated by commas</div>
+            {errors[getErrorField(order, 'insertion')] && <span className="error-message">{errors[getErrorField(order, 'insertion')]}</span>}
+          </div>
 
-        {/* FallbackEnable Checkbox Option */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
-          <label htmlFor={`fallbackenable_${order}`} style={{ marginRight: 8 }}>FallBack Enable?</label>
-          <input
-            type="checkbox"
-            id={`fallbackenable_${order}`}
-            checked={!!productionMappings[order]?.fallbackenable}
-            onChange={e => handleProductionMappingChange(order, 'fallbackenable', e.target.checked)}
-            style={{ width: 18, height: 18, marginLeft: 'auto' }}
-          />
-        </div>
+          {/* Binnable Checkbox Option */}
+          <div className="binnable-row" style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
+            <label htmlFor={`binnable_${order}_core_${coreIndex}`} style={{ marginRight: 8 }}>Binnable?</label>
+            <input
+              type="checkbox"
+              id={`binnable_${order}_core_${coreIndex}`}
+              checked={!!productionMappings[order]?.binnable}
+              onChange={e => handleProductionMappingChange(order, 'binnable', e.target.checked)}
+              style={{ width: 18, height: 18, marginLeft: 'auto' }}
+            />
+          </div>
 
-        {/* Show errors if any */}
-        {/* {['test_type', 'test_points', 'frequency', 'register_size', 'ore_enable'].map(field =>
-          errors[`${field}_${order}`] && (
-            <span key={field} className="error-message">{errors[`${field}_${order}`]}</span>
-          )
-        )} */}
-      </div>
-    ))}
-  </div>
-);
+          {/* SoftsetEnable Checkbox Option */}
+          <div className="binnable-row" style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
+            <label htmlFor={`softsetenable_${order}_core_${coreIndex}`} style={{ marginRight: 8 }}>Softset Enable?</label>
+            <input
+              type="checkbox"
+              id={`softsetenable_${order}_core_${coreIndex}`}
+              checked={!!productionMappings[order]?.softsetenable}
+              onChange={e => handleProductionMappingChange(order, 'softsetenable', e.target.checked)}
+              style={{ width: 18, height: 18, marginLeft: 'auto' }}
+            />
+          </div>
+
+          {/* FallbackEnable Checkbox Option */}
+          <div className="binnable-row" style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
+            <label htmlFor={`fallbackenable_${order}_core_${coreIndex}`} style={{ marginRight: 8 }}>FallBack Enable?</label>
+            <input
+              type="checkbox"
+              id={`fallbackenable_${order}_core_${coreIndex}`}
+              checked={!!productionMappings[order]?.fallbackenable}
+              onChange={e => handleProductionMappingChange(order, 'fallbackenable', e.target.checked)}
+              style={{ width: 18, height: 18, marginLeft: 'auto' }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default ProductionMappings;
+

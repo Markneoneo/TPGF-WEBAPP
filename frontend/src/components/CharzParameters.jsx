@@ -19,90 +19,100 @@ const WORKLOAD_FIELDS = [
 const CharzParameters = ({
   charzData,
   setCharzData,
-  errors = {},
-  ipType
+  errors,
+  ipType,
+  coreIndex = 0
 }) => {
-  // Handlers
-  // const handleGranularityChange = (e) => {
-  //   setCharzData(prev => ({ ...prev, search_granularity: e.target.value }));
-  // };
-  
+  // Update error field names to include core index
+  const getErrorField = (field) => `charz_${field}_core_${coreIndex}`;
+
   // Updated handler for multiple granularity selection
   const handleGranularityChange = (granularity) => {
-    setCharzData(prev => {
-      // Get current array or initialize empty array
-      const currentGranularities = prev.search_granularity || [];
-      
-      // Check if granularity is already selected
-      const isSelected = currentGranularities.includes(granularity);
-      
-      return {
-        ...prev,
-        search_granularity: isSelected
-          ? currentGranularities.filter(g => g !== granularity) // Remove if already selected
-          : [...currentGranularities, granularity] // Add if not selected
-      };
-    });
+    const currentGranularities = charzData.search_granularity || [];
+    const isSelected = currentGranularities.includes(granularity);
+
+    const newData = {
+      ...charzData,
+      search_granularity: isSelected
+        ? currentGranularities.filter(g => g !== granularity) // Remove if already selected
+        : [...currentGranularities, granularity] // Add if not selected
+    };
+
+    setCharzData(newData);
   };
 
   const handleSearchTypeChange = (type) => {
-    setCharzData(prev => {
-      const arr = prev.search_types || [];
-      return {
-        ...prev,
-        search_types: arr.includes(type)
-          ? arr.filter(t => t !== type)
-          : [...arr, type],
-      };
-    });
+    const arr = charzData.search_types || [];
+
+    const newData = {
+      ...charzData,
+      search_types: arr.includes(type)
+        ? arr.filter(t => t !== type)
+        : [...arr, type],
+    };
+
+    setCharzData(newData);
   };
 
   // New handler for test type selection
   const handleTestTypeChange = (searchType, testType) => {
-    setCharzData(prev => {
-      const selectedTestTypes = { ...(prev.selectedTestTypes || {}) };
-      if (!selectedTestTypes[searchType]) selectedTestTypes[searchType] = [];
-      
-      if (selectedTestTypes[searchType].includes(testType)) {
-        selectedTestTypes[searchType] = selectedTestTypes[searchType].filter(t => t !== testType);
-      } else {
-        selectedTestTypes[searchType] = [...selectedTestTypes[searchType], testType];
-      }
-      
-      return { ...prev, selectedTestTypes };
-    });
+    const selectedTestTypes = { ...(charzData.selectedTestTypes || {}) };
+    if (!selectedTestTypes[searchType]) selectedTestTypes[searchType] = [];
+
+    if (selectedTestTypes[searchType].includes(testType)) {
+      selectedTestTypes[searchType] = selectedTestTypes[searchType].filter(t => t !== testType);
+    } else {
+      selectedTestTypes[searchType] = [...selectedTestTypes[searchType], testType];
+    }
+
+    const newData = {
+      ...charzData,
+      selectedTestTypes
+    };
+
+    setCharzData(newData);
   };
 
   const handleTableChange = (searchType, testType, field, value) => {
-    setCharzData(prev => {
-      const table = { ...(prev.table || {}) };
-      if (!table[searchType]) table[searchType] = {};
-      if (!table[searchType][testType]) table[searchType][testType] = {};
-      table[searchType][testType][field] = value;
-      return { ...prev, table };
-    });
+    const table = { ...(charzData.table || {}) };
+    if (!table[searchType]) table[searchType] = {};
+    if (!table[searchType][testType]) table[searchType][testType] = {};
+    table[searchType][testType][field] = value;
+
+    const newData = {
+      ...charzData,
+      table
+    };
+
+    setCharzData(newData);
   };
 
   const handleRegisterSizeChange = (e) => {
-    setCharzData(prev => ({ ...prev, psm_register_size: e.target.value }));
+    const newData = {
+      ...charzData,
+      psm_register_size: e.target.value
+    };
+
+    setCharzData(newData);
   };
 
   const handleWorkloadTableChange = (searchType, testType, rowIdx, value) => {
-    setCharzData(prev => {
-      const workloadTable = { ...(prev.workloadTable || {}) };
-      if (!workloadTable[searchType]) workloadTable[searchType] = {};
-      if (!workloadTable[searchType][testType]) workloadTable[searchType][testType] = [];
-      workloadTable[searchType][testType][rowIdx] = value;
-      return { ...prev, workloadTable };
-    });
+    const workloadTable = { ...(charzData.workloadTable || {}) };
+    if (!workloadTable[searchType]) workloadTable[searchType] = {};
+    if (!workloadTable[searchType][testType]) workloadTable[searchType][testType] = [];
+    workloadTable[searchType][testType][rowIdx] = value;
+
+    const newData = {
+      ...charzData,
+      workloadTable
+    };
+
+    setCharzData(newData);
   };
 
   // Render
   return (
-    <div className="charz-section" style={{ marginBottom: '2rem' }}>
-      <h4 style={{ borderBottom: '1px solid #6b00b3', color: '#6b00b3', marginBottom: '1rem' }}>
-        Charz Parameters
-      </h4>
+    <div style={{ marginBottom: '2rem' }}>
 
       {/* Search Granularity - NOW WITH CHECKBOXES */}
       <div className="form-group">
@@ -122,7 +132,7 @@ const CharzParameters = ({
             </label>
           ))}
         </div>
-        {errors.search_granularity && <span className="error-message">{errors.search_granularity}</span>}
+        {errors[getErrorField('search_granularity')] && <span className="error-message">{errors[getErrorField('search_granularity')]}</span>}
       </div>
 
       {/* Search Type */}
@@ -142,7 +152,7 @@ const CharzParameters = ({
             </label>
           ))}
         </div>
-        {errors.search_types && <span className="error-message">{errors.search_types}</span>}
+        {errors[getErrorField('search_types')] && <span className="error-message">{errors[getErrorField('search_types')]}</span>}
       </div>
 
       {/* Table for each selected search type */}
@@ -150,10 +160,9 @@ const CharzParameters = ({
         <React.Fragment key={searchType}>
           <div className="charz-table-block">
             <div className="charz-table-title">{searchType.toUpperCase()} Test Types</div>
-            
+
             {/* Test Type Checkboxes */}
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              {/* <label>Select Test Types</label> */}
               <div className="checkbox-group">
                 {TEST_TYPES.map(testType => (
                   <label key={testType} className="checkbox-label">
@@ -184,7 +193,7 @@ const CharzParameters = ({
                   </thead>
                   <tbody>
                     {/* Only show rows for selected test types */}
-                    {TEST_TYPES.filter(testType => 
+                    {TEST_TYPES.filter(testType =>
                       charzData.selectedTestTypes?.[searchType]?.includes(testType)
                     ).map(testType => (
                       <tr key={testType}>
@@ -204,7 +213,7 @@ const CharzParameters = ({
                                 )
                               }
                               className={
-                                errors[`charz_${searchType}_${testType}_${field.key}`]
+                                errors[getErrorField(`${searchType}_${testType}_${field.key}`)]
                                   ? 'error single-input'
                                   : 'single-input'
                               }
@@ -234,7 +243,7 @@ const CharzParameters = ({
             // Find the max wl_count to determine number of rows
             const maxWlCount = Math.max(...Object.values(wlCounts));
             if (!maxWlCount || maxWlCount <= 0) return null;
-            
+
             return (
               <div key={searchType + '-workload-table'} className="charz-table-block">
                 <div className="charz-table-title">{searchType.toUpperCase()} Workload Table</div>
@@ -252,7 +261,7 @@ const CharzParameters = ({
                         <tr key={rowIdx}>
                           {selectedTestTypes.map(testType => (
                             WORKLOAD_FIELDS.map(field => {
-                              const errorKey = `charz_${searchType}_${testType}_${field.key}_${rowIdx}`;
+                              const errorKey = getErrorField(`${searchType}_${testType}_${field.key}_${rowIdx}`);
                               if (rowIdx < wlCounts[testType]) {
                                 return (
                                   <td key={testType + '-' + field.key}>
@@ -290,18 +299,19 @@ const CharzParameters = ({
 
       {/* PSM Register Size */}
       <div className="form-group">
-        <label htmlFor={`psm_reg_size_${ipType}`}>PSM Register Size</label>
+        <label htmlFor={`psm_reg_size_${ipType}_core_${coreIndex}`}>PSM Register Size</label>
         <input
-          id={`psm_reg_size_${ipType}`}
+          id={`psm_reg_size_${ipType}_core_${coreIndex}`}
           type="text"
           value={charzData.psm_register_size || ''}
           onChange={handleRegisterSizeChange}
-          className="single-input"
+          className={errors[getErrorField('psm_register_size')] ? 'error single-input' : 'single-input'}
         />
-        {errors.psm_register_size && <span className="error-message">{errors.psm_register_size}</span>}
+        {errors[getErrorField('psm_register_size')] && <span className="error-message">{errors[getErrorField('psm_register_size')]}</span>}
       </div>
     </div>
   );
 };
 
 export default CharzParameters;
+

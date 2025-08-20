@@ -1,18 +1,20 @@
 {
   "cpu": {
-    "1": {
+    "2": {
+      "supply": "2",
+      "clk": "2",
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_cpu_1_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_cpu_1_fwload"
+          "burst": "avfs_cpu_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_cpu_fwload"
         }
       },
       "prod_settings": {
-        "xvmindd": {
-          "burst": "avfs_cpu_1_xvmindd_burst",
-          "binnable": true,
+        "dfll": {
+          "burst": "avfs_cpu_dfll_burst",
+          "binnable": false,
           "test_points": {
-            "spec_variable": "1",
+            "spec_variable": "12",
             "values": {
               "tp0": {
                 "value": 1
@@ -23,15 +25,14 @@
             }
           },
           "register_setup": {
-            "vector_variable": {
-              "avfs_cpu_1_xvmindd": 512
+            "pattern": {
+              "avfs_cpu_dfll": 512
             }
           },
-          "softsets": "SoftsetProfile_avfs_cpu_1_xvmindd",
           "insertion_list": [
-            "1"
+            "2"
           ],
-          "fallback_enable": true
+          "fallback_enable": false
         }
       },
       "charz_settings": {}
