@@ -146,9 +146,14 @@ export default function validate({
       // Helper function to create error field names with core index
       const getErrorField = (field) => `${field}_${order}_core_${coreIndex}`;
 
-      // Require at least one of read_type_jtag or read_type_fw for each selected flow order
-      if (!mapping.read_type_jtag && !mapping.read_type_fw) {
-        newErrors[getErrorField('read_type')] = `At least one Read Type (JTAG or FW) must be selected for ${order} in Core ${coreIndex + 1}`;
+      // Updated validation: Require exactly one of read_type_jtag or read_type_fw
+      const hasJtag = !!mapping.read_type_jtag;
+      const hasFw = !!mapping.read_type_fw;
+
+      if (!hasJtag && !hasFw) {
+        newErrors[getErrorField('read_type')] = `One Read Type (JTAG or FW) must be selected for ${order} in Core ${coreIndex + 1}`;
+      } else if (hasJtag && hasFw) {
+        newErrors[getErrorField('read_type')] = `Only one Read Type (JTAG or FW) can be selected for ${order} in Core ${coreIndex + 1}`;
       }
 
       // Always validate test_points_type

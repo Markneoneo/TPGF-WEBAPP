@@ -46,7 +46,7 @@ const ProductionMappings = ({
           {/* Read Type Checkboxes */}
           <div className="form-group">
             <label>Read Type</label>
-            <div className="input-hint">Select one or more read types</div>
+            <div className="input-hint">Select one read type (JTAG or FW)</div>
             {errors[getErrorField(order, 'read_type')] && (<span className="error-message">{errors[getErrorField(order, 'read_type')]}</span>)}
             <div className="checkbox-group">
               <label className="checkbox-label">
@@ -103,7 +103,7 @@ const ProductionMappings = ({
                   <div style={{ flex: 1 }}>
                     <input
                       type="text"
-                      placeholder="Start"
+                      placeholder="Start Point"
                       value={productionMappings[order]?.test_points_start || ''}
                       onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
                       className={errors[getErrorField(order, 'test_points_start')] ? 'error single-input' : 'single-input'}
@@ -112,7 +112,7 @@ const ProductionMappings = ({
                   <div style={{ flex: 1 }}>
                     <input
                       type="text"
-                      placeholder="Stop"
+                      placeholder="Stop Point"
                       value={productionMappings[order]?.test_points_stop || ''}
                       onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
                       className={errors[getErrorField(order, 'test_points_stop')] ? 'error single-input' : 'single-input'}
@@ -170,7 +170,7 @@ const ProductionMappings = ({
             <div className="input-hint">Fixed list separated by commas</div>
             {errors[getErrorField(order, 'insertion')] && <span className="error-message">{errors[getErrorField(order, 'insertion')]}</span>}
           </div>
-          
+
           {/* Binnable Checkbox Option */}
           <div className="binnable-row" style={{ display: 'flex', alignItems: 'center', marginBottom: 4, justifyContent: 'space-between' }}>
             <label htmlFor={`binnable_${order}_core_${coreIndex}`} style={{ marginRight: 8 }}>Binnable?</label>

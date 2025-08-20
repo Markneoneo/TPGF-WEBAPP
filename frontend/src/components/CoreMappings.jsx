@@ -35,7 +35,7 @@ const CoreMappings = ({
           <input
             type="text"
             id={`spec_variable_${idx}`}
-            placeholder="Spec variable"
+            placeholder="Spec Variable"
             value={mapping.spec_variable || ''}
             onChange={e => handleCoreMappingChange(idx, 'spec_variable', e.target.value)}
             className={errors[`spec_variable_${idx}`] ? 'error single-input' : 'single-input'}
@@ -47,7 +47,7 @@ const CoreMappings = ({
         <div className="core-mapping-row">
           <input
             type="text"
-            placeholder="Core"
+            placeholder="Core Name"
             value={mapping.core}
             onChange={e => handleCoreMappingChange(idx, 'core', e.target.value)}
             className={errors[`core_${idx}`] ? 'error single-input' : 'single-input'}
