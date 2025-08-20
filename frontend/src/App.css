@@ -66,8 +66,7 @@ body {
   background: var(--bg-primary);
 }
 
-p,
-h4 {
+p, h4 {
   margin: 0;
   padding: 0;
 }
@@ -75,14 +74,13 @@ h4 {
 /* Full-bleed layout */
 html, body, #root, .App {
   width: 100%;
-  min-height: 100vh; /* optional */
+  min-height: 100vh;
 }
 
 /* Layout */
 #root {
   max-width: 90%;
-  margin: 0 auto;
-  padding: var(--spacing-xl);
+  margin: 2rem auto;
   text-align: left;
 }
 
@@ -165,73 +163,60 @@ label {
   font-style: italic;
 }
 
-/* Button Styles */
+/* Simplified Button Styles */
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: var(--border-radius-small);
+  border-radius: var(--border-radius);
   cursor: pointer;
   font-size: var(--font-size-base);
   transition: background-color var(--transition-fast);
-}
-
-.primary-button {
-  @extend .btn;
-  background-color: var(--primary-color);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: white;
+  font-weight: 500;
 }
 
-.primary-button:hover:not(:disabled) {
+/* Blue - Generate Button */
+.btn-primary {
+  background-color: var(--primary-color);
+}
+
+.btn-primary:hover:not(:disabled) {
   background-color: var(--primary-hover);
 }
 
-.primary-button:disabled {
+.btn-primary:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
 
-.secondary-button {
-  @extend .btn;
-  background-color: var(--secondary-color);
-  color: white;
-}
-
-.secondary-button:hover {
-  background-color: var(--secondary-hover);
-}
-
-.download-link-container {
-  margin-top: var(--spacing-lg);
-  text-align: center;
-}
-
-.download-link-container a {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
+/* Green - Download Button */
+.btn-success {
   background-color: var(--success-color);
-  color: white;
-  text-decoration: none;
-  border-radius: var(--border-radius-small);
-  font-size: var(--font-size-base);
-  transition: background-color var(--transition-fast);
-  border: none;
-  cursor: pointer;
 }
 
-.download-link-container a:hover {
+.btn-success:hover {
   background-color: var(--success-hover);
 }
 
-/* Layout Components */
-.button-group,
-.global-button-group {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
+/* Grey - Clear All Button */
+.btn-secondary {
+  background-color: var(--secondary-color);
 }
 
+.btn-secondary:hover {
+  background-color: var(--secondary-hover);
+}
+
+/* Layout Components */
 .global-button-group {
+  display: flex;
   justify-content: space-around;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
 .forms-container {
@@ -282,7 +267,7 @@ label {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   background-color: var(--bg-section);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-light);
@@ -304,26 +289,29 @@ label {
 }
 
 .checkbox-grid-2 {
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
 }
 
 .checkbox-grid-3 {
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
 }
 
 .checkbox-grid-4 {
+  display: grid;
   grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
 }
 
-.checkbox-grid-5 {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.checkbox-grid-2,
-.checkbox-grid-3,
-.checkbox-grid-4,
 .checkbox-grid-5 {
   display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
 }
@@ -412,6 +400,11 @@ label.checkbox-label {
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
 }
 
+/* CPU/GFX/SOC checkbox labels */
+label.checkbox-label.ip-checkbox {
+  font-size: var(--font-size-xl);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   #root {
@@ -427,7 +420,6 @@ label.checkbox-label {
     font-size: 1.4rem;
   }
 
-  .button-group,
   .global-button-group {
     flex-direction: column;
     gap: var(--spacing-md);
@@ -457,3 +449,4 @@ label.checkbox-label {
     font-size: var(--font-size-xl);
   }
 }
+

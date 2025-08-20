@@ -15,7 +15,7 @@ module TestHelper
     key = name ? "#{tname}_#{name}" : tname
     {
       'register_setup' => {
-        'vector_variable' => { key => 512 }
+        'pattern' => { key => 512 }
       }
     }
   end
@@ -99,7 +99,8 @@ class Test
   end
 
   def softsetprofile
-    "SoftsetProfile_avfs_#{ip}_#{coretype}_#{testtype}"
+    components = ["SoftsetProfile_avfs", ip, coretype, testtype]
+    components.reject(&:empty?).join("_")
   end
 
   def testsettings
@@ -115,11 +116,12 @@ end
 
 class Parametric < Test
   include TestHelper
-  attr_accessor :spec_variable, :insertionlist
+  attr_accessor :spec_variable, :insertionlist, :readtype
 
   def post_initialize(options)
     @spec_variable = options[:spec_variable] || ""
     @insertionlist = options[:insertionlist] || default_insertionlist
+    @readtype = options[:readtype] || ['fw']
   end
 
   def default_insertionlist
@@ -136,9 +138,8 @@ class Parametric < Test
 
   def testsettings
     settings = tpsettings.merge(regreadsetup)
-    settings['insertion_list'] = insertionlist
-    settings['binnable'] = binnable
     settings['softsets'] = softsetprofile if softsetenable
+    settings['insertion_list'] = insertionlist
     settings['fallback_enable'] = fallbackenable
     settings
   end
@@ -167,7 +168,9 @@ class Search < Test
   end
 
   def searchsettings
-    @searchsettings
+    {
+      'search_settings' => @searchsettings
+    }
   end
 
   def minpsmsettings
@@ -188,27 +191,42 @@ class TestSettingsGenerator
   attr_reader :ip, :core_mapping
 
   def initialize(options)
-    @ip = options[:ip] || options['ip']
-    @core_mapping = options[:core_mapping] || options['core_mapping'] || {}
+    @ip = options[:ip]
+    @core_mapping = options[:core_mapping]
   end
 
-  def generatesettings
-    result = {}
-
-    core_mapping.each do |coretype, coretype_config|
-      result[coretype] = {
-        supply: coretype_config[:supply],
-        clk: coretype_config[:clk],
-        fwload_settings: generate_fwload_settings(coretype),
-        prod_settings: generate_prod_settings(coretype, coretype_config),
-        charz_settings: generate_charz_settings(coretype, coretype_config)
-      }
+  def generate_settings
+    if core_mapping.size == 1
+      generate_single_core_settings
+    else
+      generate_multiple_core_settings
     end
-
-    result
   end
 
   private
+
+  def generate_single_core_settings
+    coretype, coretype_config = core_mapping.first
+    {
+      coretype => generate_core_settings("", coretype_config)
+    }
+  end
+
+  def generate_multiple_core_settings
+    core_mapping.each_with_object({}) do |(coretype, coretype_config), result|
+      result[coretype] = generate_core_settings(coretype, coretype_config)
+    end
+  end
+
+  def generate_core_settings(coretype, coretype_config)
+    {
+      supply: coretype_config[:supply],
+      clk: coretype_config[:clk],
+      fwload_settings: generate_fwload_settings(coretype),
+      prod_settings: generate_prod_settings(coretype, coretype_config),
+      charz_settings: generate_charz_settings(coretype, coretype_config)
+    }
+  end
 
   def generate_fwload_settings(coretype)
     fwload_test = Test.new(
@@ -220,60 +238,42 @@ class TestSettingsGenerator
   end
 
   def generate_prod_settings(coretype, coretype_config)
-    result = {}
+    return {} unless coretype_config[:floworder_mapping]
     
-    floworder_mapping = coretype_config[:floworder_mapping] || {}
-    spec_variable = coretype_config[:specvariable] || ""
-
-    floworder_mapping.each do |testtype, config|
-      test_points = config[:test_points] || []
-      binnable = config[:binnable] || false
-      softsetenable = config[:softsetenable] || false
-      fallbackenable = config[:fallbackenable] || false
-      insertionlist = config[:insertionlist] || []
-
+    spec_variable = coretype_config[:specvariable] || coretype_config[:spec_variable] || ""
+    coretype_config[:floworder_mapping].each_with_object({}) do |(testtype, config), result|
       param_obj = Parametric.new(
         ip: ip,
         coretype: coretype,
         testtype: testtype.to_s,
-        tp: test_points,
+        tp: config[:test_points] || [],
         spec_variable: spec_variable,
-        binnable: binnable,
-        softsetenable: softsetenable,
-        fallbackenable: fallbackenable,
-        insertionlist: insertionlist
+        binnable: config[:binnable] || false,
+        softsetenable: config[:softsetenable] || false,
+        fallbackenable: config[:fallbackenable] || false,
+        insertionlist: config[:insertionlist] || [],
+        readtype: config[:readtype] || ['fw']
       )
       result[testtype.to_s] = param_obj.testsettings
     end
-
-    result
   end
 
   def generate_charz_settings(coretype, coretype_config)
-    result = {}
-
-    charz_config = coretype_config[:charztype_mapping]
-    return result if charz_config.nil?
-
-    spec_variable = coretype_config[:specvariable] || ""
-    granularity_list = charz_config[:granularity] || []
-    searchtype_hash = charz_config[:searchtype] || {}
-
-    return result if granularity_list.empty? || searchtype_hash.empty?
-
-    granularity_list.each do |gran|
-      result[gran] = {}
-
-      searchtype_hash.each do |stype, stype_config|
-        result[gran][stype] = {}
-
-        testtype_hash = stype_config[:testtype] || {}
-        testtype_hash.each do |testtype, config|
-          result[gran][stype][testtype] = {}
-
+    charztype_mapping = coretype_config[:charztype_mapping]
+    return {} unless charztype_mapping && charztype_mapping[:granularity] && charztype_mapping[:searchtype]
+    
+    spec_variable = coretype_config[:specvariable] || coretype_config[:spec_variable] || ""
+    charztype_mapping[:granularity].each_with_object({}) do |gran, gran_hash|
+      gran_hash[gran] = {}
+      charztype_mapping[:searchtype].each do |stype, stype_config|
+        gran_hash[gran][stype] = {}
+        next unless stype_config[:testtype]
+        
+        stype_config[:testtype].each do |testtype, config|
+          gran_hash[gran][stype][testtype] = {}
           wl_list = config[:wl] || []
           next if wl_list.empty?
-
+          
           wl_list.each do |wl|
             search_obj = Search.new(
               ip: ip,
@@ -285,20 +285,19 @@ class TestSettingsGenerator
               searchsettings: config[:searchsettings] || {}
             )
             offset = calculate_offset(stype)
-            result[gran][stype][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
+            gran_hash[gran][stype][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
           end
         end
       end
     end
-
-    result
   end
 
   def calculate_offset(search_type)
-    case search_type.to_sym
+    case search_type
     when :vmin then 0.00625
     when :fmax then 50
     else nil
     end
   end
 end
+

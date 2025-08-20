@@ -14,6 +14,7 @@
   justify-content: center; /* centers horizontally */
   gap: 0.5rem;
   width: 100%; /* make sure it can center in the container */
+  font-size: 1.2rem;
 }
 
 .core-types-group .error-message {

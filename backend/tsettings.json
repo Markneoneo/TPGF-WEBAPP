@@ -1,20 +1,20 @@
 {
-  "soc": {
-    "1": {
-      "supply": "1",
-      "clk": "1",
+  "cpu": {
+    "23": {
+      "supply": "234",
+      "clk": "234",
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_soc_1_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_soc_1_fwload"
+          "burst": "avfs_cpu_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_cpu_fwload"
         }
       },
       "prod_settings": {
-        "avgpsm": {
-          "burst": "avfs_soc_1_avgpsm_burst",
-          "binnable": true,
+        "dldoavgpsm": {
+          "burst": "avfs_cpu_dldoavgpsm_burst",
+          "binnable": false,
           "test_points": {
-            "spec_variable": "1",
+            "spec_variable": "999",
             "values": {
               "tp0": {
                 "value": 1
@@ -28,15 +28,14 @@
             }
           },
           "register_setup": {
-            "vector_variable": {
-              "avfs_soc_1_avgpsm": 512
+            "pattern": {
+              "avfs_cpu_dldoavgpsm": 512
             }
           },
           "insertion_list": [
-            "1"
+            "243"
           ],
-          "softsets": "SoftsetProfile_avfs_soc_1_avgpsm",
-          "fallback_enable": true
+          "fallback_enable": false
         }
       },
       "charz_settings": {}

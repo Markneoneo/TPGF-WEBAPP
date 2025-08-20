@@ -137,7 +137,7 @@ post '/api/process-multiple-ips' do
       tsettings = TestSettingsGenerator.new({
         ip: symbolized_config['ip'],
         core_mapping: symbolized_config['core_mapping']
-      }).generatesettings
+      }).generate_settings
 
       combined_results[ip_name] = tsettings
       puts "Generated settings for #{ip_name}"
