@@ -9,6 +9,99 @@
   color: #b36b00;
 }
 
+/* React-Select container styling */
+.react-select-container {
+  margin-bottom: 0.5rem;
+}
+
+.react-select__control {
+  border: 1.5px solid #ffe5b4 !important;
+  border-radius: 5px !important;
+  min-height: 40px !important;
+  font-size: 1rem !important;
+  background: #fff !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.react-select__control--is-focused {
+  border-color: #ffb300 !important;
+  box-shadow: 0 0 0 2px #ffe5b4 !important;
+}
+
+.react-select__control:hover {
+  border-color: #ffb300 !important;
+}
+
+.react-select__multi-value {
+  background-color: #ffe5b4 !important;
+  border-radius: 4px !important;
+  margin: 2px !important;
+}
+
+.react-select__multi-value__label {
+  color: #b36b00 !important;
+  font-weight: 600 !important;
+  padding: 3px 6px !important;
+}
+
+.react-select__multi-value__remove {
+  color: #b36b00 !important;
+  border-radius: 0 4px 4px 0 !important;
+}
+
+.react-select__multi-value__remove:hover {
+  background-color: #ffb300 !important;
+  color: #fff !important;
+}
+
+.react-select__placeholder {
+  color: #999 !important;
+  font-size: 1rem !important;
+}
+
+.react-select__option {
+  font-size: 1rem !important;
+  cursor: pointer !important;
+}
+
+.react-select__option--is-selected {
+  background-color: #ffb300 !important;
+  color: white !important;
+}
+
+.react-select__option--is-focused {
+  background-color: #ffe5b4 !important;
+  color: #b36b00 !important;
+}
+
+.react-select__menu {
+  border: 1px solid #ffe5b4 !important;
+  border-radius: 5px !important;
+  box-shadow: 0 4px 8px rgba(255, 179, 0, 0.1) !important;
+}
+
+.react-select__menu-list {
+  max-height: 200px !important;
+}
+
+.react-select__input-container {
+  color: #333 !important;
+}
+
+.react-select__single-value {
+  color: #333 !important;
+}
+
+/* Error state for react-select */
+.react-select-container.error .react-select__control {
+  border-color: #d32f2f !important;
+}
+
+.react-select-container.error .react-select__control--is-focused {
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2) !important;
+}
+
 .production-mapping-block {
   border: 1.5px solid #ffe5b4;
   border-radius: 8px;
@@ -26,7 +119,6 @@
 }
 
 .production-mapping-block input {
-  /* width: 100%; */
   margin-bottom: 0.5rem;
   padding: 0.5rem 0.7rem;
   border-radius: 5px;
@@ -84,3 +176,25 @@
   color-scheme: light;
 }
 
+/* Checkbox group styling for read type */
+.checkbox-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  color: #b36b00;
+}
+
+.checkbox-input {
+  margin-right: 0.5rem;
+}
+
+.checkbox-custom {
+  margin-left: 0.25rem;
+}

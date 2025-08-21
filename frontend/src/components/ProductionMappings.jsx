@@ -1,7 +1,67 @@
 import React from 'react';
+import Select from 'react-select';
 import './ProductionMappings.css';
 
 const FLOW_ORDERS = ['AVGPSM', 'MINPSM', 'DLDOAVGPSM', 'DLDOMINPSM', 'CPO', 'FAVFS', 'MAFDD', 'DFLL', 'XVMIN', 'XVMINDD'];
+
+// Convert flow orders to react-select options format
+const flowOrderOptions = FLOW_ORDERS.map(order => ({
+  value: order,
+  label: order
+}));
+
+// Custom styles for react-select
+const customStyles = {
+  control: (provided, state) => ({
+    ...provided,
+    borderColor: state.isFocused ? '#ffb300' : '#ffe5b4',
+    borderWidth: '1.5px',
+    borderRadius: '5px',
+    boxShadow: state.isFocused ? '0 0 0 2px #ffe5b4' : 'none',
+    '&:hover': {
+      borderColor: '#ffb300'
+    },
+    minHeight: '40px',
+    fontSize: '1rem'
+  }),
+  multiValue: (provided) => ({
+    ...provided,
+    backgroundColor: '#ffe5b4',
+    borderRadius: '4px'
+  }),
+  multiValueLabel: (provided) => ({
+    ...provided,
+    color: '#b36b00',
+    fontWeight: '600'
+  }),
+  multiValueRemove: (provided) => ({
+    ...provided,
+    color: '#b36b00',
+    '&:hover': {
+      backgroundColor: '#ffb300',
+      color: '#fff'
+    }
+  }),
+  placeholder: (provided) => ({
+    ...provided,
+    color: '#999',
+    fontSize: '1rem'
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: state.isSelected
+      ? '#ffb300'
+      : state.isFocused
+        ? '#ffe5b4'
+        : 'white',
+    color: state.isSelected
+      ? 'white'
+      : state.isFocused
+        ? '#b36b00'
+        : '#333',
+    fontSize: '1rem'
+  })
+};
 
 const ProductionMappings = ({
   selectedFlowOrders,
@@ -9,45 +69,74 @@ const ProductionMappings = ({
   errors,
   handleFlowOrderChange,
   handleProductionMappingChange,
-  coreIndex = 0 // Default to 0 for backward compatibility
+  coreIndex = 0
 }) => {
   // Update error field names to include core index
   const getErrorField = (order, field) => `${field}_${order}_core_${coreIndex}`;
 
+  // Convert selected flow orders to react-select value format
+  const selectedOptions = selectedFlowOrders.map(order => ({
+    value: order,
+    label: order
+  }));
+
+  // Handle react-select change
+  const handleSelectChange = (selectedOptions) => {
+    const currentSelected = selectedFlowOrders;
+    const newSelected = selectedOptions ? selectedOptions.map(option => option.value) : [];
+
+    // Find added and removed orders
+    const added = newSelected.filter(order => !currentSelected.includes(order));
+    const removed = currentSelected.filter(order => !newSelected.includes(order));
+
+    // Handle added orders
+    added.forEach(order => handleFlowOrderChange(order));
+
+    // Handle removed orders
+    removed.forEach(order => handleFlowOrderChange(order));
+  };
+
   return (
     <div className="production-mappings">
-      {/* Flow order selection as checkboxes */}
+      {/* Flow order selection with React-Select */}
       <div className="form-group">
         <label>Flow Orders</label>
         <div className="input-hint">Select one or more flow orders</div>
-        <div className="checkbox-group">
-          {FLOW_ORDERS.map(order => (
-            <label key={order} className="checkbox-label">
-              <input
-                type="checkbox"
-                className="checkbox-input"
-                checked={selectedFlowOrders.includes(order)}
-                onChange={() => handleFlowOrderChange(order)}
-              />
-              <span className="checkbox-custom"></span>
-              {order}
-            </label>
-          ))}
+        <div className="react-select-container">
+          <Select
+            isMulti
+            isSearchable
+            options={flowOrderOptions}
+            value={selectedOptions}
+            onChange={handleSelectChange}
+            placeholder="Search and select flow orders..."
+            styles={customStyles}
+            className="react-select"
+            classNamePrefix="react-select"
+            closeMenuOnSelect={false}
+            hideSelectedOptions={false}
+            isClearable={false}
+            menuPlacement="auto"
+            maxMenuHeight={200}
+          />
         </div>
-        {errors[`flow_orders_core_${coreIndex}`] && <span className="error-message">{errors[`flow_orders_core_${coreIndex}`]}</span>}
+        {errors[`flow_orders_core_${coreIndex}`] && (
+          <span className="error-message">{errors[`flow_orders_core_${coreIndex}`]}</span>
+        )}
       </div>
 
       {/* Render mapping fields for each selected flow order */}
       {selectedFlowOrders.map(order => (
         <div key={order} className="production-mapping-block">
-
           <h5><strong>{order.toUpperCase()} Mapping</strong></h5>
 
           {/* Read Type Checkboxes */}
           <div className="form-group">
             <label>Read Type</label>
             <div className="input-hint">Select one read type (JTAG or FW)</div>
-            {errors[getErrorField(order, 'read_type')] && (<span className="error-message">{errors[getErrorField(order, 'read_type')]}</span>)}
+            {errors[getErrorField(order, 'read_type')] && (
+              <span className="error-message">{errors[getErrorField(order, 'read_type')]}</span>
+            )}
             <div className="checkbox-group">
               <label className="checkbox-label">
                 <input
@@ -95,45 +184,54 @@ const ProductionMappings = ({
                   }
                 />
                 <div className="input-hint">Fixed list separated by commas</div>
-                {errors[getErrorField(order, 'test_points')] && <span className="error-message">{errors[getErrorField(order, 'test_points')]}</span>}
+                {errors[getErrorField(order, 'test_points')] && (
+                  <span className="error-message">{errors[getErrorField(order, 'test_points')]}</span>
+                )}
               </>
             ) : (
-              <>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <div style={{ flex: 1 }}>
-                    <input
-                      type="text"
-                      placeholder="Start Point"
-                      value={productionMappings[order]?.test_points_start || ''}
-                      onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
-                      className={errors[getErrorField(order, 'test_points_start')] ? 'error single-input' : 'single-input'}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <input
-                      type="text"
-                      placeholder="Stop Point"
-                      value={productionMappings[order]?.test_points_stop || ''}
-                      onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
-                      className={errors[getErrorField(order, 'test_points_stop')] ? 'error single-input' : 'single-input'}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <input
-                      type="text"
-                      placeholder="Step"
-                      value={productionMappings[order]?.test_points_step || ''}
-                      onChange={e => handleProductionMappingChange(order, 'test_points_step', e.target.value)}
-                      className={errors[getErrorField(order, 'test_points_step')] ? 'error single-input' : 'single-input'}
-                    />
-                  </div>
+              <>                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    placeholder="Start Point"
+                    value={productionMappings[order]?.test_points_start || ''}
+                    onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
+                    className={errors[getErrorField(order, 'test_points_start')] ? 'error single-input' : 'single-input'}
+                  />
                 </div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    placeholder="Stop Point"
+                    value={productionMappings[order]?.test_points_stop || ''}
+                    onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
+                    className={errors[getErrorField(order, 'test_points_stop')] ? 'error single-input' : 'single-input'}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    placeholder="Step"
+                    value={productionMappings[order]?.test_points_step || ''}
+                    onChange={e => handleProductionMappingChange(order, 'test_points_step', e.target.value)}
+                    className={errors[getErrorField(order, 'test_points_step')] ? 'error single-input' : 'single-input'}
+                  />
+                </div>
+              </div>
                 {/* Display individual field errors */}
-                {errors[getErrorField(order, 'test_points_start')] && <span className="error-message">{errors[getErrorField(order, 'test_points_start')]}</span>}
-                {errors[getErrorField(order, 'test_points_stop')] && <span className="error-message">{errors[getErrorField(order, 'test_points_stop')]}</span>}
-                {errors[getErrorField(order, 'test_points_step')] && <span className="error-message">{errors[getErrorField(order, 'test_points_step')]}</span>}
+                {errors[getErrorField(order, 'test_points_start')] && (
+                  <span className="error-message">{errors[getErrorField(order, 'test_points_start')]}</span>
+                )}
+                {errors[getErrorField(order, 'test_points_stop')] && (
+                  <span className="error-message">{errors[getErrorField(order, 'test_points_stop')]}</span>
+                )}
+                {errors[getErrorField(order, 'test_points_step')] && (
+                  <span className="error-message">{errors[getErrorField(order, 'test_points_step')]}</span>
+                )}
                 {/* Display range validation error */}
-                {errors[getErrorField(order, 'test_points_range')] && <span className="error-message">{errors[getErrorField(order, 'test_points_range')]}</span>}
+                {errors[getErrorField(order, 'test_points_range')] && (
+                  <span className="error-message">{errors[getErrorField(order, 'test_points_range')]}</span>
+                )}
               </>
             )}
           </div>
@@ -146,7 +244,9 @@ const ProductionMappings = ({
             className={errors[getErrorField(order, 'frequency')] ? 'error single-input' : 'single-input'}
             style={{ marginBottom: 4 }}
           />
-          {errors[getErrorField(order, 'frequency')] && <span className="error-message">{errors[getErrorField(order, 'frequency')]}</span>}
+          {errors[getErrorField(order, 'frequency')] && (
+            <span className="error-message">{errors[getErrorField(order, 'frequency')]}</span>
+          )}
 
           <input
             type="text"
@@ -156,7 +256,9 @@ const ProductionMappings = ({
             className={errors[getErrorField(order, 'register_size')] ? 'error single-input' : 'single-input'}
             style={{ marginBottom: 4 }}
           />
-          {errors[getErrorField(order, 'register_size')] && <span className="error-message">{errors[getErrorField(order, 'register_size')]}</span>}
+          {errors[getErrorField(order, 'register_size')] && (
+            <span className="error-message">{errors[getErrorField(order, 'register_size')]}</span>
+          )}
 
           {/* Insertion Field */}
           <div style={{ marginBottom: 4 }}>
@@ -168,7 +270,9 @@ const ProductionMappings = ({
               className={errors[getErrorField(order, 'insertion')] ? 'error single-input insertion-input' : 'single-input insertion-input'}
             />
             <div className="input-hint">Fixed list separated by commas</div>
-            {errors[getErrorField(order, 'insertion')] && <span className="error-message">{errors[getErrorField(order, 'insertion')]}</span>}
+            {errors[getErrorField(order, 'insertion')] && (
+              <span className="error-message">{errors[getErrorField(order, 'insertion')]}</span>
+            )}
           </div>
 
           {/* Binnable Checkbox Option */}

@@ -1,8 +1,8 @@
 {
   "cpu": {
-    "2": {
-      "supply": "2",
-      "clk": "2",
+    "1": {
+      "supply": "1",
+      "clk": "1",
       "fwload_settings": {
         "fwload": {
           "burst": "avfs_cpu_fwload_burst",
@@ -10,11 +10,11 @@
         }
       },
       "prod_settings": {
-        "dfll": {
-          "burst": "avfs_cpu_dfll_burst",
+        "avgpsm": {
+          "burst": "avfs_cpu_avgpsm_burst",
           "binnable": false,
           "test_points": {
-            "spec_variable": "12",
+            "spec_variable": "1",
             "values": {
               "tp0": {
                 "value": 1
@@ -26,11 +26,11 @@
           },
           "register_setup": {
             "pattern": {
-              "avfs_cpu_dfll": 512
+              "avfs_cpu_avgpsm": 512
             }
           },
           "insertion_list": [
-            "2"
+            "1"
           ],
           "fallback_enable": false
         }
