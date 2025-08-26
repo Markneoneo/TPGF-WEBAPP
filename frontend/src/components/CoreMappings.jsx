@@ -21,8 +21,7 @@ const CoreMappings = ({
     {coreMappings.map((mapping, idx) => (
 
       <div key={idx} className="core-mapping-container">
-        <div className="form-group" style={{ marginBottom: '0.75rem' }}>
-
+        <div className="form-group" style={{ marginBottom: '0.5rem' }}>
           <label
             htmlFor={`spec_variable_${idx}`}
             className="core-mapping-label"
@@ -32,47 +31,79 @@ const CoreMappings = ({
 
           <hr className="form-divider" />
 
-          <input
-            type="text"
-            id={`spec_variable_${idx}`}
-            placeholder="Spec Variable"
-            value={mapping.spec_variable || ''}
-            onChange={e => handleCoreMappingChange(idx, 'spec_variable', e.target.value)}
-            className={errors[`spec_variable_${idx}`] ? 'error single-input' : 'single-input'}
-          />
+          <div className="spec-variable-wrapper">
+            <span className="spec-variable-prefix">Spec Variable:</span>
+            <div className="input-with-overlay">
+              {/* <span className="input-overlay-left">LEV.36.</span> */}
+              <input
+                type="text"
+                id={`spec_variable_${idx}`}
+                placeholder="Example: VDDCR"
+                value={mapping.spec_variable || ''}
+                onChange={e => handleCoreMappingChange(idx, 'spec_variable', e.target.value)}
+                className={errors[`spec_variable_${idx}`] ? 'error single-input spec-variable-input' : 'single-input spec-variable-input'}
+              />
+              {/* <span className="input-overlay-right">[V]</span> */}
+            </div>
+          </div>
           {errors[`spec_variable_${idx}`] && <span className="error-message">{errors[`spec_variable_${idx}`]}</span>}
         </div>
 
-        {/* Core Mapping Row */}
-        <div className="core-mapping-row">
-          <input
-            type="text"
-            placeholder="Core Name"
-            value={mapping.core}
-            onChange={e => handleCoreMappingChange(idx, 'core', e.target.value)}
-            className={errors[`core_${idx}`] ? 'error single-input' : 'single-input'}
-          />
-          <input
-            type="text"
-            placeholder="Core Count"
-            value={mapping.core_count}
-            onChange={e => handleCoreMappingChange(idx, 'core_count', e.target.value)}
-            className={errors[`core_count_${idx}`] ? 'error single-input' : 'single-input'}
-          />
-          <input
-            type="text"
-            placeholder="Supply"
-            value={mapping.supply}
-            onChange={e => handleCoreMappingChange(idx, 'supply', e.target.value)}
-            className={errors[`supply_${idx}`] ? 'error single-input' : 'single-input'}
-          />
-          <input
-            type="text"
-            placeholder="Clock"
-            value={mapping.clock || ''}
-            onChange={e => handleCoreMappingChange(idx, 'clock', e.target.value)}
-            className={errors[`clock_${idx}`] ? 'error single-input' : 'single-input'}
-          />
+        {/* Core Mapping Rows - Split into 2 rows */}
+        <div className="core-mapping-rows">
+          {/* First Row: Core Count and Supply */}
+          <div className="core-mapping-row">
+            <div className="input-wrapper">
+              <span className="input-prefix">Core Name:</span>
+              <input
+                type="text"
+                placeholder="Enter core name"
+                value={mapping.core}
+                onChange={e => handleCoreMappingChange(idx, 'core', e.target.value)}
+                className={errors[`core_${idx}`] ? 'error single-input' : 'single-input'}
+              />
+              {/* <span className="input-suffix">core</span> */}
+            </div>
+
+            <div className="input-wrapper">
+              <span className="input-prefix">Core Count:</span>
+              <input
+                type="text"
+                placeholder="Enter count"
+                value={mapping.core_count}
+                onChange={e => handleCoreMappingChange(idx, 'core_count', e.target.value)}
+                className={errors[`core_count_${idx}`] ? 'error single-input' : 'single-input'}
+              />
+              {/* <span className="input-suffix">cores</span> */}
+            </div>
+          </div>
+
+          {/* Second Row: Core Name and Clock */}
+          <div className="core-mapping-row">
+            <div className="input-wrapper">
+              <span className="input-prefix">Supply Name:</span>
+              <input
+                type="text"
+                placeholder="Enter supply"
+                value={mapping.supply}
+                onChange={e => handleCoreMappingChange(idx, 'supply', e.target.value)}
+                className={errors[`supply_${idx}`] ? 'error single-input' : 'single-input'}
+              />
+              {/* <span className="input-suffix">V</span> */}
+            </div>
+
+            <div className="input-wrapper">
+              <span className="input-prefix">Clock:</span>
+              <input
+                type="text"
+                placeholder="Enter clock"
+                value={mapping.clock || ''}
+                onChange={e => handleCoreMappingChange(idx, 'clock', e.target.value)}
+                className={errors[`clock_${idx}`] ? 'error single-input' : 'single-input'}
+              />
+              {/* <span className="input-suffix">MHz</span> */}
+            </div>
+          </div>
         </div>
 
         {/* Production Parameters for this core type */}

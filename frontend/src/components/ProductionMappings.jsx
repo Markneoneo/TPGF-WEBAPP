@@ -176,48 +176,53 @@ const ProductionMappings = ({
               <>
                 <input
                   type="text"
-                  placeholder="Fixed List"
+                  placeholder="Enter Fixed list separated by commas"
                   value={productionMappings[order]?.test_points || ''}
                   onChange={e => handleProductionMappingChange(order, 'test_points', e.target.value)}
                   className={
                     (errors[getErrorField(order, 'test_points')] ? 'error ' : '') + 'single-input test-points-list-input'
                   }
                 />
-                <div className="input-hint">Fixed list separated by commas</div>
+                {/* <div className="input-hint">Fixed list separated by commas</div> */}
                 {errors[getErrorField(order, 'test_points')] && (
                   <span className="error-message">{errors[getErrorField(order, 'test_points')]}</span>
                 )}
               </>
             ) : (
-              <>                <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ flex: 1 }}>
-                  <input
-                    type="text"
-                    placeholder="Start Point"
-                    value={productionMappings[order]?.test_points_start || ''}
-                    onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
-                    className={errors[getErrorField(order, 'test_points_start')] ? 'error single-input' : 'single-input'}
-                  />
+              <>
+                <div className="test-points-range-container">
+                  <div className="test-point-field">
+                    <span className="test-point-label">Start Point:</span>
+                    <input
+                      type="text"
+                      value={productionMappings[order]?.test_points_start || ''}
+                      onChange={e => handleProductionMappingChange(order, 'test_points_start', e.target.value)}
+                      className={errors[getErrorField(order, 'test_points_start')] ? 'error single-input' : 'single-input'}
+                    />
+                    <span className="test-point-unit">V</span>
+                  </div>
+                  <div className="test-point-field">
+                    <span className="test-point-label">Stop Point:</span>
+                    <input
+                      type="text"
+                      value={productionMappings[order]?.test_points_stop || ''}
+                      onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
+                      className={errors[getErrorField(order, 'test_points_stop')] ? 'error single-input' : 'single-input'}
+                    />
+                    <span className="test-point-unit">V</span>
+                  </div>
+                  <div className="test-point-field">
+                    <span className="test-point-label">Step:</span>
+                    <input
+                      type="text"
+                      value={productionMappings[order]?.test_points_step || ''}
+                      onChange={e => handleProductionMappingChange(order, 'test_points_step', e.target.value)}
+                      className={errors[getErrorField(order, 'test_points_step')] ? 'error single-input' : 'single-input'}
+                    />
+                    <span className="test-point-unit">V</span>
+                  </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <input
-                    type="text"
-                    placeholder="Stop Point"
-                    value={productionMappings[order]?.test_points_stop || ''}
-                    onChange={e => handleProductionMappingChange(order, 'test_points_stop', e.target.value)}
-                    className={errors[getErrorField(order, 'test_points_stop')] ? 'error single-input' : 'single-input'}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <input
-                    type="text"
-                    placeholder="Step"
-                    value={productionMappings[order]?.test_points_step || ''}
-                    onChange={e => handleProductionMappingChange(order, 'test_points_step', e.target.value)}
-                    className={errors[getErrorField(order, 'test_points_step')] ? 'error single-input' : 'single-input'}
-                  />
-                </div>
-              </div>
+
                 {/* Display individual field errors */}
                 {errors[getErrorField(order, 'test_points_start')] && (
                   <span className="error-message">{errors[getErrorField(order, 'test_points_start')]}</span>
@@ -236,40 +241,48 @@ const ProductionMappings = ({
             )}
           </div>
 
-          <input
-            type="text"
-            placeholder="Frequency"
-            value={productionMappings[order]?.frequency || ''}
-            onChange={e => handleProductionMappingChange(order, 'frequency', e.target.value)}
-            className={errors[getErrorField(order, 'frequency')] ? 'error single-input' : 'single-input'}
-            style={{ marginBottom: 4 }}
-          />
+          <div className="input-field-container">
+            <span className="input-field-label">Frequency:</span>
+            <input
+              type="text"
+              value={productionMappings[order]?.frequency || ''}
+              onChange={e => handleProductionMappingChange(order, 'frequency', e.target.value)}
+              className={errors[getErrorField(order, 'frequency')] ? 'error single-input' : 'single-input'}
+            />
+            <span className="input-field-unit">MHz</span>
+          </div>
           {errors[getErrorField(order, 'frequency')] && (
             <span className="error-message">{errors[getErrorField(order, 'frequency')]}</span>
           )}
 
-          <input
-            type="text"
-            placeholder="Register Size"
-            value={productionMappings[order]?.register_size || ''}
-            onChange={e => handleProductionMappingChange(order, 'register_size', e.target.value)}
-            className={errors[getErrorField(order, 'register_size')] ? 'error single-input' : 'single-input'}
-            style={{ marginBottom: 4 }}
-          />
+          <div className="input-field-container">
+            <span className="input-field-label">Register Size:</span>
+            <input
+              type="text"
+              value={productionMappings[order]?.register_size || ''}
+              onChange={e => handleProductionMappingChange(order, 'register_size', e.target.value)}
+              className={errors[getErrorField(order, 'register_size')] ? 'error single-input' : 'single-input'}
+            />
+            {/* <span className="input-field-unit">bits</span> */}
+          </div>
           {errors[getErrorField(order, 'register_size')] && (
             <span className="error-message">{errors[getErrorField(order, 'register_size')]}</span>
           )}
 
           {/* Insertion Field */}
-          <div style={{ marginBottom: 4 }}>
-            <input
-              type="text"
-              placeholder="Insertion List"
-              value={productionMappings[order]?.insertion || ''}
-              onChange={e => handleProductionMappingChange(order, 'insertion', e.target.value)}
-              className={errors[getErrorField(order, 'insertion')] ? 'error single-input insertion-input' : 'single-input insertion-input'}
-            />
-            <div className="input-hint">Fixed list separated by commas</div>
+          <div className="insertion-field-container">
+            <div className="input-field-container">
+              <span className="input-field-label">Insertion List:</span>
+              <input
+                type="text"
+                placeholder="Enter Fixed list separated by commas"
+                value={productionMappings[order]?.insertion || ''}
+                onChange={e => handleProductionMappingChange(order, 'insertion', e.target.value)}
+                className={errors[getErrorField(order, 'insertion')] ? 'error single-input insertion-input' : 'single-input insertion-input'}
+              />
+              {/* <span className="input-field-unit">dB</span> */}
+            </div>
+            {/* <div className="input-hint">Fixed list separated by commas</div> */}
             {errors[getErrorField(order, 'insertion')] && (
               <span className="error-message">{errors[getErrorField(order, 'insertion')]}</span>
             )}

@@ -32,6 +32,87 @@
   align-items: center;
 }
 
+/* Wrapper for spec variable with prefix */
+.spec-variable-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Styling for prefix text */
+.spec-variable-prefix {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Container for input with overlaid text */
+.input-with-overlay {
+  position: relative;
+  flex: 1;
+}
+
+/* Input field styling - add padding for overlay text */
+.spec-variable-input {
+  width: 100%;
+  /* padding-left: 4rem !important;    */
+  /* padding-right: 4.5rem !important;   */
+}
+
+/* Overlay text on the left side of input */
+.input-overlay-left {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 600;
+  color: #666;
+  pointer-events: none;  /* Allows clicks to pass through to input */
+  z-index: 1;
+}
+
+/* Overlay text on the right side of input */
+.input-overlay-right {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 600;
+  color: #666;
+  pointer-events: none;  /* Allows clicks to pass through to input */
+  z-index: 1;
+}
+
+/* Wrapper for the input with prefix text */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+/* Styling for prefix text before inputs */
+.input-prefix {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+/* Styling for suffix text after inputs */
+.input-suffix {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  min-width: 40px;
+}
+
+/* Container for multiple core mapping rows */
+.core-mapping-rows {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Divider line under the spec variable label */
 .form-divider {
   border: none;

@@ -176,11 +176,62 @@
   color-scheme: light;
 }
 
+.test-points-list-input {
+  margin-bottom: 16px !important;
+}
+
+.test-points-range-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.test-point-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.test-point-label {
+  color: #b36b00;
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 80px;
+  margin-bottom: 0.5rem;
+}
+
+.test-point-unit {
+  color: #b36b00;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.input-field-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input-field-label {
+  color: #b36b00;
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 100px;
+  line-height: 1;
+  align-self: center;
+  margin-bottom: 0.5rem;
+}
+
+.input-field-unit {
+  color: #b36b00;
+  font-weight: 600;
+  line-height: 1;
+  align-self: center;
+}
+
 /* Checkbox group styling for read type */
 .checkbox-group {
   display: flex;
   gap: 1rem;
-  margin-top: 0.5rem;
 }
 
 .checkbox-label {

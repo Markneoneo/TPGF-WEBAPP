@@ -46,3 +46,15 @@
   color: #6b00b3;
   font-weight: 700;
 }
+
+.charz-table td {
+  border: 1px solid #d1b3ff;
+  padding: 0.5rem 0.7rem;
+  text-align: center;
+  color: #000;
+  min-width: 120px; /* Ensures minimum column width */
+}
+
+.charz-table input {
+  box-sizing: border-box;
+}
