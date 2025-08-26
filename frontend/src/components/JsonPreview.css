@@ -1,0 +1,100 @@
+/* JSON Preview Section Styles */
+.json-preview-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .json-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .json-preview-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .json-preview-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  
+  .json-preview-close:hover {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+  
+  .json-preview-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+  }
+  
+  .json-preview {
+    margin: 0;
+    padding: 1rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    background-color: #fff;
+    color: #333;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  .json-preview code {
+    font-family: inherit;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  
+  /* Dark theme for JSON preview (optional) */
+  .json-preview-container.dark {
+    background-color: #2d3748;
+  }
+  
+  .json-preview-container.dark .json-preview {
+    background-color: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  /* Scrollbar styling for JSON preview */
+  .json-preview-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .json-preview-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .json-preview-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  .json-preview-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+  
