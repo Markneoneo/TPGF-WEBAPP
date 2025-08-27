@@ -1,51 +1,54 @@
 {
-  "cpu": {
-    "45645": {
-      "supply": "456",
-      "clk": "456",
+  "soc": {
+    "234": {
+      "supply": "234",
+      "clk": "234",
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_cpu_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_cpu_fwload"
+          "burst": "avfs_soc_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_soc_fwload"
         }
       },
-      "prod_settings": {
-        "minpsm": {
-          "burst": "avfs_cpu_minpsm_burst",
-          "binnable": true,
-          "test_points": {
-            "spec_variable": "564",
-            "values": {
-              "tp0": {
-                "value": 1
-              },
-              "tp1": {
-                "value": 2
-              },
-              "tp2": {
-                "value": 3
-              },
-              "tp3": {
-                "value": 4
-              },
-              "tp4": {
-                "value": 5
+      "prod_settings": {},
+      "charz_settings": {
+        "bycore": {
+          "fmax": {
+            "crest": {
+              "1": {
+                "burst": "avfs_soc_crest_1_burst",
+                "binnable": false,
+                "test_points": {
+                  "spec_variable": "",
+                  "values": {
+                    "2": {
+                      "override_primaries": {},
+                      "softsets": {
+                        "profile_name": "SoftsetProfile_avfs_soc_crest_2"
+                      }
+                    }
+                  }
+                },
+                "search_settings": {
+                  "start": "1",
+                  "stop": "1",
+                  "mode": "LinBin",
+                  "res": "1",
+                  "step": "1"
+                },
+                "minpsm_settings": {
+                  "burst": "",
+                  "register_setup": {
+                    "pattern": {
+                      "avfs_soc_crest_1_minPSM": 512
+                    }
+                  }
+                },
+                "offset": 50
               }
             }
-          },
-          "register_setup": {
-            "pattern": {
-              "avfs_cpu_minpsm": 512
-            }
-          },
-          "softsets": "SoftsetProfile_avfs_cpu_minpsm",
-          "insertion_list": [
-            "243"
-          ],
-          "fallback_enable": true
+          }
         }
-      },
-      "charz_settings": {}
+      }
     }
   }
 }

@@ -7,13 +7,14 @@ import validateForm from '../utils/validateForm';
 
 const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
   const [errors, setErrors] = useState({});
-  const [coreMappings, setCoreMappings] = useState([{ core: '', core_count: '', supply: '', clock: '', spec_variable: '' }]);
+  const [coreMappings, setCoreMappings] = useState([{ core: '', core_count: '', supply: '', clock: '' }]);
   const [numCoreTypes, setNumCoreTypes] = useState('1');
 
   // Changed: Now arrays indexed by core type
   const [selectedFlowOrders, setSelectedFlowOrders] = useState([[]]);
-  const [productionMappings, setProductionMappings] = useState([{}]);
+  const [productionMappings, setProductionMappings] = useState([{ spec_variable: '' }]);
   const [showCharzForCore, setShowCharzForCore] = useState([false]);
+  const [showProductionForCore, setShowProductionForCore] = useState([false]);
   const [charzData, setCharzData] = useState([{
     search_granularity: '',
     search_types: [],
@@ -33,7 +34,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
       setCoreMappings(prev => {
         const arr = [...prev];
         if (arr.length < num) {
-          while (arr.length < num) arr.push({ core: '', core_count: '', supply: '', clock: '', spec_variable: '' });
+          while (arr.length < num) arr.push({ core: '', core_count: '', supply: '', clock: '' });
         } else if (arr.length > num) {
           arr.length = num;
         }
@@ -48,9 +49,16 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
         return arr;
       });
 
+      setShowProductionForCore(prev => {
+        const arr = [...prev];
+        while (arr.length < num) arr.push(false);
+        if (arr.length > num) arr.length = num;
+        return arr;
+      });
+
       setProductionMappings(prev => {
         const arr = [...prev];
-        while (arr.length < num) arr.push({});
+        while (arr.length < num) arr.push({ spec_variable: '' });
         if (arr.length > num) arr.length = num;
         return arr;
       });
@@ -141,16 +149,48 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
   };
 
   // Handle production mapping field change for specific core type
-  const handleProductionMappingChange = (coreIndex, order, field, value) => {
+  const handleProductionMappingChange = (coreIndex, orderOrField, fieldOrValue, value) => {
     setProductionMappings(prev => {
       const updated = [...prev];
       if (!updated[coreIndex]) {
         updated[coreIndex] = {};
       }
-      if (!updated[coreIndex][order]) {
-        updated[coreIndex][order] = {};
+
+      // Handle spec_variable (not tied to a specific order)
+      if (orderOrField === 'spec_variable') {
+        updated[coreIndex]['spec_variable'] = fieldOrValue;
+      } else {
+        // Handle regular flow order mappings
+        const order = orderOrField;
+        const field = fieldOrValue;
+        if (!updated[coreIndex][order]) {
+          updated[coreIndex][order] = {};
+        }
+        updated[coreIndex][order][field] = value;
       }
-      updated[coreIndex][order][field] = value;
+      return updated;
+    });
+  };
+
+  // Handle production toggle for specific core type
+  const handleProductionToggle = (coreIndex) => {
+    setShowProductionForCore(prev => {
+      const updated = [...prev];
+      updated[coreIndex] = !updated[coreIndex];
+
+      // Clear production data if disabling
+      if (!updated[coreIndex]) {
+        setSelectedFlowOrders(flowPrev => {
+          const flowUpdated = [...flowPrev];
+          flowUpdated[coreIndex] = [];
+          return flowUpdated;
+        });
+        setProductionMappings(prodPrev => {
+          const prodUpdated = [...prodPrev];
+          prodUpdated[coreIndex] = { spec_variable: '' };
+          return prodUpdated;
+        });
+      }
       return updated;
     });
   };
@@ -191,9 +231,10 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
   // Clear form data
   const clearForm = () => {
     setNumCoreTypes('1');
-    setCoreMappings([{ core: '', core_count: '', supply: '', clock: '', spec_variable: '' }]);
+    setCoreMappings([{ core: '', core_count: '', supply: '', clock: '' }]);
     setSelectedFlowOrders([[]]);
-    setProductionMappings([{}]);
+    setProductionMappings([{ spec_variable: '' }]);
+    setShowProductionForCore([false]);
     setShowCharzForCore([false]);
     setCharzData([{
       search_granularity: '',
@@ -212,6 +253,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
       coreMappings,
       selectedFlowOrders,
       productionMappings,
+      showProductionForCore,
       charzData,
       showCharzForCore
     });
@@ -233,6 +275,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
       core_mappings: coreMappings,
       flow_orders: selectedFlowOrders,
       production_mappings: productionMappings,
+      show_production_for_core: showProductionForCore,
       charz_data: charzData,
       show_charz_for_core: showCharzForCore,
     }),
@@ -293,9 +336,11 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
               productionMappings={productionMappings}
               charzData={charzData}
               selectedFlowOrders={selectedFlowOrders}
+              showProductionForCore={showProductionForCore}
               showCharzForCore={showCharzForCore}
               handleFlowOrderChange={handleFlowOrderChange}
               handleProductionMappingChange={handleProductionMappingChange}
+              handleProductionToggle={handleProductionToggle}
               handleCharzToggle={handleCharzToggle}
               setCharzData={handleCharzDataChange}
               ipType={ipType}

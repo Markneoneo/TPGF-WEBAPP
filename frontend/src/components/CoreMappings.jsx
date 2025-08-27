@@ -10,9 +10,11 @@ const CoreMappings = ({
   productionMappings,
   charzData,
   selectedFlowOrders,
+  showProductionForCore,
   showCharzForCore,
   handleFlowOrderChange,
   handleProductionMappingChange,
+  handleProductionToggle,
   handleCharzToggle,
   setCharzData,
   ipType
@@ -22,31 +24,10 @@ const CoreMappings = ({
 
       <div key={idx} className="core-mapping-container">
         <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-          <label
-            htmlFor={`spec_variable_${idx}`}
-            className="core-mapping-label"
-          >
+          <label className="core-mapping-label">
             <strong>Core Type {idx + 1}</strong>
           </label>
-
           <hr className="form-divider" />
-
-          <div className="spec-variable-wrapper">
-            <span className="spec-variable-prefix">Spec Variable:</span>
-            <div className="input-with-overlay">
-              {/* <span className="input-overlay-left">LEV.36.</span> */}
-              <input
-                type="text"
-                id={`spec_variable_${idx}`}
-                placeholder="Example: VDDCR"
-                value={mapping.spec_variable || ''}
-                onChange={e => handleCoreMappingChange(idx, 'spec_variable', e.target.value)}
-                className={errors[`spec_variable_${idx}`] ? 'error single-input spec-variable-input' : 'single-input spec-variable-input'}
-              />
-              {/* <span className="input-overlay-right">[V]</span> */}
-            </div>
-          </div>
-          {errors[`spec_variable_${idx}`] && <span className="error-message">{errors[`spec_variable_${idx}`]}</span>}
         </div>
 
         {/* Core Mapping Rows - Split into 2 rows */}
@@ -106,23 +87,39 @@ const CoreMappings = ({
           </div>
         </div>
 
-        {/* Production Parameters for this core type */}
-        <div className="production-section">
-          <h5 className="production-section-label">
-            <strong>Production Parameters for Core Type {idx + 1}</strong>
-          </h5>
-          <ProductionMappings
-            selectedFlowOrders={selectedFlowOrders[idx] || []}
-            productionMappings={productionMappings[idx] || {}}
-            errors={errors}
-            handleFlowOrderChange={(order) => handleFlowOrderChange(idx, order)}
-            handleProductionMappingChange={(order, field, value) => handleProductionMappingChange(idx, order, field, value)}
-            coreIndex={idx}
-          />
+        {/* Production Parameters Toggle for this core type */}
+        <div className="form-group checkbox-toggle-row">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={showProductionForCore[idx] || false}
+              onChange={() => handleProductionToggle(idx)}
+              className="checkbox-input"
+            />
+            <span className="checkbox-custom"></span>
+            Production Parameters for Core Type {idx + 1}
+          </label>
         </div>
 
+        {/* Production Parameters for this core type */}
+        {showProductionForCore[idx] && (
+          <div className="production-section">
+            <h5 className="production-section-label">
+              <strong>Production Parameters for Core Type {idx + 1}</strong>
+            </h5>
+            <ProductionMappings
+              selectedFlowOrders={selectedFlowOrders[idx] || []}
+              productionMappings={productionMappings[idx] || {}}
+              errors={errors}
+              handleFlowOrderChange={(order) => handleFlowOrderChange(idx, order)}
+              handleProductionMappingChange={(orderOrField, fieldOrValue, value) => handleProductionMappingChange(idx, orderOrField, fieldOrValue, value)}
+              coreIndex={idx}
+            />
+          </div>
+        )}
+
         {/* Charz Parameters Toggle for this core type */}
-        <div className="form-group" style={{ marginLeft: '1rem' }}>
+        <div className="form-group checkbox-toggle-row">
           <label className="checkbox-label">
             <input
               type="checkbox"

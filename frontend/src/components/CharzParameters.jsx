@@ -2,14 +2,14 @@ import React from 'react';
 import './CharzParameters.css';
 
 const SEARCH_GRANULARITY_OPTIONS = ['allcore', 'bycore'];
-const SEARCH_TYPE_OPTIONS = ['vmin', 'fmax'];
+const SEARCH_TYPE_OPTIONS = ['VMIN', 'FMAX'];
 const TEST_TYPES = ['CREST', 'BIST', 'PBIST'];
 const WORKLOAD_FIELDS = [
   { key: 'wl', label: 'WL', type: 'text' }
 ];
 
 const getTableFields = (searchType) => {
-  if (searchType === 'vmin') {
+  if (searchType === 'VMIN') {
     return [
       { key: 'wl_count', label: 'WL Count', type: 'number', min: 0 },
       { key: 'tp', label: 'Test Points (MHz)', type: 'text' },
@@ -18,7 +18,7 @@ const getTableFields = (searchType) => {
       { key: 'search_step', label: 'Search Step (V)', type: 'text' },
       { key: 'resolution', label: 'Resolution (V)', type: 'text' },
     ];
-  } else if (searchType === 'fmax') {
+  } else if (searchType === 'FMAX') {
     return [
       { key: 'wl_count', label: 'WL Count', type: 'number', min: 0 },
       { key: 'tp', label: 'Test Points (V)', type: 'text' },
@@ -337,16 +337,22 @@ const CharzParameters = ({
 
       {/* PSM Register Size */}
       <div className="form-group">
-        <label htmlFor={`psm_reg_size_${ipType}_core_${coreIndex}`}>PSM Register Size</label>
-        <input
-          id={`psm_reg_size_${ipType}_core_${coreIndex}`}
-          type="text"
-          value={charzData.psm_register_size || ''}
-          onChange={handleRegisterSizeChange}
-          className={errors[getErrorField('psm_register_size')] ? 'error single-input' : 'single-input'}
-        />
+        <div className="psm-register-wrapper">
+          <span className="psm-register-prefix">PSM Register Size:</span>
+          <div className="input-with-overlay">
+            <input
+              id={`psm_reg_size_${ipType}_core_${coreIndex}`}
+              type="text"
+              placeholder="Enter size"
+              value={charzData.psm_register_size || ''}
+              onChange={handleRegisterSizeChange}
+              className={errors[getErrorField('psm_register_size')] ? 'error single-input psm-register-input' : 'single-input psm-register-input'}
+            />
+          </div>
+        </div>
         {errors[getErrorField('psm_register_size')] && <span className="error-message">{errors[getErrorField('psm_register_size')]}</span>}
       </div>
+
     </div>
   );
 };

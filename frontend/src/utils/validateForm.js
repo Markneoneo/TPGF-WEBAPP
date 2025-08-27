@@ -107,6 +107,7 @@ export default function validate({
   coreMappings,
   selectedFlowOrders,
   productionMappings,
+  showProductionForCore,
   charzData,
   showCharzForCore
 }) {
@@ -119,26 +120,32 @@ export default function validate({
 
   // Core mappings
   coreMappings.forEach((mapping, idx) => {
-    if (!mapping.spec_variable || typeof mapping.spec_variable !== 'string' || mapping.spec_variable.trim() === '') {
-      newErrors[`spec_variable_${idx}`] = `Spec Variable is required for Core ${idx + 1}.`;
-    }
     if (!mapping.core || typeof mapping.core !== 'string' || mapping.core.trim() === '') newErrors[`core_${idx}`] = 'Core is required.';
     if (!mapping.core_count || isNaN(Number(mapping.core_count)) || Number(mapping.core_count) < 1) newErrors[`core_count_${idx}`] = 'Core Count is required and must be at least 1.';
     if (!mapping.supply || typeof mapping.supply !== 'string' || mapping.supply.trim() === '') newErrors[`supply_${idx}`] = 'Supply is required.';
     if (!mapping.clock || typeof mapping.clock !== 'string' || mapping.clock.trim() === '') newErrors[`clock_${idx}`] = 'Clock is required.';
   });
 
-  // Production mappings - now validate per core type
+  // Production mappings - only validate if enabled for each core type
   selectedFlowOrders.forEach((coreFlowOrders, coreIndex) => {
+    // Only validate if production is enabled for this core
+    if (!showProductionForCore || !showProductionForCore[coreIndex]) {
+      return;
+    }
+
     if (!Array.isArray(coreFlowOrders)) return;
+    const coreProductionMappings = productionMappings[coreIndex] || {};
+
+    // Validate spec_variable for this core
+    if (!coreProductionMappings.spec_variable || typeof coreProductionMappings.spec_variable !== 'string' || coreProductionMappings.spec_variable.trim() === '') {
+      newErrors[`spec_variable_core_${coreIndex}`] = `Spec Variable is required for Core ${coreIndex + 1}.`;
+    }
 
     // Check if at least one flow order is selected for this core
     if (coreFlowOrders.length === 0) {
       newErrors[`flow_orders_core_${coreIndex}`] = `At least one flow order must be selected for Core ${coreIndex + 1}.`;
       return;
     }
-
-    const coreProductionMappings = productionMappings[coreIndex] || {};
 
     coreFlowOrders.forEach(order => {
       const mapping = coreProductionMappings[order] || {};

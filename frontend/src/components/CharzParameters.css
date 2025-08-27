@@ -30,7 +30,6 @@
   width: 100%;
   min-width: 650px;
   background: #faf7ff;
-  margin-bottom: 1rem;
 }
 
 .charz-table th,
@@ -57,4 +56,21 @@
 
 .charz-table input {
   box-sizing: border-box;
+}
+
+/* PSM Register Size styling - similar to spec variable */
+.psm-register-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.psm-register-prefix {
+  font-weight: 600;
+  color: #6b00b3;
+  white-space: nowrap;
+}
+
+.psm-register-input {
+  width: 100%;
 }
