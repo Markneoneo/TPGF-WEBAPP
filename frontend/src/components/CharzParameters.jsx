@@ -77,6 +77,19 @@ const CharzParameters = ({
     setCharzData(newData);
   };
 
+  // New handler for spec variable change
+  const handleSpecVariableChange = (searchType, value) => {
+    const newData = {
+      ...charzData,
+      spec_variables: {
+        ...charzData.spec_variables,
+        [searchType]: value
+      }
+    };
+
+    setCharzData(newData);
+  };
+
   // New handler for test type selection
   const handleTestTypeChange = (searchType, testType) => {
     const selectedTestTypes = { ...(charzData.selectedTestTypes || {}) };
@@ -183,6 +196,24 @@ const CharzParameters = ({
         <React.Fragment key={searchType}>
           <div className="charz-table-block">
             <div className="charz-table-title">{searchType.toUpperCase()} Test Types</div>
+
+            {/* VMIN/FMAX Spec Variable - NEW ADDITION */}
+            <div className="form-group">
+              <div className="spec-variable-wrapper">
+                <span className="spec-variable-prefix">{searchType} Spec Variable:</span>
+                <div className="input-with-overlay">
+                  <input
+                    id={`${searchType}_spec_variable_${ipType}_core_${coreIndex}`}
+                    type="text"
+                    placeholder="Enter spec variable"
+                    value={charzData.spec_variables?.[searchType] || ''}
+                    onChange={(e) => handleSpecVariableChange(searchType, e.target.value)}
+                    className={errors[getErrorField(`${searchType}_spec_variable`)] ? 'error single-input spec-variable-input' : 'single-input spec-variable-input'}
+                  />
+                </div>
+              </div>
+              {errors[getErrorField(`${searchType}_spec_variable`)] && <span className="error-message">{errors[getErrorField(`${searchType}_spec_variable`)]}</span>}
+            </div>
 
             {/* Test Type Checkboxes */}
             <div className="form-group" style={{ marginBottom: '1rem' }}>

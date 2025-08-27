@@ -49,6 +49,7 @@ function transformFormDataToBackend(formData) {
           const selectedTestTypes = charzData.selectedTestTypes?.[searchType] || [];
 
           charztype_mapping.searchtype[searchType] = {
+            specvariable: charzData.spec_variables?.[searchType] || '',
             testtype: {}
           };
 

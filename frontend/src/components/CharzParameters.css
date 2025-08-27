@@ -58,6 +58,22 @@
   box-sizing: border-box;
 }
 
+/* Spec Variable styling - similar to PSM register size */
+.spec-variable-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.spec-variable-prefix {
+  font-weight: 600;
+  color: #6b00b3;
+  white-space: nowrap;
+}
+
+.spec-variable-input {
+  width: 100%;
+}
+
 /* PSM Register Size styling - similar to spec variable */
 .psm-register-wrapper {
   display: flex;

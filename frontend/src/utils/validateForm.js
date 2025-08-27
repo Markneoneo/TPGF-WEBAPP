@@ -239,6 +239,12 @@ export default function validate({
     }
 
     (charz.search_types || []).forEach(searchType => {
+      // Validate spec variable for each selected search type
+      const specVariable = charz.spec_variables?.[searchType];
+      if (!specVariable || typeof specVariable !== 'string' || specVariable.trim() === '') {
+        newErrors[getCoreErrorField(`${searchType}_spec_variable`)] = `${searchType} Spec Variable is required for Core ${coreIndex + 1}.`;
+      }
+
       // Get selected test types for this search type
       const selectedTestTypes = charz.selectedTestTypes?.[searchType] || [];
 

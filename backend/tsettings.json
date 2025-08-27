@@ -1,49 +1,49 @@
 {
-  "soc": {
-    "234": {
-      "supply": "234",
-      "clk": "234",
+  "gfx": {
+    "45": {
+      "supply": "64",
+      "clk": "3465",
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_soc_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_soc_fwload"
+          "burst": "avfs_gfx_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_gfx_fwload"
         }
       },
       "prod_settings": {},
       "charz_settings": {
         "bycore": {
-          "fmax": {
-            "crest": {
-              "1": {
-                "burst": "avfs_soc_crest_1_burst",
+          "_f_m_a_x": {
+            "pbist": {
+              "45": {
+                "burst": "avfs_gfx_pbist_45_burst",
                 "binnable": false,
                 "test_points": {
                   "spec_variable": "",
                   "values": {
-                    "2": {
+                    "46": {
                       "override_primaries": {},
                       "softsets": {
-                        "profile_name": "SoftsetProfile_avfs_soc_crest_2"
+                        "profile_name": "SoftsetProfile_avfs_gfx_pbist_46"
                       }
                     }
                   }
                 },
                 "search_settings": {
-                  "start": "1",
-                  "stop": "1",
+                  "start": "364",
+                  "stop": "4564",
                   "mode": "LinBin",
-                  "res": "1",
-                  "step": "1"
+                  "res": "645",
+                  "step": "56456"
                 },
                 "minpsm_settings": {
                   "burst": "",
                   "register_setup": {
                     "pattern": {
-                      "avfs_soc_crest_1_minPSM": 512
+                      "avfs_gfx_pbist_45_minPSM": 512
                     }
                   }
                 },
-                "offset": 50
+                "offset": null
               }
             }
           }
