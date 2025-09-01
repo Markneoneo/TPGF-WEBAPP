@@ -136,10 +136,14 @@ export default function validate({
     if (!Array.isArray(coreFlowOrders)) return;
     const coreProductionMappings = productionMappings[coreIndex] || {};
 
-    // Validate spec_variable for this core
-    if (!coreProductionMappings.spec_variable || typeof coreProductionMappings.spec_variable !== 'string' || coreProductionMappings.spec_variable.trim() === '') {
-      newErrors[`spec_variable_core_${coreIndex}`] = `Spec Variable is required for Core ${coreIndex + 1}.`;
-    }
+    // Validate spec_variable for each flow order in this core
+    coreFlowOrders.forEach(order => {
+      const mapping = coreProductionMappings[order] || {};
+      if (!mapping.spec_variable || typeof mapping.spec_variable !== 'string' || mapping.spec_variable.trim() === '') {
+        const getErrorField = (field) => `${field}_${order}_core_${coreIndex}`;
+        newErrors[getErrorField('spec_variable')] = `Spec Variable is required for ${order} in Core ${coreIndex + 1}.`;
+      }
+    });
 
     // Check if at least one flow order is selected for this core
     if (coreFlowOrders.length === 0) {

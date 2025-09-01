@@ -12,7 +12,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
 
   // Changed: Now arrays indexed by core type
   const [selectedFlowOrders, setSelectedFlowOrders] = useState([[]]);
-  const [productionMappings, setProductionMappings] = useState([{ spec_variable: '' }]);
+  const [productionMappings, setProductionMappings] = useState([{}]);
   const [showCharzForCore, setShowCharzForCore] = useState([false]);
   const [showProductionForCore, setShowProductionForCore] = useState([false]);
   const [charzData, setCharzData] = useState([{
@@ -58,10 +58,11 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
 
       setProductionMappings(prev => {
         const arr = [...prev];
-        while (arr.length < num) arr.push({ spec_variable: '' });
+        while (arr.length < num) arr.push({});
         if (arr.length > num) arr.length = num;
         return arr;
       });
+
 
       setShowCharzForCore(prev => {
         const arr = [...prev];
@@ -187,9 +188,10 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
         });
         setProductionMappings(prodPrev => {
           const prodUpdated = [...prodPrev];
-          prodUpdated[coreIndex] = { spec_variable: '' };
+          prodUpdated[coreIndex] = {};
           return prodUpdated;
         });
+
       }
       return updated;
     });
@@ -233,7 +235,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
     setNumCoreTypes('1');
     setCoreMappings([{ core: '', core_count: '', supply: '', clock: '' }]);
     setSelectedFlowOrders([[]]);
-    setProductionMappings([{ spec_variable: '' }]);
+    setProductionMappings([{}]);
     setShowProductionForCore([false]);
     setShowCharzForCore([false]);
     setCharzData([{

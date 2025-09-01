@@ -98,24 +98,6 @@ const ProductionMappings = ({
 
   return (
     <div className="production-mappings">
-      {/* Spec Variable Input */}
-      <div className="form-group">
-        <div className="spec-variable-wrapper">
-          <span className="spec-variable-prefix">Spec Variable:</span>
-          <div className="input-with-overlay">
-            <input
-              type="text"
-              placeholder="Example: VDDCR"
-              value={productionMappings.spec_variable || ''}
-              onChange={e => handleProductionMappingChange('spec_variable', e.target.value)}
-              className={errors[`spec_variable_core_${coreIndex}`] ? 'error single-input spec-variable-input' : 'single-input spec-variable-input'}
-            />
-          </div>
-        </div>
-        {errors[`spec_variable_core_${coreIndex}`] && (
-          <span className="error-message">{errors[`spec_variable_core_${coreIndex}`]}</span>
-        )}
-      </div>
 
       {/* Flow order selection with React-Select */}
       <div className="form-group">
@@ -259,6 +241,21 @@ const ProductionMappings = ({
               </>
             )}
           </div>
+
+          {/* Spec Variable */}
+          <div className="input-field-container">
+            <span className="input-field-label">Spec Variable:</span>
+            <input
+              type="text"
+              placeholder="Example: VDDCR"
+              value={productionMappings[order]?.spec_variable || ''}
+              onChange={e => handleProductionMappingChange(order, 'spec_variable', e.target.value)}
+              className={errors[getErrorField(order, 'spec_variable')] ? 'error single-input' : 'single-input'}
+            />
+          </div>
+          {errors[getErrorField(order, 'spec_variable')] && (
+            <span className="error-message">{errors[getErrorField(order, 'spec_variable')]}</span>
+          )}
 
           <div className="input-field-container">
             <span className="input-field-label">Frequency:</span>

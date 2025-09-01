@@ -13,8 +13,9 @@ function transformFormDataToBackend(formData) {
       const coreFlowOrders = formData.flow_orders[coreIndex] || [];
       const coreProductionMappings = formData.production_mappings[coreIndex] || {};
 
-      // Get spec_variable from production mappings
-      specVariable = coreProductionMappings.spec_variable || '';
+      // Get spec_variable from the first flow order mapping (or handle multiple spec variables as needed)
+      const firstOrder = coreFlowOrders[0];
+      specVariable = firstOrder ? (coreProductionMappings[firstOrder]?.spec_variable || '') : '';
 
       coreFlowOrders.forEach(order => {
         const mapping = coreProductionMappings[order] || {};
