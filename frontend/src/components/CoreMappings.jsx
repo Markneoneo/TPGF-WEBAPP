@@ -114,6 +114,7 @@ const CoreMappings = ({
               handleFlowOrderChange={(order) => handleFlowOrderChange(idx, order)}
               handleProductionMappingChange={(orderOrField, fieldOrValue, value) => handleProductionMappingChange(idx, orderOrField, fieldOrValue, value)}
               coreIndex={idx}
+              supplyValue={mapping.supply || ''}
             />
           </div>
         )}
@@ -144,6 +145,7 @@ const CoreMappings = ({
               errors={errors}
               ipType={ipType}
               coreIndex={idx}
+              supplyValue={mapping.supply || ''}
             />
           </div>
         )}

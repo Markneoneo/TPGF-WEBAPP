@@ -21,6 +21,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
     table: {},
     workloadTable: {},
     psm_register_size: '',
+    use_power_supply: {}
   }]);
 
   // Handle number of core types change
@@ -79,6 +80,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
           table: {},
           workloadTable: {},
           psm_register_size: '',
+          use_power_supply: {}
         });
         if (arr.length > num) arr.length = num;
         return arr;
@@ -140,6 +142,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
             softsetenable: updated[coreIndex][order]?.softsetenable || false,
             fallbackenable: updated[coreIndex][order]?.fallbackenable || false,
             read_type_jtag: updated[coreIndex][order]?.read_type_jtag || false,
+            use_power_supply: updated[coreIndex][order]?.use_power_supply || false,
             read_type_fw: updated[coreIndex][order]?.read_type_fw || false
           };
           return updated;
@@ -212,7 +215,8 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
             search_types: [],
             table: {},
             workloadTable: {},
-            psm_register_size: ''
+            psm_register_size: '',
+            use_power_supply: {}
           };
           return charzUpdated;
         });
@@ -244,6 +248,7 @@ const ExtendedForm = forwardRef(({ ipType, isProcessing, result }, ref) => {
       table: {},
       workloadTable: {},
       psm_register_size: '',
+      use_power_supply: {}
     }]);
     setErrors({});
   };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Select from 'react-select';
 import './ProductionMappings.css';
 
@@ -69,8 +69,27 @@ const ProductionMappings = ({
   errors,
   handleFlowOrderChange,
   handleProductionMappingChange,
-  coreIndex = 0
+  coreIndex = 0,
+  supplyValue = ''
 }) => {
+  // Handle use_power_supply checkbox logic
+  useEffect(() => {
+    selectedFlowOrders.forEach(order => {
+      const mapping = productionMappings[order] || {};
+      if (mapping.use_power_supply && supplyValue) {
+        // Auto-fill spec_variable with supply value when checkbox is checked
+        if (mapping.spec_variable !== supplyValue) {
+          handleProductionMappingChange(order, 'spec_variable', supplyValue);
+        }
+      } else if (mapping.use_power_supply && !supplyValue) {
+        // Clear spec_variable if checkbox is checked but no supply value
+        if (mapping.spec_variable) {
+          handleProductionMappingChange(order, 'spec_variable', '');
+        }
+      }
+    });
+  }, [selectedFlowOrders, productionMappings, supplyValue, handleProductionMappingChange]);
+
   // Update error field names to include core index
   const getErrorField = (order, field) => `${field}_${order}_core_${coreIndex}`;
 
@@ -242,17 +261,34 @@ const ProductionMappings = ({
             )}
           </div>
 
-          {/* Spec Variable */}
-          <div className="input-field-container">
-            <span className="input-field-label">Spec Variable:</span>
-            <input
-              type="text"
-              placeholder="Example: VDDCR"
-              value={productionMappings[order]?.spec_variable || ''}
-              onChange={e => handleProductionMappingChange(order, 'spec_variable', e.target.value)}
-              className={errors[getErrorField(order, 'spec_variable')] ? 'error single-input' : 'single-input'}
-            />
+          {/* Spec Variable with Use Power Supply checkbox on same row */}
+          <div className="spec-variable-row">
+            <div className="input-field-container spec-variable-input-container">
+              <span className="input-field-label">Spec Variable:</span>
+              <input
+                type="text"
+                placeholder="Example: VDDCR"
+                value={productionMappings[order]?.spec_variable || ''}
+                onChange={e => handleProductionMappingChange(order, 'spec_variable', e.target.value)}
+                className={errors[getErrorField(order, 'spec_variable')] ? 'error single-input spec-variable-shortened' : 'single-input spec-variable-shortened'}
+                disabled={productionMappings[order]?.use_power_supply || false}
+              />
+            </div>
+
+            <div className="power-supply-checkbox-container">
+              <label htmlFor={`use_power_supply_${order}_core_${coreIndex}`} style={{ marginBottom: 8, fontWeight: 600 }}>
+                Use Power Supply?
+              </label>
+              <input
+                type="checkbox"
+                id={`use_power_supply_${order}_core_${coreIndex}`}
+                checked={!!productionMappings[order]?.use_power_supply}
+                onChange={e => handleProductionMappingChange(order, 'use_power_supply', e.target.checked)}
+                className="power-supply-checkbox"
+              />
+            </div>
           </div>
+
           {errors[getErrorField(order, 'spec_variable')] && (
             <span className="error-message">{errors[getErrorField(order, 'spec_variable')]}</span>
           )}

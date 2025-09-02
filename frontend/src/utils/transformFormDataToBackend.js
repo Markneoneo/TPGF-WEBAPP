@@ -7,15 +7,10 @@ function transformFormDataToBackend(formData) {
 
     // Build floworder_mapping for this core (only if production is enabled)
     let floworder_mapping = {};
-    let specVariable = '';
 
     if (formData.show_production_for_core && formData.show_production_for_core[coreIndex]) {
       const coreFlowOrders = formData.flow_orders[coreIndex] || [];
       const coreProductionMappings = formData.production_mappings[coreIndex] || {};
-
-      // Get spec_variable from the first flow order mapping (or handle multiple spec variables as needed)
-      const firstOrder = coreFlowOrders[0];
-      specVariable = firstOrder ? (coreProductionMappings[firstOrder]?.spec_variable || '') : '';
 
       coreFlowOrders.forEach(order => {
         const mapping = coreProductionMappings[order] || {};
@@ -28,7 +23,9 @@ function transformFormDataToBackend(formData) {
           softsetenable: !!mapping.softsetenable,
           fallbackenable: !!mapping.fallbackenable,
           insertionlist: parseInsertionList(mapping.insertion),
-          readtype: buildReadType(mapping)
+          readtype: buildReadType(mapping),
+          specvariable: mapping.spec_variable || '',
+          use_power_supply: !!mapping.use_power_supply
         };
       });
     }
@@ -36,27 +33,37 @@ function transformFormDataToBackend(formData) {
     // Build charztype_mapping for this core (if enabled)
     let charztype_mapping = {};
     if (formData.show_charz_for_core && formData.show_charz_for_core[coreIndex]) {
-      const charzData = formData.charz_data[coreIndex] || {};
+      // Get charzData for THIS specific core
+      const coreCharzData = formData.charz_data[coreIndex] || {};
 
-      if (charzData.search_granularity && charzData.search_granularity.length > 0 &&
-        charzData.search_types && charzData.search_types.length > 0) {
+      // Add debug logging
+      console.log(`Core ${coreIndex} charz data:`, coreCharzData);
+      console.log(`Core ${coreIndex} spec variables:`, coreCharzData.spec_variables);
+
+      if (coreCharzData.search_granularity && coreCharzData.search_granularity.length > 0 &&
+        coreCharzData.search_types && coreCharzData.search_types.length > 0) {
 
         charztype_mapping = {
-          granularity: charzData.search_granularity || [],
+          granularity: coreCharzData.search_granularity || [],
           searchtype: {}
         };
 
-        (charzData.search_types || []).forEach(searchType => {
-          const selectedTestTypes = charzData.selectedTestTypes?.[searchType] || [];
+        (coreCharzData.search_types || []).forEach(searchType => {
+          const selectedTestTypes = coreCharzData.selectedTestTypes?.[searchType] || [];
+
+          // Get spec variable for this search type
+          const searchTypeSpecVariable = coreCharzData.spec_variables?.[searchType] || '';
+
+          console.log(`Search type ${searchType} spec variable:`, searchTypeSpecVariable);
 
           charztype_mapping.searchtype[searchType] = {
-            specvariable: charzData.spec_variables?.[searchType] || '',
+            specvariable: searchTypeSpecVariable,
             testtype: {}
           };
 
           selectedTestTypes.forEach(testType => {
-            const table = charzData.table?.[searchType]?.[testType] || {};
-            const wlArr = charzData.workloadTable?.[searchType]?.[testType] || [];
+            const table = coreCharzData.table?.[searchType]?.[testType] || {};
+            const wlArr = coreCharzData.workloadTable?.[searchType]?.[testType] || [];
 
             charztype_mapping.searchtype[searchType].testtype[testType.toLowerCase()] = {
               wl_count: Number(table.wl_count) || 0,
@@ -65,7 +72,7 @@ function transformFormDataToBackend(formData) {
               searchsettings: {
                 start: table.search_start || '',
                 stop: table.search_end || '',
-                mode: 'LinBin', // You can make this configurable
+                mode: 'LinBin',
                 res: table.resolution || '',
                 step: table.search_step || ''
               }
@@ -80,20 +87,21 @@ function transformFormDataToBackend(formData) {
       count: Number(coreMapping.core_count) || 0,
       supply: coreMapping.supply || '',
       clk: coreMapping.clock || '',
-      freq: 1000, // You can make this configurable
-      specvariable: specVariable,
+      freq: 1000,
       floworder_mapping: floworder_mapping,
       charztype_mapping: charztype_mapping
     };
   });
 
+  // Log the final result
+  console.log('Final core_mapping:', JSON.stringify(core_mapping, null, 2));
+
   return {
-    ip: 'cpu', // or from formData if available
     core_mapping: core_mapping
   };
 }
 
-// Helper functions remain the same
+// Helper functions 
 function buildReadType(mapping) {
   const readTypes = [];
   if (mapping.read_type_jtag) readTypes.push('jtag');

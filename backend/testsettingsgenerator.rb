@@ -240,14 +240,14 @@ class TestSettingsGenerator
   def generate_prod_settings(coretype, coretype_config)
     return {} unless coretype_config[:floworder_mapping]
     
-    spec_variable = coretype_config[:specvariable] || coretype_config[:spec_variable] || ""
     coretype_config[:floworder_mapping].each_with_object({}) do |(testtype, config), result|
+      
       param_obj = Parametric.new(
         ip: ip,
         coretype: coretype,
         testtype: testtype.to_s,
         tp: config[:test_points] || [],
-        spec_variable: spec_variable,
+        spec_variable: config[:specvariable] || "", 
         binnable: config[:binnable] || false,
         softsetenable: config[:softsetenable] || false,
         fallbackenable: config[:fallbackenable] || false,
@@ -262,7 +262,6 @@ class TestSettingsGenerator
     charztype_mapping = coretype_config[:charztype_mapping]
     return {} unless charztype_mapping && charztype_mapping[:granularity] && charztype_mapping[:searchtype]
     
-    spec_variable = coretype_config[:specvariable] || coretype_config[:spec_variable] || ""
     charztype_mapping[:granularity].each_with_object({}) do |gran, gran_hash|
       gran_hash[gran] = {}
       charztype_mapping[:searchtype].each do |stype, stype_config|
@@ -280,7 +279,7 @@ class TestSettingsGenerator
               coretype: coretype,
               testtype: testtype.to_s,
               tp: config[:test_points] || [],
-              spec_variable: spec_variable,
+              spec_variable: stype_config[:specvariable] || "", 
               wl: wl,
               searchsettings: config[:searchsettings] || {}
             )
@@ -290,7 +289,7 @@ class TestSettingsGenerator
         end
       end
     end
-  end
+  end  
 
   def calculate_offset(search_type)
     case search_type

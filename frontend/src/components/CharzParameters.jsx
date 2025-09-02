@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './CharzParameters.css';
 
 const SEARCH_GRANULARITY_OPTIONS = ['allcore', 'bycore'];
@@ -44,10 +44,32 @@ const CharzParameters = ({
   setCharzData,
   errors,
   ipType,
-  coreIndex = 0
+  coreIndex = 0,
+  supplyValue = '' // Add this new prop
 }) => {
   // Update error field names to include core index
   const getErrorField = (field) => `charz_${field}_core_${coreIndex}`;
+
+  // Handle use_power_supply checkbox logic for charz spec variables
+  useEffect(() => {
+    const searchTypes = charzData.search_types || [];
+    searchTypes.forEach(searchType => {
+      const usePowerSupply = charzData.use_power_supply?.[searchType];
+      if (usePowerSupply && supplyValue) {
+        // Auto-fill spec_variable with supply value when checkbox is checked
+        const currentSpecVar = charzData.spec_variables?.[searchType] || '';
+        if (currentSpecVar !== supplyValue) {
+          handleSpecVariableChange(searchType, supplyValue);
+        }
+      } else if (usePowerSupply && !supplyValue) {
+        // Clear spec_variable if checkbox is checked but no supply value
+        const currentSpecVar = charzData.spec_variables?.[searchType] || '';
+        if (currentSpecVar) {
+          handleSpecVariableChange(searchType, '');
+        }
+      }
+    });
+  }, [charzData.search_types, charzData.use_power_supply, supplyValue]);
 
   // Updated handler for multiple granularity selection
   const handleGranularityChange = (granularity) => {
@@ -77,13 +99,26 @@ const CharzParameters = ({
     setCharzData(newData);
   };
 
-  // New handler for spec variable change
+  // Updated handler for spec variable change
   const handleSpecVariableChange = (searchType, value) => {
     const newData = {
       ...charzData,
       spec_variables: {
         ...charzData.spec_variables,
         [searchType]: value
+      }
+    };
+
+    setCharzData(newData);
+  };
+
+  // New handler for use power supply checkbox
+  const handleUsePowerSupplyChange = (searchType, checked) => {
+    const newData = {
+      ...charzData,
+      use_power_supply: {
+        ...charzData.use_power_supply,
+        [searchType]: checked
       }
     };
 
@@ -197,9 +232,9 @@ const CharzParameters = ({
           <div className="charz-table-block">
             <div className="charz-table-title">{searchType.toUpperCase()} Test Types</div>
 
-            {/* VMIN/FMAX Spec Variable - NEW ADDITION */}
-            <div className="form-group">
-              <div className="spec-variable-wrapper">
+            {/* VMIN/FMAX Spec Variable with Use Power Supply checkbox */}
+            <div className="charz-spec-variable-row">
+              <div className="spec-variable-wrapper charz-spec-variable-input-container">
                 <span className="spec-variable-prefix">{searchType} Spec Variable:</span>
                 <div className="input-with-overlay">
                   <input
@@ -208,12 +243,29 @@ const CharzParameters = ({
                     placeholder="Enter spec variable"
                     value={charzData.spec_variables?.[searchType] || ''}
                     onChange={(e) => handleSpecVariableChange(searchType, e.target.value)}
-                    className={errors[getErrorField(`${searchType}_spec_variable`)] ? 'error single-input spec-variable-input' : 'single-input spec-variable-input'}
+                    className={errors[getErrorField(`${searchType}_spec_variable`)] ? 'error single-input charz-spec-variable-shortened' : 'single-input charz-spec-variable-shortened'}
+                    disabled={charzData.use_power_supply?.[searchType] || false}
                   />
                 </div>
               </div>
-              {errors[getErrorField(`${searchType}_spec_variable`)] && <span className="error-message">{errors[getErrorField(`${searchType}_spec_variable`)]}</span>}
+
+              <div className="charz-power-supply-checkbox-container">
+                <label htmlFor={`use_power_supply_${searchType}_core_${coreIndex}`} style={{ marginRight: 8, fontWeight: 600 }}>
+                  Use Power Supply?
+                </label>
+                <input
+                  type="checkbox"
+                  id={`use_power_supply_${searchType}_core_${coreIndex}`}
+                  checked={!!charzData.use_power_supply?.[searchType]}
+                  onChange={e => handleUsePowerSupplyChange(searchType, e.target.checked)}
+                  className="charz-power-supply-checkbox"
+                />
+              </div>
             </div>
+
+            {errors[getErrorField(`${searchType}_spec_variable`)] && (
+              <span className="error-message">{errors[getErrorField(`${searchType}_spec_variable`)]}</span>
+            )}
 
             {/* Test Type Checkboxes */}
             <div className="form-group" style={{ marginBottom: '1rem' }}>
@@ -389,4 +441,3 @@ const CharzParameters = ({
 };
 
 export default CharzParameters;
-
