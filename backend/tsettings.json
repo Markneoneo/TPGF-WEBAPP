@@ -1,86 +1,22 @@
 {
-  "cpu": {
-    "234": {
-      "supply": "POWER",
-      "clk": "324",
+  "gfx": {
+    "23": {
+      "supply": "231",
+      "clk": "123",
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_cpu_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_cpu_fwload"
+          "burst": "avfs_gfx_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_gfx_fwload"
         }
       },
       "prod_settings": {},
       "charz_settings": {
         "allcore": {
           "_v_m_i_n": {
-            "crest": {
-              "42": {
-                "burst": "avfs_cpu_crest_42_burst",
-                "binnable": false,
-                "test_points": {
-                  "spec_variable": "POWER",
-                  "values": {
-                    "324": {
-                      "override_primaries": {},
-                      "softsets": {
-                        "profile_name": "SoftsetProfile_avfs_cpu_crest_324"
-                      }
-                    }
-                  }
-                },
-                "search_settings": {
-                  "start": "234",
-                  "stop": "423",
-                  "mode": "LinBin",
-                  "res": "432",
-                  "step": "423"
-                },
-                "minpsm_settings": {
-                  "burst": "",
-                  "register_setup": {
-                    "pattern": {
-                      "avfs_cpu_crest_42_minPSM": 512
-                    }
-                  }
-                },
-                "offset": null
-              }
-            }
+            "bist": {}
           },
           "_f_m_a_x": {
-            "bist": {
-              "423": {
-                "burst": "avfs_cpu_bist_423_burst",
-                "binnable": false,
-                "test_points": {
-                  "spec_variable": "FMAX",
-                  "values": {
-                    "324": {
-                      "override_primaries": {},
-                      "softsets": {
-                        "profile_name": "SoftsetProfile_avfs_cpu_bist_324"
-                      }
-                    }
-                  }
-                },
-                "search_settings": {
-                  "start": "243",
-                  "stop": "342",
-                  "mode": "LinBin",
-                  "res": "243",
-                  "step": "234"
-                },
-                "minpsm_settings": {
-                  "burst": "",
-                  "register_setup": {
-                    "pattern": {
-                      "avfs_cpu_bist_423_minPSM": 512
-                    }
-                  }
-                },
-                "offset": null
-              }
-            }
+            "bist": {}
           }
         }
       }

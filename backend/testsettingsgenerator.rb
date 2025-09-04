@@ -265,6 +265,7 @@ class TestSettingsGenerator
     charztype_mapping[:granularity].each_with_object({}) do |gran, gran_hash|
       gran_hash[gran] = {}
       charztype_mapping[:searchtype].each do |stype, stype_config|
+        search_type_key = stype.to_s.downcase  # Convert to lowercase string
         gran_hash[gran][stype] = {}
         next unless stype_config[:testtype]
         
