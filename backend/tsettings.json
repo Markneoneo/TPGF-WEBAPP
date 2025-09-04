@@ -1,41 +1,25 @@
 {
-  "cpu": {
-    "2": {
-      "supply": "2",
-      "clk": "2",
+  "gfx": {
+    "23": {
+      "supply": "231",
+      "clk": "123",
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_cpu_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_cpu_fwload"
+          "burst": "avfs_gfx_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_gfx_fwload"
         }
       },
-      "prod_settings": {
-        "dfll": {
-          "burst": "avfs_cpu_dfll_burst",
-          "binnable": false,
-          "test_points": {
-            "spec_variable": "12",
-            "values": {
-              "tp0": {
-                "value": 1
-              },
-              "tp1": {
-                "value": 2
-              }
-            }
+      "prod_settings": {},
+      "charz_settings": {
+        "allcore": {
+          "_v_m_i_n": {
+            "bist": {}
           },
-          "register_setup": {
-            "pattern": {
-              "avfs_cpu_dfll": 512
-            }
-          },
-          "insertion_list": [
-            "2"
-          ],
-          "fallback_enable": false
+          "_f_m_a_x": {
+            "bist": {}
+          }
         }
-      },
-      "charz_settings": {}
+      }
     }
   }
 }

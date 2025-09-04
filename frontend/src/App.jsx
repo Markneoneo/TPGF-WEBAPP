@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import ExtendedForm from './components/ExtendedForm'
+import JsonPreview from './components/JsonPreview'
 import transformFormDataToBackend from './utils/transformFormDataToBackend';
 import './App.css'
 import { runAllTests } from './utils/testPointValidation.test.js';
@@ -9,6 +10,7 @@ function App() {
   const [processResults, setProcessResults] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
   const [fileReady, setFileReady] = useState(false);
+  const [jsonPreview, setJsonPreview] = useState(null);
   const formRefs = useRef({});
 
   const ipOptions = ['CPU', 'GFX', 'SOC'];
@@ -96,11 +98,13 @@ function App() {
       console.log('Combined result from backend:', result);
 
       setProcessResults(result);
+      setJsonPreview(result.data);
       setFileReady(true);
       console.log('processAllForms: finished successfully');
 
     } catch (error) {
       console.error('Error processing data:', error);
+      setJsonPreview(null);
     } finally {
       setIsProcessing(false);
       console.log('processAllForms: processing ended');
@@ -133,6 +137,12 @@ function App() {
     setSelectedIpTypes([]);
     setProcessResults({});
     setFileReady(false);
+    setJsonPreview(null);
+  };
+
+  // Add function to close preview manually
+  const handleClosePreview = () => {
+    setJsonPreview(null);
   };
 
   return (
@@ -219,6 +229,12 @@ function App() {
             </div>
           </div>
         )}
+
+        {/* JSON Preview Component */}
+        <JsonPreview
+          jsonData={jsonPreview}
+          onClose={handleClosePreview}
+        />
       </div>
     </div>
   );
