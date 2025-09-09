@@ -265,7 +265,7 @@ class TestSettingsGenerator
     charztype_mapping[:granularity].each_with_object({}) do |gran, gran_hash|
       gran_hash[gran] = {}
       charztype_mapping[:searchtype].each do |stype, stype_config|
-        search_type_key = stype.to_s.downcase  # Convert to lowercase string
+        stype_key = stype.to_s.downcase
         gran_hash[gran][stype] = {}
         next unless stype_config[:testtype]
         
@@ -293,11 +293,10 @@ class TestSettingsGenerator
   end  
 
   def calculate_offset(search_type)
-    case search_type
+    search_type_str = search_type.to_s.downcase
+    case search_type_str
     when :vmin then 0.00625
     when :fmax then 50
     else nil
     end
   end
-end
-

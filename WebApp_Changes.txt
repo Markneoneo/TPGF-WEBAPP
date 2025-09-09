@@ -1,5 +1,0 @@
-
-
-ore enable change to binnable?
-
-test points checkbox: range (start, stop, step), fixed list (separated by comma)

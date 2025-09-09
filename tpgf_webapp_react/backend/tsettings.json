@@ -1,7 +1,7 @@
 {
   "gfx": {
-    "23": {
-      "supply": "231",
+    "123": {
+      "supply": "123",
       "clk": "123",
       "fwload_settings": {
         "fwload": {
@@ -11,12 +11,12 @@
       },
       "prod_settings": {},
       "charz_settings": {
-        "allcore": {
+        "bycore": {
           "_v_m_i_n": {
-            "bist": {}
+            "crest": {}
           },
           "_f_m_a_x": {
-            "bist": {}
+            "crest": {}
           }
         }
       }
