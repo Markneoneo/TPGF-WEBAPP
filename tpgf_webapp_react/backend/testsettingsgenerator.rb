@@ -300,3 +300,4 @@ class TestSettingsGenerator
     else nil
     end
   end
+end

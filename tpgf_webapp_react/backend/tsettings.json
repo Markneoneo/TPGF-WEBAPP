@@ -1,17 +1,17 @@
 {
-  "gfx": {
-    "123": {
-      "supply": "123",
-      "clk": "123",
+  "cpu": {
+    "_v_d_d_c_r": {
+      "supply": "VDDCR",
+      "clk": "1",
       "fwload_settings": {
         "fwload": {
-          "burst": "avfs_gfx_fwload_burst",
-          "softsets": "SoftsetProfile_avfs_gfx_fwload"
+          "burst": "avfs_cpu_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_cpu_fwload"
         }
       },
       "prod_settings": {},
       "charz_settings": {
-        "bycore": {
+        "allcore": {
           "_v_m_i_n": {
             "crest": {}
           },
