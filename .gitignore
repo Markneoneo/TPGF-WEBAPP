@@ -2,12 +2,12 @@
 # Node / React ignores
 # ==================================================
 
-# dependencies
-/node_modules
+# dependencies (ignore node_modules anywhere)
+node_modules/
 
-# production build
-/dist
-/build
+# production builds
+dist/
+build/
 
 # misc
 .DS_Store
@@ -30,26 +30,26 @@ pnpm-debug.log*
 # ==================================================
 
 # Ignore bundler config
-/.bundle
+.bundle/
 
 # Ignore logs, temp files, and storage
-/log/*
-/tmp/*
-/storage/*
-!/log/.keep
-!/tmp/.keep
-!/storage/.keep
+log/*
+tmp/*
+storage/*
+!log/.keep
+!tmp/.keep
+!storage/.keep
 
 # Ignore sqlite databases
 *.sqlite3
 *.sqlite3-*
 
 # Ignore credentials and master key
-/config/master.key
-/config/credentials.yml.enc
+config/master.key
+config/credentials.yml.enc
 
 # Ignore coverage reports
-/coverage/
+coverage/
 
 # ==================================================
 # Editor / system junk
