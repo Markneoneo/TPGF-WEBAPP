@@ -1,3 +1,5 @@
-// Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
-import "@hotwired/turbo-rails"
-import "controllers"
+// Entry point for the build script
+import "@hotwired/turbo"
+import "./controllers"
+
+console.log("Application loaded")

@@ -1,0 +1,112 @@
+<div data-controller="charz-parameters">
+  <h5 class="font-semibold mb-3">Charz Parameters for Core Type <%= core_index + 1 %></h5>
+  
+  <!-- Search Granularity -->
+  <div class="mb-4">
+    <label class="block text-sm font-medium mb-2">Search Granularity</label>
+    <div class="text-xs text-gray-600 mb-2">Select one or more granularity options</div>
+    <div class="flex gap-4">
+      <% %w[allcore bycore].each do |granularity| %>
+        <label class="flex items-center cursor-pointer">
+          <input type="checkbox" 
+                 name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][search_granularity][]"
+                 value="<%= granularity %>"
+                 class="mr-2">
+          <span><%= granularity %></span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- Search Type -->
+  <div class="mb-4">
+    <label class="block text-sm font-medium mb-2">Search Type</label>
+    <div class="flex gap-4">
+      <% %w[VMIN FMAX].each do |search_type| %>
+        <label class="flex items-center cursor-pointer">
+          <input type="checkbox" 
+                 name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][search_types][]"
+                 value="<%= search_type %>"
+                 class="mr-2"
+                 data-action="change->charz-parameters#toggleSearchType">
+          <span><%= search_type %></span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- Search Type Tables Container -->
+  <div data-charz-parameters-target="tablesContainer"></div>
+  
+  <!-- PSM Register Size -->
+  <div class="mb-4">
+    <label class="block text-sm font-medium mb-1">PSM Register Size:</label>
+    <input type="text" 
+           name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][psm_register_size]"
+           placeholder="Enter size"
+           class="w-full px-3 py-2 border rounded">
+  </div>
+  
+  <!-- Template for search type table -->
+  <template id="search-type-table-template">
+    <div class="search-type-table border rounded p-4 mb-4" data-search-type="SEARCH_TYPE">
+      <h6 class="font-semibold mb-3">SEARCH_TYPE Test Types</h6>
+      
+      <!-- Spec Variable -->
+      <div class="mb-3">
+        <div class="flex items-center justify-between">
+          <label class="block text-sm font-medium">SEARCH_TYPE Spec Variable:</label>
+          <label class="flex items-center text-sm">
+            <span class="mr-2">Use Power Supply?</span>
+            <input type="checkbox" 
+                   name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][use_power_supply][SEARCH_TYPE]"
+                   data-action="change->charz-parameters#togglePowerSupply">
+          </label>
+        </div>
+        <input type="text" 
+               name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][spec_variables][SEARCH_TYPE]"
+               placeholder="Enter spec variable"
+               class="w-full px-3 py-2 border rounded mt-1">
+      </div>
+      
+      <!-- Test Type Selection -->
+      <div class="mb-3">
+        <div class="flex gap-4">
+          <% %w[CREST BIST PBIST].each do |test_type| %>
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" 
+                     name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][selected_test_types][SEARCH_TYPE][]"
+                     value="<%= test_type %>"
+                     class="mr-2"
+                     data-action="change->charz-parameters#toggleTestType">
+              <span><%= test_type %></span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Test Type Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="border px-2 py-1 text-sm">Test Type</th>
+              <th class="border px-2 py-1 text-sm">WL Count</th>
+              <th class="border px-2 py-1 text-sm">Test Points</th>
+              <th class="border px-2 py-1 text-sm">Search Start</th>
+              <th class="border px-2 py-1 text-sm">Search End</th>
+              <th class="border px-2 py-1 text-sm">Search Step</th>
+              <th class="border px-2 py-1 text-sm">Resolution</th>
+            </tr>
+          </thead>
+          <tbody data-test-types-tbody>
+            <!-- Rows will be added dynamically -->
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Workload Table Container -->
+      <div class="workload-table-container mt-4" data-workload-container></div>
+    </div>
+  </template>
+</div>

@@ -1,0 +1,70 @@
+<div class="max-w-6xl mx-auto">
+  <h1 class="text-3xl font-bold text-center mb-2">Test Settings Generator</h1>
+  <p class="text-center text-gray-600 mb-8">Please select the IP types and configure options.</p>
+  
+  <%= form_with url: generate_test_settings_path, local: false, data: { controller: "test-settings-form" } do |form| %>
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <!-- IP Type Selection -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold mb-3">Select IP Types</h3>
+        <div class="flex gap-4">
+          <% @ip_options.each do |ip_type| %>
+            <label class="flex items-center cursor-pointer">
+              <%= check_box_tag "selected_ip_types[]", ip_type, false, 
+                  class: "mr-2", 
+                  data: { 
+                    action: "change->test-settings-form#toggleIpType",
+                    ip_type: ip_type 
+                  } %>
+              <span class="select-none"><%= ip_type %></span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Dynamic IP Configuration Forms -->
+      <div id="ip-configurations" class="space-y-6">
+        <% @ip_options.each do |ip_type| %>
+                    <div id="<%= ip_type %>-config" class="hidden" data-ip-type="<%= ip_type %>">
+            <%= render 'ip_configuration_form', ip_type: ip_type %>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Global Actions -->
+      <div id="global-actions" class="hidden mt-8 flex gap-4">
+        <%= form.submit "Generate Combined Test Settings", 
+            class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
+            data: { disable_with: "Generating Files..." } %>
+        
+        <div id="download-button" class="hidden">
+          <%= link_to "Download JSON", download_test_settings_path, 
+              class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded",
+              target: "_blank" %>
+        </div>
+        
+        <button type="button" 
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                data-action="click->test-settings-form#clearAll">
+          Clear All
+        </button>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- JSON Preview -->
+  <div id="json-preview" class="hidden mt-8">
+    <div class="bg-white shadow-md rounded-lg p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Generated JSON Preview</h3>
+        <button type="button" 
+                class="text-gray-500 hover:text-gray-700 text-2xl"
+                data-action="click->test-settings-form#closePreview">
+          ×
+        </button>
+      </div>
+      <pre class="bg-gray-100 p-4 rounded overflow-x-auto"><code id="json-content"></code></pre>
+    </div>
+  </div>
+</div>
+

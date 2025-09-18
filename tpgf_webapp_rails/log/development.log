@@ -1,7 +1,744 @@
-Started GET "/" for ::1 at 2025-09-09 16:17:55 +0800
-Processing by Rails::WelcomeController#index as HTML
-  Rendering C:/Ruby34-x64/lib/ruby/gems/3.4.0/gems/railties-8.0.2.1/lib/rails/templates/rails/welcome/index.html.erb
-  Rendered C:/Ruby34-x64/lib/ruby/gems/3.4.0/gems/railties-8.0.2.1/lib/rails/templates/rails/welcome/index.html.erb (Duration: 2.0ms | GC: 0.0ms)
-Completed 200 OK in 3715ms (Views: 60.0ms | GC: 0.0ms)
+  [1m[35m (8303.2ms)[0m  [1m[35mCREATE DATABASE "tpgf_webapp_rails_development" ENCODING = 'unicode' /*application='TpgfWebappRails'*/[0m
+Started GET "/" for ::1 at 2025-09-16 13:26:47 +0800
+  
+ActiveRecord::ConnectionNotEstablished (connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+)
+Caused by: PG::ConnectionBad (connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+)
+
+Information for: ActiveRecord::ConnectionNotEstablished (connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+):
+  
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:69:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new_client'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:939:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#connect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:951:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#reconnect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:667:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:666:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:771:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#verify!'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:761:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#verify!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:779:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#connect!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:985:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#with_raw_connection'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:984:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#with_raw_connection'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/quoting.rb:128:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting#quote_string'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/quoting.rb:76:in 'ActiveRecord::ConnectionAdapters::Quoting#quote'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/quoting.rb:122:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting#quote'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/schema_statements.rb:1142:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaStatements#quoted_scope'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/schema_statements.rb:1119:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaStatements#data_source_sql'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/schema_statements.rb:60:in 'ActiveRecord::ConnectionAdapters::SchemaStatements#table_exists?'
+activerecord (8.0.2.1) lib/active_record/schema_migration.rb:55:in 'block in ActiveRecord::SchemaMigration#create_table'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/connection_pool.rb:418:in 'ActiveRecord::ConnectionAdapters::ConnectionPool#with_connection'
+activerecord (8.0.2.1) lib/active_record/schema_migration.rb:54:in 'ActiveRecord::SchemaMigration#create_table'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1431:in 'ActiveRecord::Migrator#initialize'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1279:in 'Class#new'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1279:in 'ActiveRecord::MigrationContext#open'
+activerecord (8.0.2.1) lib/active_record/migration.rb:763:in 'block (2 levels) in ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration/pending_migration_connection.rb:8:in 'ActiveRecord::PendingMigrationConnection.with_temporary_pool'
+activerecord (8.0.2.1) lib/active_record/migration.rb:762:in 'block in ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:761:in 'Array#each'
+activerecord (8.0.2.1) lib/active_record/migration.rb:761:in 'ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:740:in 'ActiveRecord::Migration.check_pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:660:in 'block (2 levels) in ActiveRecord::Migration::CheckPending#call'
+activesupport (8.0.2.1) lib/active_support/file_update_checker.rb:85:in 'ActiveSupport::FileUpdateChecker#execute'
+activerecord (8.0.2.1) lib/active_record/migration.rb:665:in 'block in ActiveRecord::Migration::CheckPending#call'
+activerecord (8.0.2.1) lib/active_record/migration.rb:657:in 'Thread::Mutex#synchronize'
+activerecord (8.0.2.1) lib/active_record/migration.rb:657:in 'ActiveRecord::Migration::CheckPending#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:31:in 'block in ActionDispatch::Callbacks#call'
+activesupport (8.0.2.1) lib/active_support/callbacks.rb:100:in 'ActiveSupport::Callbacks#run_callbacks'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:30:in 'ActionDispatch::Callbacks#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/actionable_exceptions.rb:18:in 'ActionDispatch::ActionableExceptions#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/debug_exceptions.rb:31:in 'ActionDispatch::DebugExceptions#call'
+web-console (4.2.1) lib/web_console/middleware.rb:132:in 'WebConsole::Middleware#call_app'
+web-console (4.2.1) lib/web_console/middleware.rb:28:in 'block in WebConsole::Middleware#call'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'Kernel#catch'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'WebConsole::Middleware#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/show_exceptions.rb:32:in 'ActionDispatch::ShowExceptions#call'
+railties (8.0.2.1) lib/rails/rack/logger.rb:41:in 'Rails::Rack::Logger#call_app'
+railties (8.0.2.1) lib/rails/rack/logger.rb:29:in 'Rails::Rack::Logger#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/remote_ip.rb:96:in 'ActionDispatch::RemoteIp#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/request_id.rb:34:in 'ActionDispatch::RequestId#call'
+rack (3.2.1) lib/rack/method_override.rb:28:in 'Rack::MethodOverride#call'
+rack (3.2.1) lib/rack/runtime.rb:24:in 'Rack::Runtime#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:61:in 'block in ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:26:in 'ActionDispatch::ServerTiming::Subscriber#collect_events'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:60:in 'ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/static.rb:27:in 'ActionDispatch::Static#call'
+rack (3.2.1) lib/rack/sendfile.rb:114:in 'Rack::Sendfile#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/host_authorization.rb:143:in 'ActionDispatch::HostAuthorization#call'
+railties (8.0.2.1) lib/rails/engine.rb:535:in 'Rails::Engine#call'
+puma (7.0.2) lib/puma/configuration.rb:297:in 'Puma::Configuration::ConfigMiddleware#call'
+puma (7.0.2) lib/puma/request.rb:101:in 'block in Puma::Request#handle_request'
+puma (7.0.2) lib/puma/thread_pool.rb:346:in 'Puma::ThreadPool#with_force_shutdown'
+puma (7.0.2) lib/puma/request.rb:100:in 'Puma::Request#handle_request'
+puma (7.0.2) lib/puma/server.rb:497:in 'Puma::Server#process_client'
+puma (7.0.2) lib/puma/server.rb:266:in 'block in Puma::Server#run'
+puma (7.0.2) lib/puma/thread_pool.rb:173:in 'block in Puma::ThreadPool#spawn_thread'
+
+Information for cause: PG::ConnectionBad (connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+):
+  
+pg-1.6.2-x64-mingw (ucrt) lib/pg/connection.rb:751:in 'PG::Connection::Pollable#polling_loop'
+pg-1.6.2-x64-mingw (ucrt) lib/pg/connection.rb:795:in 'PG::Connection#async_connect_or_reset'
+pg-1.6.2-x64-mingw (ucrt) lib/pg/connection.rb:951:in 'PG::Connection.connect_to_hosts'
+pg-1.6.2-x64-mingw (ucrt) lib/pg/connection.rb:871:in 'PG::Connection.new'
+pg-1.6.2-x64-mingw (ucrt) lib/pg.rb:88:in 'PG.connect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:58:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new_client'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:939:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#connect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:951:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#reconnect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:667:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:666:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:771:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#verify!'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:761:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#verify!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:779:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#connect!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:985:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#with_raw_connection'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:984:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#with_raw_connection'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/quoting.rb:128:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting#quote_string'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/quoting.rb:76:in 'ActiveRecord::ConnectionAdapters::Quoting#quote'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/quoting.rb:122:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting#quote'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/schema_statements.rb:1142:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaStatements#quoted_scope'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/schema_statements.rb:1119:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaStatements#data_source_sql'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/schema_statements.rb:60:in 'ActiveRecord::ConnectionAdapters::SchemaStatements#table_exists?'
+activerecord (8.0.2.1) lib/active_record/schema_migration.rb:55:in 'block in ActiveRecord::SchemaMigration#create_table'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/connection_pool.rb:418:in 'ActiveRecord::ConnectionAdapters::ConnectionPool#with_connection'
+activerecord (8.0.2.1) lib/active_record/schema_migration.rb:54:in 'ActiveRecord::SchemaMigration#create_table'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1431:in 'ActiveRecord::Migrator#initialize'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1279:in 'Class#new'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1279:in 'ActiveRecord::MigrationContext#open'
+activerecord (8.0.2.1) lib/active_record/migration.rb:763:in 'block (2 levels) in ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration/pending_migration_connection.rb:8:in 'ActiveRecord::PendingMigrationConnection.with_temporary_pool'
+activerecord (8.0.2.1) lib/active_record/migration.rb:762:in 'block in ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:761:in 'Array#each'
+activerecord (8.0.2.1) lib/active_record/migration.rb:761:in 'ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:740:in 'ActiveRecord::Migration.check_pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:660:in 'block (2 levels) in ActiveRecord::Migration::CheckPending#call'
+activesupport (8.0.2.1) lib/active_support/file_update_checker.rb:85:in 'ActiveSupport::FileUpdateChecker#execute'
+activerecord (8.0.2.1) lib/active_record/migration.rb:665:in 'block in ActiveRecord::Migration::CheckPending#call'
+activerecord (8.0.2.1) lib/active_record/migration.rb:657:in 'Thread::Mutex#synchronize'
+activerecord (8.0.2.1) lib/active_record/migration.rb:657:in 'ActiveRecord::Migration::CheckPending#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:31:in 'block in ActionDispatch::Callbacks#call'
+activesupport (8.0.2.1) lib/active_support/callbacks.rb:100:in 'ActiveSupport::Callbacks#run_callbacks'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:30:in 'ActionDispatch::Callbacks#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/actionable_exceptions.rb:18:in 'ActionDispatch::ActionableExceptions#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/debug_exceptions.rb:31:in 'ActionDispatch::DebugExceptions#call'
+web-console (4.2.1) lib/web_console/middleware.rb:132:in 'WebConsole::Middleware#call_app'
+web-console (4.2.1) lib/web_console/middleware.rb:28:in 'block in WebConsole::Middleware#call'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'Kernel#catch'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'WebConsole::Middleware#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/show_exceptions.rb:32:in 'ActionDispatch::ShowExceptions#call'
+railties (8.0.2.1) lib/rails/rack/logger.rb:41:in 'Rails::Rack::Logger#call_app'
+railties (8.0.2.1) lib/rails/rack/logger.rb:29:in 'Rails::Rack::Logger#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/remote_ip.rb:96:in 'ActionDispatch::RemoteIp#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/request_id.rb:34:in 'ActionDispatch::RequestId#call'
+rack (3.2.1) lib/rack/method_override.rb:28:in 'Rack::MethodOverride#call'
+rack (3.2.1) lib/rack/runtime.rb:24:in 'Rack::Runtime#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:61:in 'block in ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:26:in 'ActionDispatch::ServerTiming::Subscriber#collect_events'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:60:in 'ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/static.rb:27:in 'ActionDispatch::Static#call'
+rack (3.2.1) lib/rack/sendfile.rb:114:in 'Rack::Sendfile#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/host_authorization.rb:143:in 'ActionDispatch::HostAuthorization#call'
+railties (8.0.2.1) lib/rails/engine.rb:535:in 'Rails::Engine#call'
+puma (7.0.2) lib/puma/configuration.rb:297:in 'Puma::Configuration::ConfigMiddleware#call'
+puma (7.0.2) lib/puma/request.rb:101:in 'block in Puma::Request#handle_request'
+puma (7.0.2) lib/puma/thread_pool.rb:346:in 'Puma::ThreadPool#with_force_shutdown'
+puma (7.0.2) lib/puma/request.rb:100:in 'Puma::Request#handle_request'
+puma (7.0.2) lib/puma/server.rb:497:in 'Puma::Server#process_client'
+puma (7.0.2) lib/puma/server.rb:266:in 'block in Puma::Server#run'
+puma (7.0.2) lib/puma/thread_pool.rb:173:in 'block in Puma::ThreadPool#spawn_thread'
+Started GET "/favicon.ico" for ::1 at 2025-09-16 13:26:59 +0800
+  
+ActiveRecord::ConnectionNotEstablished (connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+)
+Caused by: PG::ConnectionBad (connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+)
+
+Information for: ActiveRecord::ConnectionNotEstablished (connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+):
+  
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:69:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new_client'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:939:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#connect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:951:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#reconnect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:667:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:666:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:771:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#verify!'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:761:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#verify!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:779:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#connect!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:985:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#with_raw_connection'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:984:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#with_raw_connection'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/quoting.rb:128:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting#quote_string'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/quoting.rb:76:in 'ActiveRecord::ConnectionAdapters::Quoting#quote'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/quoting.rb:122:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting#quote'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/schema_statements.rb:1142:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaStatements#quoted_scope'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/schema_statements.rb:1119:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaStatements#data_source_sql'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/schema_statements.rb:60:in 'ActiveRecord::ConnectionAdapters::SchemaStatements#table_exists?'
+activerecord (8.0.2.1) lib/active_record/schema_migration.rb:55:in 'block in ActiveRecord::SchemaMigration#create_table'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/connection_pool.rb:418:in 'ActiveRecord::ConnectionAdapters::ConnectionPool#with_connection'
+activerecord (8.0.2.1) lib/active_record/schema_migration.rb:54:in 'ActiveRecord::SchemaMigration#create_table'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1431:in 'ActiveRecord::Migrator#initialize'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1279:in 'Class#new'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1279:in 'ActiveRecord::MigrationContext#open'
+activerecord (8.0.2.1) lib/active_record/migration.rb:763:in 'block (2 levels) in ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration/pending_migration_connection.rb:8:in 'ActiveRecord::PendingMigrationConnection.with_temporary_pool'
+activerecord (8.0.2.1) lib/active_record/migration.rb:762:in 'block in ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:761:in 'Array#each'
+activerecord (8.0.2.1) lib/active_record/migration.rb:761:in 'ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:740:in 'ActiveRecord::Migration.check_pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:660:in 'block (2 levels) in ActiveRecord::Migration::CheckPending#call'
+activesupport (8.0.2.1) lib/active_support/file_update_checker.rb:85:in 'ActiveSupport::FileUpdateChecker#execute'
+activerecord (8.0.2.1) lib/active_record/migration.rb:665:in 'block in ActiveRecord::Migration::CheckPending#call'
+activerecord (8.0.2.1) lib/active_record/migration.rb:657:in 'Thread::Mutex#synchronize'
+activerecord (8.0.2.1) lib/active_record/migration.rb:657:in 'ActiveRecord::Migration::CheckPending#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:31:in 'block in ActionDispatch::Callbacks#call'
+activesupport (8.0.2.1) lib/active_support/callbacks.rb:100:in 'ActiveSupport::Callbacks#run_callbacks'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:30:in 'ActionDispatch::Callbacks#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/actionable_exceptions.rb:18:in 'ActionDispatch::ActionableExceptions#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/debug_exceptions.rb:31:in 'ActionDispatch::DebugExceptions#call'
+web-console (4.2.1) lib/web_console/middleware.rb:132:in 'WebConsole::Middleware#call_app'
+web-console (4.2.1) lib/web_console/middleware.rb:28:in 'block in WebConsole::Middleware#call'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'Kernel#catch'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'WebConsole::Middleware#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/show_exceptions.rb:32:in 'ActionDispatch::ShowExceptions#call'
+railties (8.0.2.1) lib/rails/rack/logger.rb:41:in 'Rails::Rack::Logger#call_app'
+railties (8.0.2.1) lib/rails/rack/logger.rb:29:in 'Rails::Rack::Logger#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/remote_ip.rb:96:in 'ActionDispatch::RemoteIp#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/request_id.rb:34:in 'ActionDispatch::RequestId#call'
+rack (3.2.1) lib/rack/method_override.rb:28:in 'Rack::MethodOverride#call'
+rack (3.2.1) lib/rack/runtime.rb:24:in 'Rack::Runtime#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:61:in 'block in ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:26:in 'ActionDispatch::ServerTiming::Subscriber#collect_events'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:60:in 'ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/static.rb:27:in 'ActionDispatch::Static#call'
+rack (3.2.1) lib/rack/sendfile.rb:114:in 'Rack::Sendfile#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/host_authorization.rb:143:in 'ActionDispatch::HostAuthorization#call'
+railties (8.0.2.1) lib/rails/engine.rb:535:in 'Rails::Engine#call'
+puma (7.0.2) lib/puma/configuration.rb:297:in 'Puma::Configuration::ConfigMiddleware#call'
+puma (7.0.2) lib/puma/request.rb:101:in 'block in Puma::Request#handle_request'
+puma (7.0.2) lib/puma/thread_pool.rb:346:in 'Puma::ThreadPool#with_force_shutdown'
+puma (7.0.2) lib/puma/request.rb:100:in 'Puma::Request#handle_request'
+puma (7.0.2) lib/puma/server.rb:497:in 'Puma::Server#process_client'
+puma (7.0.2) lib/puma/server.rb:266:in 'block in Puma::Server#run'
+puma (7.0.2) lib/puma/thread_pool.rb:173:in 'block in Puma::ThreadPool#spawn_thread'
+
+Information for cause: PG::ConnectionBad (connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+):
+  
+pg-1.6.2-x64-mingw (ucrt) lib/pg/connection.rb:751:in 'PG::Connection::Pollable#polling_loop'
+pg-1.6.2-x64-mingw (ucrt) lib/pg/connection.rb:795:in 'PG::Connection#async_connect_or_reset'
+pg-1.6.2-x64-mingw (ucrt) lib/pg/connection.rb:951:in 'PG::Connection.connect_to_hosts'
+pg-1.6.2-x64-mingw (ucrt) lib/pg/connection.rb:871:in 'PG::Connection.new'
+pg-1.6.2-x64-mingw (ucrt) lib/pg.rb:88:in 'PG.connect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:58:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new_client'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:939:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#connect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql_adapter.rb:951:in 'ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#reconnect'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:667:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:666:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#reconnect!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:771:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#verify!'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:761:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#verify!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:779:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#connect!'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:985:in 'block in ActiveRecord::ConnectionAdapters::AbstractAdapter#with_raw_connection'
+activesupport (8.0.2.1) lib/active_support/concurrency/null_lock.rb:9:in 'ActiveSupport::Concurrency::NullLock#synchronize'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract_adapter.rb:984:in 'ActiveRecord::ConnectionAdapters::AbstractAdapter#with_raw_connection'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/quoting.rb:128:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting#quote_string'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/quoting.rb:76:in 'ActiveRecord::ConnectionAdapters::Quoting#quote'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/quoting.rb:122:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::Quoting#quote'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/schema_statements.rb:1142:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaStatements#quoted_scope'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/postgresql/schema_statements.rb:1119:in 'ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaStatements#data_source_sql'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/schema_statements.rb:60:in 'ActiveRecord::ConnectionAdapters::SchemaStatements#table_exists?'
+activerecord (8.0.2.1) lib/active_record/schema_migration.rb:55:in 'block in ActiveRecord::SchemaMigration#create_table'
+activerecord (8.0.2.1) lib/active_record/connection_adapters/abstract/connection_pool.rb:418:in 'ActiveRecord::ConnectionAdapters::ConnectionPool#with_connection'
+activerecord (8.0.2.1) lib/active_record/schema_migration.rb:54:in 'ActiveRecord::SchemaMigration#create_table'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1431:in 'ActiveRecord::Migrator#initialize'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1279:in 'Class#new'
+activerecord (8.0.2.1) lib/active_record/migration.rb:1279:in 'ActiveRecord::MigrationContext#open'
+activerecord (8.0.2.1) lib/active_record/migration.rb:763:in 'block (2 levels) in ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration/pending_migration_connection.rb:8:in 'ActiveRecord::PendingMigrationConnection.with_temporary_pool'
+activerecord (8.0.2.1) lib/active_record/migration.rb:762:in 'block in ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:761:in 'Array#each'
+activerecord (8.0.2.1) lib/active_record/migration.rb:761:in 'ActiveRecord::Migration.pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:740:in 'ActiveRecord::Migration.check_pending_migrations'
+activerecord (8.0.2.1) lib/active_record/migration.rb:660:in 'block (2 levels) in ActiveRecord::Migration::CheckPending#call'
+activesupport (8.0.2.1) lib/active_support/file_update_checker.rb:85:in 'ActiveSupport::FileUpdateChecker#execute'
+activerecord (8.0.2.1) lib/active_record/migration.rb:665:in 'block in ActiveRecord::Migration::CheckPending#call'
+activerecord (8.0.2.1) lib/active_record/migration.rb:657:in 'Thread::Mutex#synchronize'
+activerecord (8.0.2.1) lib/active_record/migration.rb:657:in 'ActiveRecord::Migration::CheckPending#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:31:in 'block in ActionDispatch::Callbacks#call'
+activesupport (8.0.2.1) lib/active_support/callbacks.rb:100:in 'ActiveSupport::Callbacks#run_callbacks'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:30:in 'ActionDispatch::Callbacks#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/actionable_exceptions.rb:18:in 'ActionDispatch::ActionableExceptions#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/debug_exceptions.rb:31:in 'ActionDispatch::DebugExceptions#call'
+web-console (4.2.1) lib/web_console/middleware.rb:132:in 'WebConsole::Middleware#call_app'
+web-console (4.2.1) lib/web_console/middleware.rb:28:in 'block in WebConsole::Middleware#call'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'Kernel#catch'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'WebConsole::Middleware#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/show_exceptions.rb:32:in 'ActionDispatch::ShowExceptions#call'
+railties (8.0.2.1) lib/rails/rack/logger.rb:41:in 'Rails::Rack::Logger#call_app'
+railties (8.0.2.1) lib/rails/rack/logger.rb:29:in 'Rails::Rack::Logger#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/remote_ip.rb:96:in 'ActionDispatch::RemoteIp#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/request_id.rb:34:in 'ActionDispatch::RequestId#call'
+rack (3.2.1) lib/rack/method_override.rb:28:in 'Rack::MethodOverride#call'
+rack (3.2.1) lib/rack/runtime.rb:24:in 'Rack::Runtime#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:61:in 'block in ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:26:in 'ActionDispatch::ServerTiming::Subscriber#collect_events'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:60:in 'ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/static.rb:27:in 'ActionDispatch::Static#call'
+rack (3.2.1) lib/rack/sendfile.rb:114:in 'Rack::Sendfile#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/host_authorization.rb:143:in 'ActionDispatch::HostAuthorization#call'
+railties (8.0.2.1) lib/rails/engine.rb:535:in 'Rails::Engine#call'
+puma (7.0.2) lib/puma/configuration.rb:297:in 'Puma::Configuration::ConfigMiddleware#call'
+puma (7.0.2) lib/puma/request.rb:101:in 'block in Puma::Request#handle_request'
+puma (7.0.2) lib/puma/thread_pool.rb:346:in 'Puma::ThreadPool#with_force_shutdown'
+puma (7.0.2) lib/puma/request.rb:100:in 'Puma::Request#handle_request'
+puma (7.0.2) lib/puma/server.rb:497:in 'Puma::Server#process_client'
+puma (7.0.2) lib/puma/server.rb:266:in 'block in Puma::Server#run'
+puma (7.0.2) lib/puma/thread_pool.rb:173:in 'block in Puma::ThreadPool#spawn_thread'
+Started GET "/" for ::1 at 2025-09-16 14:17:27 +0800
+  
+Zeitwerk::NameError (expected file C:/Users/markneo2/OneDrive - Advanced Micro Devices Inc/Documents/TPGF WebApp/tpgf_webapp_rails/app/controllers/test_settings_controller.rb to define constant TestSettingsController, but didn't):
+  
+zeitwerk (2.7.3) lib/zeitwerk/loader/callbacks.rb:31:in 'Zeitwerk::Loader::Callbacks#on_file_autoloaded'
+zeitwerk (2.7.3) lib/zeitwerk/core_ext/kernel.rb:27:in 'Kernel#require'
+activesupport (8.0.2.1) lib/active_support/inflector/methods.rb:290:in 'Module#const_get'
+activesupport (8.0.2.1) lib/active_support/inflector/methods.rb:290:in 'ActiveSupport::Inflector#constantize'
+activesupport (8.0.2.1) lib/active_support/core_ext/string/inflections.rb:74:in 'String#constantize'
+actionpack (8.0.2.1) lib/action_dispatch/http/request.rb:99:in 'ActionDispatch::Request#controller_class_for'
+actionpack (8.0.2.1) lib/action_dispatch/request/utils.rb:108:in 'ActionDispatch::Request::Utils::CustomParamEncoder.action_encoding_template'
+actionpack (8.0.2.1) lib/action_dispatch/request/utils.rb:102:in 'ActionDispatch::Request::Utils::CustomParamEncoder.encode'
+actionpack (8.0.2.1) lib/action_dispatch/request/utils.rb:47:in 'ActionDispatch::Request::Utils.set_binary_encoding'
+actionpack (8.0.2.1) lib/action_dispatch/http/parameters.rb:70:in 'ActionDispatch::Http::Parameters#path_parameters='
+actionpack (8.0.2.1) lib/action_dispatch/journey/router.rb:50:in 'block in ActionDispatch::Journey::Router#serve'
+actionpack (8.0.2.1) lib/action_dispatch/journey/router.rb:133:in 'block in ActionDispatch::Journey::Router#find_routes'
+actionpack (8.0.2.1) lib/action_dispatch/journey/router.rb:126:in 'Array#each'
+actionpack (8.0.2.1) lib/action_dispatch/journey/router.rb:126:in 'ActionDispatch::Journey::Router#find_routes'
+actionpack (8.0.2.1) lib/action_dispatch/journey/router.rb:34:in 'ActionDispatch::Journey::Router#serve'
+actionpack (8.0.2.1) lib/action_dispatch/routing/route_set.rb:908:in 'ActionDispatch::Routing::RouteSet#call'
+railties (8.0.2.1) lib/rails/engine/lazy_route_set.rb:68:in 'Rails::Engine::LazyRouteSet#call'
+rack (3.2.1) lib/rack/tempfile_reaper.rb:20:in 'Rack::TempfileReaper#call'
+rack (3.2.1) lib/rack/etag.rb:29:in 'Rack::ETag#call'
+rack (3.2.1) lib/rack/conditional_get.rb:31:in 'Rack::ConditionalGet#call'
+rack (3.2.1) lib/rack/head.rb:15:in 'Rack::Head#call'
+actionpack (8.0.2.1) lib/action_dispatch/http/permissions_policy.rb:38:in 'ActionDispatch::PermissionsPolicy::Middleware#call'
+actionpack (8.0.2.1) lib/action_dispatch/http/content_security_policy.rb:38:in 'ActionDispatch::ContentSecurityPolicy::Middleware#call'
+rack-session (2.1.1) lib/rack/session/abstract/id.rb:274:in 'Rack::Session::Abstract::Persisted#context'
+rack-session (2.1.1) lib/rack/session/abstract/id.rb:268:in 'Rack::Session::Abstract::Persisted#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/cookies.rb:706:in 'ActionDispatch::Cookies#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:31:in 'block in ActionDispatch::Callbacks#call'
+activesupport (8.0.2.1) lib/active_support/callbacks.rb:100:in 'ActiveSupport::Callbacks#run_callbacks'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/callbacks.rb:30:in 'ActionDispatch::Callbacks#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/actionable_exceptions.rb:18:in 'ActionDispatch::ActionableExceptions#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/debug_exceptions.rb:31:in 'ActionDispatch::DebugExceptions#call'
+web-console (4.2.1) lib/web_console/middleware.rb:132:in 'WebConsole::Middleware#call_app'
+web-console (4.2.1) lib/web_console/middleware.rb:28:in 'block in WebConsole::Middleware#call'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'Kernel#catch'
+web-console (4.2.1) lib/web_console/middleware.rb:17:in 'WebConsole::Middleware#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/show_exceptions.rb:32:in 'ActionDispatch::ShowExceptions#call'
+railties (8.0.2.1) lib/rails/rack/logger.rb:41:in 'Rails::Rack::Logger#call_app'
+railties (8.0.2.1) lib/rails/rack/logger.rb:29:in 'Rails::Rack::Logger#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/remote_ip.rb:96:in 'ActionDispatch::RemoteIp#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/request_id.rb:34:in 'ActionDispatch::RequestId#call'
+rack (3.2.1) lib/rack/method_override.rb:28:in 'Rack::MethodOverride#call'
+rack (3.2.1) lib/rack/runtime.rb:24:in 'Rack::Runtime#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:61:in 'block in ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:26:in 'ActionDispatch::ServerTiming::Subscriber#collect_events'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/server_timing.rb:60:in 'ActionDispatch::ServerTiming#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/executor.rb:16:in 'ActionDispatch::Executor#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/static.rb:27:in 'ActionDispatch::Static#call'
+rack (3.2.1) lib/rack/sendfile.rb:114:in 'Rack::Sendfile#call'
+actionpack (8.0.2.1) lib/action_dispatch/middleware/host_authorization.rb:143:in 'ActionDispatch::HostAuthorization#call'
+railties (8.0.2.1) lib/rails/engine.rb:535:in 'Rails::Engine#call'
+puma (7.0.3) lib/puma/configuration.rb:299:in 'Puma::Configuration::ConfigMiddleware#call'
+puma (7.0.3) lib/puma/request.rb:101:in 'block in Puma::Request#handle_request'
+puma (7.0.3) lib/puma/thread_pool.rb:346:in 'Puma::ThreadPool#with_force_shutdown'
+puma (7.0.3) lib/puma/request.rb:100:in 'Puma::Request#handle_request'
+puma (7.0.3) lib/puma/server.rb:497:in 'Puma::Server#process_client'
+puma (7.0.3) lib/puma/server.rb:266:in 'block in Puma::Server#run'
+puma (7.0.3) lib/puma/thread_pool.rb:173:in 'block in Puma::ThreadPool#spawn_thread'
+Started GET "/favicon.ico" for ::1 at 2025-09-16 14:17:29 +0800
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+Started GET "/" for ::1 at 2025-09-16 14:23:47 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 2.7ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 2.2ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 40.8ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 10.0ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 63.0ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 76.2ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 79.1ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 4838ms (GC: 0.0ms)
 
 
+  
+ActionView::Template::Error (no implicit conversion of Integer into String)
+Caused by: TypeError (no implicit conversion of Integer into String)
+
+Information for: ActionView::Template::Error (no implicit conversion of Integer into String):
+    1: <div class="border-t pt-4 mt-4" data-core-index="<%= core_index %>">
+    2:   <h4 class="font-semibold mb-3">Core Type <%= core_index + 1 %></h4>
+    3:   
+    4:   <div class="grid grid-cols-2 gap-4 mb-4">
+    5:     <div>
+  
+app/views/test_settings/_core_mapping.html.erb:2:in 'String#+'
+app/views/test_settings/_core_mapping.html.erb:2
+app/views/test_settings/_ip_configuration_form.html.erb:31
+app/views/test_settings/new.html.erb:29
+app/views/test_settings/new.html.erb:27:in 'Array#each'
+app/views/test_settings/new.html.erb:27
+app/views/test_settings/new.html.erb:5
+
+Information for cause: TypeError (no implicit conversion of Integer into String):
+  
+app/views/test_settings/_core_mapping.html.erb:2:in 'String#+'
+app/views/test_settings/_core_mapping.html.erb:2
+app/views/test_settings/_ip_configuration_form.html.erb:31
+app/views/test_settings/new.html.erb:29
+app/views/test_settings/new.html.erb:27:in 'Array#each'
+app/views/test_settings/new.html.erb:27
+app/views/test_settings/new.html.erb:5
+Started GET "/" for ::1 at 2025-09-16 14:28:24 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 2.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 2.7ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 26.3ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.0ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 39.6ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.1ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.6ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.4ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 3.0ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 6.7ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 71.3ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 100.4ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 4360ms (GC: 0.2ms)
+
+
+  
+ActionView::Template::Error (The asset 'application.css' was not found in the load path.)
+Caused by: Propshaft::MissingAssetError (The asset 'application.css' was not found in the load path.)
+
+Information for: ActionView::Template::Error (The asset 'application.css' was not found in the load path.):
+     6:     <%= csrf_meta_tags %>
+     7:     <%= csp_meta_tag %>
+     8:     
+     9:     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    10:     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    11:   </head>
+    12: 
+  
+app/views/layouts/application.html.erb:9
+
+Information for cause: Propshaft::MissingAssetError (The asset 'application.css' was not found in the load path.):
+  
+app/views/layouts/application.html.erb:9
+Started GET "/" for ::1 at 2025-09-16 14:33:23 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 3.0ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 1.7ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 29.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.1ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 44.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.4ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 6.0ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.3ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.9ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 6.1ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 77.2ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 113.6ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 5063ms (GC: 0.0ms)
+
+
+  
+ActionView::Template::Error (The asset 'application.css' was not found in the load path.)
+Caused by: Propshaft::MissingAssetError (The asset 'application.css' was not found in the load path.)
+
+Information for: ActionView::Template::Error (The asset 'application.css' was not found in the load path.):
+     6:     <%= csrf_meta_tags %>
+     7:     <%= csp_meta_tag %>
+     8:     
+     9:     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    10:     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    11:   </head>
+    12: 
+  
+app/views/layouts/application.html.erb:9
+
+Information for cause: Propshaft::MissingAssetError (The asset 'application.css' was not found in the load path.):
+  
+app/views/layouts/application.html.erb:9
+Started GET "/" for ::1 at 2025-09-16 14:33:36 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.8ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.0ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.2ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.5ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.3ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.8ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 3.1ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 6.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.4ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 6.8ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 25.9ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 32.7ms | GC: 0.0ms)
+Completed 500 Internal Server Error in 2459ms (GC: 0.0ms)
+
+
+  
+ActionView::Template::Error (The asset 'application.css' was not found in the load path.)
+Caused by: Propshaft::MissingAssetError (The asset 'application.css' was not found in the load path.)
+
+Information for: ActionView::Template::Error (The asset 'application.css' was not found in the load path.):
+     6:     <%= csrf_meta_tags %>
+     7:     <%= csp_meta_tag %>
+     8:     
+     9:     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    10:     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    11:   </head>
+    12: 
+  
+app/views/layouts/application.html.erb:9
+
+Information for cause: Propshaft::MissingAssetError (The asset 'application.css' was not found in the load path.):
+  
+app/views/layouts/application.html.erb:9
+Started GET "/" for ::1 at 2025-09-16 14:36:14 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 2.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 24.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 8.9ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 54.3ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.0ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.5ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.2ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 84.9ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 88.8ms | GC: 0.0ms)
+Completed 200 OK in 4092ms (Views: 133.3ms | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2025-09-16 14:37:50 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 3.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 7.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.5ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.4ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.4ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 7.1ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 600.5ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 603.4ms | GC: 0.0ms)
+Completed 200 OK in 2704ms (Views: 604.9ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-16 14:38:04 +0800
+Processing by TestSettingsController#generate as HTML
+  Parameters: {"authenticity_token" => "[FILTERED]", "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}}}}, "commit" => "Generate Combined Test Settings"}
+Completed 500 Internal Server Error in 2008ms (GC: 0.0ms)
+
+
+  
+NoMethodError (undefined method 'each_with_index' for an instance of ActionController::Parameters):
+  
+app/controllers/test_settings_controller.rb:91:in 'TestSettingsController#transform_core_mapping'
+app/controllers/test_settings_controller.rb:81:in 'block in TestSettingsController#transform_params'
+app/controllers/test_settings_controller.rb:78:in 'TestSettingsController#transform_params'
+app/controllers/test_settings_controller.rb:7:in 'TestSettingsController#generate'
+Started GET "/" for ::1 at 2025-09-19 05:28:17 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 2.5ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 2.5ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 27.9ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.1ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 72.6ms | GC: 0.2ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.7ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.7ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.0ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.5ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.7ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 140.7ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 179.3ms | GC: 0.2ms)
+Completed 500 Internal Server Error in 5221ms (GC: 0.2ms)
+
+
+  
+ActionView::Template::Error (The asset 'application.js' was not found in the load path.)
+Caused by: Propshaft::MissingAssetError (The asset 'application.js' was not found in the load path.)
+
+Information for: ActionView::Template::Error (The asset 'application.js' was not found in the load path.):
+     7:     <%= csp_meta_tag %>
+     8:     
+     9:     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    10:     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    11:     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+    12:   </head>
+    13: 
+  
+app/views/layouts/application.html.erb:10
+
+Information for cause: Propshaft::MissingAssetError (The asset 'application.js' was not found in the load path.):
+  
+app/views/layouts/application.html.erb:10
+Started GET "/favicon.ico" for ::1 at 2025-09-19 05:28:24 +0800
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+Started GET "/" for ::1 at 2025-09-19 05:41:25 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 3.5ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 28.9ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 55.4ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.5ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 70.0ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.3ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.1ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 4.6ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.9ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.4ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 141.2ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 178.6ms | GC: 0.0ms)
+Completed 200 OK in 4948ms (Views: 231.7ms | GC: 0.0ms)
+
+
+Started GET "/assets/application-7cda662d.css" for ::1 at 2025-09-19 05:41:31 +0800
+Started GET "/assets/application-93afb03c.js" for ::1 at 2025-09-19 05:41:31 +0800
