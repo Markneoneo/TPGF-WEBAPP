@@ -5915,13 +5915,13 @@ var AttributeObserver = class {
   }
 };
 function add(map, key, value) {
-  fetch(map, key).add(value);
+  fetch2(map, key).add(value);
 }
 function del(map, key, value) {
-  fetch(map, key).delete(value);
+  fetch2(map, key).delete(value);
   prune(map, key);
 }
-function fetch(map, key) {
+function fetch2(map, key) {
   let values = map.get(key);
   if (!values) {
     values = /* @__PURE__ */ new Set();
@@ -7783,6 +7783,420 @@ Controller.values = {};
 var application = Application.start();
 application.debug = false;
 window.Stimulus = application;
+
+// app/javascript/controllers/test_settings_form_controller.js
+var test_settings_form_controller_default = class extends Controller {
+  static targets = ["jsonContent"];
+  connect() {
+    this.selectedIpTypes = /* @__PURE__ */ new Set();
+  }
+  toggleIpType(event) {
+    const checkbox = event.target;
+    const ipType = checkbox.dataset.ipType;
+    const configSection = document.getElementById(`${ipType}-config`);
+    if (checkbox.checked) {
+      this.selectedIpTypes.add(ipType);
+      configSection.classList.remove("hidden");
+    } else {
+      this.selectedIpTypes.delete(ipType);
+      configSection.classList.add("hidden");
+    }
+    const globalActions = document.getElementById("global-actions");
+    if (this.selectedIpTypes.size > 0) {
+      globalActions.classList.remove("hidden");
+    } else {
+      globalActions.classList.add("hidden");
+    }
+  }
+  async submitForm(event) {
+    event.preventDefault();
+    const form = this.element;
+    const formData = new FormData(form);
+    console.log("Form data being sent:");
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+    const button = event.currentTarget;
+    button.disabled = true;
+    button.textContent = "Generating Files...";
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRF-Token": document.querySelector('[name="csrf-token"]').content,
+          "Accept": "application/json"
+        }
+      });
+      const responseText = await response.text();
+      console.log("Raw response:", responseText);
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error("Failed to parse JSON:", responseText);
+        throw new Error("Invalid JSON response from server");
+      }
+      if (response.ok && data.status === "success") {
+        const preview = document.getElementById("json-preview");
+        const content = document.getElementById("json-content");
+        content.textContent = JSON.stringify(data.data, null, 2);
+        preview.classList.remove("hidden");
+        document.getElementById("download-button").classList.remove("hidden");
+      } else {
+        alert(`Error: ${data.error || "Unknown error"}
+${data.details || ""}`);
+      }
+    } catch (error2) {
+      console.error("Error:", error2);
+      alert(`Error generating settings: ${error2.message}`);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Generate Combined Test Settings";
+    }
+  }
+  clearAll() {
+    document.querySelectorAll('input[name="selected_ip_types[]"]').forEach((checkbox) => {
+      checkbox.checked = false;
+      checkbox.dispatchEvent(new Event("change"));
+    });
+    this.element.reset();
+    document.getElementById("json-preview").classList.add("hidden");
+    document.getElementById("download-button").classList.add("hidden");
+  }
+  closePreview() {
+    document.getElementById("json-preview").classList.add("hidden");
+  }
+};
+
+// app/javascript/controllers/ip_configuration_controller.js
+var ip_configuration_controller_default = class extends Controller {
+  static targets = ["numCores", "coreMappings", "coreMappingTemplate"];
+  connect() {
+    this.ipType = this.element.closest("[data-ip-type]").dataset.ipType;
+  }
+  incrementCores() {
+    const current = parseInt(this.numCoresTarget.value) || 1;
+    this.numCoresTarget.value = current + 1;
+    this.updateCoreCount();
+  }
+  decrementCores() {
+    const current = parseInt(this.numCoresTarget.value) || 1;
+    if (current > 1) {
+      this.numCoresTarget.value = current - 1;
+      this.updateCoreCount();
+    }
+  }
+  updateCoreCount() {
+    const targetCount = parseInt(this.numCoresTarget.value) || 1;
+    const allCoreMappings = Array.from(this.coreMappingsTarget.children).filter((child) => {
+      if (child.hasAttribute("data-ip-configuration-target") && child.getAttribute("data-ip-configuration-target") === "coreMappingTemplate") {
+        return false;
+      }
+      return child.hasAttribute("data-core-index");
+    });
+    const currentCount = allCoreMappings.length;
+    console.log(`Actually found ${currentCount} core mappings (target: ${targetCount})`);
+    console.log("Core mappings:", allCoreMappings.map((el) => el.getAttribute("data-core-index")));
+    if (targetCount > currentCount) {
+      for (let i = currentCount; i < targetCount; i++) {
+        console.log(`Adding core type ${i + 1}`);
+        this.addCoreMapping(i);
+      }
+    } else if (targetCount < currentCount) {
+      for (let i = currentCount - 1; i >= targetCount; i--) {
+        console.log(`Removing core type ${i + 1}`);
+        allCoreMappings[i].remove();
+      }
+    }
+  }
+  addCoreMapping(index) {
+    let template = this.coreMappingTemplateTarget.innerHTML;
+    template = template.replace(/Core Type 1000/g, `Core Type ${index + 1}`);
+    template = template.replace(/data-core-index="999"/g, `data-core-index="${index}"`);
+    template = template.replace(/data-production-section="999"/g, `data-production-section="${index}"`);
+    template = template.replace(/data-charz-section="999"/g, `data-charz-section="${index}"`);
+    template = template.replace(/data-coreIndex="999"/g, `data-core-index="${index}"`);
+    template = template.replace(/\[core_mappings\]\[999\]/g, `[core_mappings][${index}]`);
+    template = template.replace(/\[flow_orders\]\[999\]/g, `[flow_orders][${index}]`);
+    template = template.replace(/\[production_mappings\]\[999\]/g, `[production_mappings][${index}]`);
+    template = template.replace(/\[show_production_for_core\]\[999\]/g, `[show_production_for_core][${index}]`);
+    template = template.replace(/\[show_charz_for_core\]\[999\]/g, `[show_charz_for_core][${index}]`);
+    template = template.replace(/\[charz_data\]\[999\]/g, `[charz_data][${index}]`);
+    template = template.replace(/_999/g, `_${index}`);
+    template = template.replace(/="999"/g, `="${index}"`);
+    this.coreMappingsTarget.insertAdjacentHTML("beforeend", template);
+  }
+  toggleProduction(event) {
+    const coreIndex = event.target.dataset.coreIndex;
+    const section = this.element.querySelector(`[data-production-section="${coreIndex}"]`);
+    if (event.target.checked) {
+      section.classList.remove("hidden");
+    } else {
+      section.classList.add("hidden");
+    }
+  }
+  toggleCharz(event) {
+    const coreIndex = event.target.dataset.coreIndex;
+    const section = this.element.querySelector(`[data-charz-section="${coreIndex}"]`);
+    if (event.target.checked) {
+      section.classList.remove("hidden");
+    } else {
+      section.classList.add("hidden");
+    }
+  }
+};
+
+// app/javascript/controllers/production_parameters_controller.js
+var production_parameters_controller_default = class extends Controller {
+  static targets = ["flowOrders", "mappingContainer", "testPointsType", "rangeFields", "listField"];
+  connect() {
+    this.flowOrders = /* @__PURE__ */ new Set();
+  }
+  toggleFlowOrder(event) {
+    const order = event.target.value;
+    if (event.target.checked) {
+      this.flowOrders.add(order);
+      this.addFlowOrderMapping(order);
+    } else {
+      this.flowOrders.delete(order);
+      this.removeFlowOrderMapping(order);
+    }
+  }
+  addFlowOrderMapping(order) {
+    const template = document.getElementById("flow-order-mapping-template");
+    const content = template.content.cloneNode(true);
+    content.querySelectorAll("[data-order-placeholder]").forEach((element) => {
+      element.textContent = element.textContent.replace("ORDER", order);
+      element.dataset.order = order;
+    });
+    content.querySelectorAll("input, select").forEach((input) => {
+      if (input.name) {
+        input.name = input.name.replace("ORDER", order);
+      }
+    });
+    const container = content.querySelector(".flow-order-mapping");
+    container.dataset.order = order;
+    this.mappingContainerTarget.appendChild(content);
+  }
+  removeFlowOrderMapping(order) {
+    const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`);
+    if (mapping) {
+      mapping.remove();
+    }
+  }
+  toggleTestPointsType(event) {
+    const container = event.target.closest(".flow-order-mapping");
+    const rangeFields = container.querySelector(".test-points-range");
+    const listField = container.querySelector(".test-points-list");
+    if (event.target.value === "List") {
+      rangeFields.classList.add("hidden");
+      listField.classList.remove("hidden");
+    } else {
+      rangeFields.classList.remove("hidden");
+      listField.classList.add("hidden");
+    }
+  }
+  togglePowerSupply(event) {
+    const container = event.target.closest(".flow-order-mapping");
+    const specVariableInput = container.querySelector('[name*="spec_variable"]');
+    const supplyInput = document.querySelector('[data-supply-field="true"]');
+    if (event.target.checked && supplyInput) {
+      specVariableInput.value = supplyInput.value;
+      specVariableInput.disabled = true;
+    } else {
+      specVariableInput.disabled = false;
+    }
+  }
+};
+
+// app/javascript/controllers/charz_parameters_controller.js
+var charz_parameters_controller_default = class extends Controller {
+  static targets = ["tablesContainer"];
+  connect() {
+    this.searchTypes = /* @__PURE__ */ new Set();
+    this.testTypes = {};
+  }
+  toggleSearchType(event) {
+    const searchType = event.target.value;
+    if (event.target.checked) {
+      this.searchTypes.add(searchType);
+      this.addSearchTypeTable(searchType);
+    } else {
+      this.searchTypes.delete(searchType);
+      this.removeSearchTypeTable(searchType);
+    }
+  }
+  addSearchTypeTable(searchType) {
+    const template = document.getElementById("search-type-table-template");
+    if (!template) {
+      console.error("Template not found!");
+      return;
+    }
+    const content = template.content.cloneNode(true);
+    const searchTypeDiv = content.querySelector(".search-type-table");
+    const replaceInElement = (element) => {
+      if (element.nodeType === Node.TEXT_NODE) {
+        element.textContent = element.textContent.replace(/SEARCH_TYPE/g, searchType);
+      }
+      if (element.nodeType === Node.ELEMENT_NODE) {
+        ["name", "id", "for", "data-search-type"].forEach((attr) => {
+          if (element.hasAttribute(attr)) {
+            element.setAttribute(attr, element.getAttribute(attr).replace(/SEARCH_TYPE/g, searchType));
+          }
+        });
+      }
+      element.childNodes.forEach((child) => replaceInElement(child));
+    };
+    replaceInElement(searchTypeDiv);
+    this.tablesContainerTarget.appendChild(searchTypeDiv);
+    this.testTypes[searchType] = /* @__PURE__ */ new Set();
+  }
+  removeSearchTypeTable(searchType) {
+    const table = this.tablesContainerTarget.querySelector(`[data-search-type="${searchType}"]`);
+    if (table) {
+      table.remove();
+      delete this.testTypes[searchType];
+    }
+  }
+  toggleTestType(event) {
+    const checkbox = event.target;
+    const testType = checkbox.value;
+    const searchTypeTable = checkbox.closest("[data-search-type]");
+    const searchType = searchTypeTable.dataset.searchType;
+    const tbody = searchTypeTable.querySelector("[data-test-types-tbody]");
+    if (checkbox.checked) {
+      this.testTypes[searchType].add(testType);
+      this.addTestTypeRow(tbody, searchType, testType);
+    } else {
+      this.testTypes[searchType].delete(testType);
+      this.removeTestTypeRow(tbody, testType);
+    }
+    this.updateWorkloadTable(searchTypeTable);
+  }
+  addTestTypeRow(tbody, searchType, testType) {
+    const row = document.createElement("tr");
+    const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
+    const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
+    const units = searchType === "VMIN" ? { tp: "MHz", search: "V" } : { tp: "V", search: "MHz" };
+    row.innerHTML = `
+      <td class="border px-2 py-1">${testType}</td>
+      <td class="border px-2 py-1">
+        <input type="number" 
+               name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][wl_count]"
+               class="w-20 px-1 py-1 border rounded"
+               min="0"
+               data-action="change->charz-parameters#updateWorkloadTable">
+      </td>
+      <td class="border px-2 py-1">
+        <input type="text" 
+               name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][tp]"
+               placeholder="${units.tp}"
+               class="w-24 px-1 py-1 border rounded">
+      </td>
+      <td class="border px-2 py-1">
+        <input type="text" 
+               name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][search_start]"
+               placeholder="${units.search}"
+               class="w-24 px-1 py-1 border rounded">
+      </td>
+      <td class="border px-2 py-1">
+        <input type="text" 
+               name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][search_end]"
+               placeholder="${units.search}"
+               class="w-24 px-1 py-1 border rounded">
+      </td>
+      <td class="border px-2 py-1">
+        <input type="text" 
+               name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][search_step]"
+               placeholder="${units.search}"
+               class="w-24 px-1 py-1 border rounded">
+      </td>
+      <td class="border px-2 py-1">
+        <input type="text" 
+               name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][resolution]"
+               placeholder="${units.search}"
+               class="w-24 px-1 py-1 border rounded">
+      </td>
+    `;
+    row.dataset.testType = testType;
+    tbody.appendChild(row);
+  }
+  removeTestTypeRow(tbody, testType) {
+    const row = tbody.querySelector(`[data-test-type="${testType}"]`);
+    if (row) {
+      row.remove();
+    }
+  }
+  updateWorkloadTable(event) {
+    const searchTypeTable = event.target ? event.target.closest("[data-search-type]") : event;
+    const searchType = searchTypeTable.dataset.searchType;
+    const workloadContainer = searchTypeTable.querySelector("[data-workload-container]");
+    const tbody = searchTypeTable.querySelector("[data-test-types-tbody]");
+    workloadContainer.innerHTML = "";
+    let maxWlCount = 0;
+    const wlCounts = {};
+    tbody.querySelectorAll("tr").forEach((row) => {
+      const testType = row.dataset.testType;
+      const wlCountInput = row.querySelector('input[name*="wl_count"]');
+      const count = parseInt(wlCountInput.value) || 0;
+      if (count > 0) {
+        wlCounts[testType] = count;
+        maxWlCount = Math.max(maxWlCount, count);
+      }
+    });
+    if (maxWlCount === 0) return;
+    const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
+    const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
+    const table = document.createElement("div");
+    table.innerHTML = `
+      <h6 class="font-semibold mb-2">${searchType} Workload Table</h6>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              ${Object.keys(wlCounts).map((tt) => `<th class="border px-2 py-1 text-sm">${tt}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${Array.from({ length: maxWlCount }).map((_, idx) => `
+              <tr>
+                ${Object.entries(wlCounts).map(([testType, count]) => `
+                  <td class="border px-2 py-1">
+                    ${idx < count ? `
+                      <input type="text" 
+                             name="ip_configurations[${ipType}][charz_data][${coreIndex}][workload_table][${searchType}][${testType}][]"
+                             class="w-full px-1 py-1 border rounded">
+                    ` : ""}
+                  </td>
+                `).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+    workloadContainer.appendChild(table);
+  }
+  togglePowerSupply(event) {
+    const searchTypeTable = event.target.closest("[data-search-type]");
+    const specVariableInput = searchTypeTable.querySelector('input[name*="spec_variables"]');
+    const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
+    const supplyInput = document.querySelector(`[data-supply-field="true"][data-core-index="${coreIndex}"]`);
+    if (event.target.checked && supplyInput) {
+      specVariableInput.value = supplyInput.value;
+      specVariableInput.disabled = true;
+    } else {
+      specVariableInput.disabled = false;
+    }
+  }
+};
+
+// app/javascript/controllers/index.js
+application.register("test-settings-form", test_settings_form_controller_default);
+application.register("ip-configuration", ip_configuration_controller_default);
+application.register("production-parameters", production_parameters_controller_default);
+application.register("charz-parameters", charz_parameters_controller_default);
 
 // app/javascript/application.js
 console.log("Application loaded");

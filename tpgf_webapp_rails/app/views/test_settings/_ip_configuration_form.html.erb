@@ -22,13 +22,13 @@
   </div>
   
   <!-- Core Mappings Container -->
-<div data-ip-configuration-target="coreMappings">
-  <%= render 'core_mapping', ip_type: ip_type, core_index: 0 %>
-</div>
-
-<!-- Templates for dynamic content -->
-<template data-ip-configuration-target="coreMappingTemplate">
-  <%= render 'core_mapping', ip_type: ip_type, core_index: 999 %>
-</template>
+  <div data-ip-configuration-target="coreMappings">
+    <%= render 'core_mapping', ip_type: ip_type, core_index: 0 %>
+  </div>
+  
+  <!-- Templates for dynamic content -->
+  <div data-ip-configuration-target="coreMappingTemplate" style="display: none;">
+    <%= render 'core_mapping', ip_type: ip_type, core_index: 999 %>
+  </div>  
 
 </div>

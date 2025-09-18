@@ -29,6 +29,67 @@ export default class extends Controller {
         }
     }
 
+    async submitForm(event) {
+        event.preventDefault()
+
+        const form = this.element
+        const formData = new FormData(form)
+
+        // Log what we're sending
+        console.log('Form data being sent:')
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`)
+        }
+
+        // Disable the button to prevent double submission
+        const button = event.currentTarget
+        button.disabled = true
+        button.textContent = "Generating Files..."
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+
+            // Log the raw response
+            const responseText = await response.text()
+            console.log('Raw response:', responseText)
+
+            let data
+            try {
+                data = JSON.parse(responseText)
+            } catch (e) {
+                console.error('Failed to parse JSON:', responseText)
+                throw new Error('Invalid JSON response from server')
+            }
+
+            if (response.ok && data.status === 'success') {
+                // Show JSON preview
+                const preview = document.getElementById('json-preview')
+                const content = document.getElementById('json-content')
+                content.textContent = JSON.stringify(data.data, null, 2)
+                preview.classList.remove('hidden')
+
+                // Show download button
+                document.getElementById('download-button').classList.remove('hidden')
+            } else {
+                alert(`Error: ${data.error || 'Unknown error'}\n${data.details || ''}`)
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            alert(`Error generating settings: ${error.message}`)
+        } finally {
+            // Re-enable the button
+            button.disabled = false
+            button.textContent = "Generate Combined Test Settings"
+        }
+    }
+
     clearAll() {
         // Uncheck all IP type checkboxes
         document.querySelectorAll('input[name="selected_ip_types[]"]').forEach(checkbox => {
@@ -47,26 +108,4 @@ export default class extends Controller {
     closePreview() {
         document.getElementById('json-preview').classList.add('hidden')
     }
-
-    // Handle form submission response
-    handleSuccess(event) {
-        const [data, status, xhr] = event.detail
-
-        if (data.status === 'success') {
-            // Show JSON preview
-            const preview = document.getElementById('json-preview')
-            const content = document.getElementById('json-content')
-            content.textContent = JSON.stringify(data.data, null, 2)
-            preview.classList.remove('hidden')
-
-            // Show download button
-            document.getElementById('download-button').classList.remove('hidden')
-        }
-    }
-
-    handleError(event) {
-        const [data, status, xhr] = event.detail
-        alert(`Error: ${data.error}\n${data.details || ''}`)
-    }
 }
-

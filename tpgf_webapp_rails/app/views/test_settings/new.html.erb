@@ -2,8 +2,11 @@
   <h1 class="text-3xl font-bold text-center mb-2">Test Settings Generator</h1>
   <p class="text-center text-gray-600 mb-8">Please select the IP types and configure options.</p>
   
-  <%= form_with url: generate_test_settings_path, local: false, data: { controller: "test-settings-form" } do |form| %>
-    <div class="bg-white shadow-md rounded-lg p-6">
+  <%= form_with url: generate_test_settings_path, local: false, data: { 
+    controller: "test-settings-form"
+  } do |form| %>
+
+      <div class="bg-white shadow-md rounded-lg p-6">
       <!-- IP Type Selection -->
       <div class="mb-6">
         <h3 class="text-lg font-semibold mb-3">Select IP Types</h3>
@@ -31,24 +34,25 @@
         <% end %>
       </div>
       
-      <!-- Global Actions -->
-      <div id="global-actions" class="hidden mt-8 flex gap-4">
-        <%= form.submit "Generate Combined Test Settings", 
-            class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
-            data: { disable_with: "Generating Files..." } %>
-        
-        <div id="download-button" class="hidden">
-          <%= link_to "Download JSON", download_test_settings_path, 
-              class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded",
-              target: "_blank" %>
-        </div>
-        
-        <button type="button" 
-                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                data-action="click->test-settings-form#clearAll">
-          Clear All
-        </button>
+    <!-- Global Actions -->
+    <div id="global-actions" class="hidden mt-8 flex gap-4">
+      <button type="button"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              data-action="click->test-settings-form#submitForm">
+        Generate Combined Test Settings
+      </button>
+      
+      <div id="download-button" class="hidden">
+        <%= link_to "Download JSON", download_test_settings_path, 
+            class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded",
+            target: "_blank" %>
       </div>
+      
+      <button type="button" 
+              class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+              data-action="click->test-settings-form#clearAll">
+        Clear All
+      </button>
     </div>
   <% end %>
   

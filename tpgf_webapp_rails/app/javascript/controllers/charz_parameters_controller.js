@@ -1,82 +1,102 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["tablesContainer"]
+  static targets = ["tablesContainer"]
 
-    connect() {
-        this.searchTypes = new Set()
-        this.testTypes = {}
+  connect() {
+    this.searchTypes = new Set()
+    this.testTypes = {}
+  }
+
+  toggleSearchType(event) {
+    const searchType = event.target.value
+
+    if (event.target.checked) {
+      this.searchTypes.add(searchType)
+      this.addSearchTypeTable(searchType)
+    } else {
+      this.searchTypes.delete(searchType)
+      this.removeSearchTypeTable(searchType)
+    }
+  }
+
+  addSearchTypeTable(searchType) {
+    const template = document.getElementById('search-type-table-template')
+
+    if (!template) {
+      console.error('Template not found!')
+      return
     }
 
-    toggleSearchType(event) {
-        const searchType = event.target.value
+    // Clone the template content properly
+    const content = template.content.cloneNode(true)
 
-        if (event.target.checked) {
-            this.searchTypes.add(searchType)
-            this.addSearchTypeTable(searchType)
-        } else {
-            this.searchTypes.delete(searchType)
-            this.removeSearchTypeTable(searchType)
-        }
-    }
+    // Get the actual div element from the cloned content
+    const searchTypeDiv = content.querySelector('.search-type-table')
 
-    addSearchTypeTable(searchType) {
-        const template = document.getElementById('search-type-table-template')
-        const content = template.content.cloneNode(true)
+    // Replace SEARCH_TYPE in all text content and attributes
+    const replaceInElement = (element) => {
+      // Replace in text nodes
+      if (element.nodeType === Node.TEXT_NODE) {
+        element.textContent = element.textContent.replace(/SEARCH_TYPE/g, searchType)
+      }
 
-        // Replace all occurrences of SEARCH_TYPE
-        content.querySelectorAll('*').forEach(element => {
-            if (element.textContent) {
-                element.textContent = element.textContent.replace(/SEARCH_TYPE/g, searchType)
-            }
-            if (element.name) {
-                element.name = element.name.replace(/SEARCH_TYPE/g, searchType)
-            }
-            if (element.dataset.searchType) {
-                element.dataset.searchType = searchType
-            }
+      // Replace in attributes
+      if (element.nodeType === Node.ELEMENT_NODE) {
+        // Replace in common attributes
+        ['name', 'id', 'for', 'data-search-type'].forEach(attr => {
+          if (element.hasAttribute(attr)) {
+            element.setAttribute(attr, element.getAttribute(attr).replace(/SEARCH_TYPE/g, searchType))
+          }
         })
+      }
 
-        this.tablesContainerTarget.appendChild(content)
-        this.testTypes[searchType] = new Set()
+      // Recurse for child nodes
+      element.childNodes.forEach(child => replaceInElement(child))
     }
 
-    removeSearchTypeTable(searchType) {
-        const table = this.tablesContainerTarget.querySelector(`[data-search-type="${searchType}"]`)
-        if (table) {
-            table.remove()
-            delete this.testTypes[searchType]
-        }
+    replaceInElement(searchTypeDiv)
+
+    this.tablesContainerTarget.appendChild(searchTypeDiv)
+    this.testTypes[searchType] = new Set()
+  }
+
+  removeSearchTypeTable(searchType) {
+    const table = this.tablesContainerTarget.querySelector(`[data-search-type="${searchType}"]`)
+    if (table) {
+      table.remove()
+      delete this.testTypes[searchType]
+    }
+  }
+
+  toggleTestType(event) {
+    const checkbox = event.target
+    const testType = checkbox.value
+    const searchTypeTable = checkbox.closest('[data-search-type]')
+    const searchType = searchTypeTable.dataset.searchType
+    const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
+
+    if (checkbox.checked) {
+      this.testTypes[searchType].add(testType)
+      this.addTestTypeRow(tbody, searchType, testType)
+    } else {
+      this.testTypes[searchType].delete(testType)
+      this.removeTestTypeRow(tbody, testType)
     }
 
-    toggleTestType(event) {
-        const checkbox = event.target
-        const testType = checkbox.value
-        const searchTypeTable = checkbox.closest('[data-search-type]')
-        const searchType = searchTypeTable.dataset.searchType
-        const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
+    this.updateWorkloadTable(searchTypeTable)
+  }
 
-        if (checkbox.checked) {
-            this.testTypes[searchType].add(testType)
-            this.addTestTypeRow(tbody, searchType, testType)
-        } else {
-            this.testTypes[searchType].delete(testType)
-            this.removeTestTypeRow(tbody, testType)
-        }
+  addTestTypeRow(tbody, searchType, testType) {
+    const row = document.createElement('tr')
+    const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+    const ipType = this.element.closest('[data-ip-type]').dataset.ipType
 
-        this.updateWorkloadTable(searchTypeTable)
-    }
+    const units = searchType === 'VMIN'
+      ? { tp: 'MHz', search: 'V' }
+      : { tp: 'V', search: 'MHz' }
 
-    addTestTypeRow(tbody, searchType, testType) {
-        const row = document.createElement('tr')
-        const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
-        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
-
-        const units = searchType === 'VMIN'
-            ? { tp: 'MHz', search: 'V' }
-            : { tp: 'V', search: 'MHz' }
-
-        row.innerHTML = `
+    row.innerHTML = `
       <td class="border px-2 py-1">${testType}</td>
       <td class="border px-2 py-1">
         <input type="number" 
@@ -117,49 +137,49 @@ export default class extends Controller {
       </td>
     `
 
-        row.dataset.testType = testType
-        tbody.appendChild(row)
+    row.dataset.testType = testType
+    tbody.appendChild(row)
+  }
+
+  removeTestTypeRow(tbody, testType) {
+    const row = tbody.querySelector(`[data-test-type="${testType}"]`)
+    if (row) {
+      row.remove()
     }
+  }
 
-    removeTestTypeRow(tbody, testType) {
-        const row = tbody.querySelector(`[data-test-type="${testType}"]`)
-        if (row) {
-            row.remove()
-        }
-    }
+  updateWorkloadTable(event) {
+    const searchTypeTable = event.target ? event.target.closest('[data-search-type]') : event
+    const searchType = searchTypeTable.dataset.searchType
+    const workloadContainer = searchTypeTable.querySelector('[data-workload-container]')
+    const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
 
-    updateWorkloadTable(event) {
-        const searchTypeTable = event.target ? event.target.closest('[data-search-type]') : event
-        const searchType = searchTypeTable.dataset.searchType
-        const workloadContainer = searchTypeTable.querySelector('[data-workload-container]')
-        const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
+    // Clear existing workload table
+    workloadContainer.innerHTML = ''
 
-        // Clear existing workload table
-        workloadContainer.innerHTML = ''
+    // Get max WL count
+    let maxWlCount = 0
+    const wlCounts = {}
 
-        // Get max WL count
-        let maxWlCount = 0
-        const wlCounts = {}
+    tbody.querySelectorAll('tr').forEach(row => {
+      const testType = row.dataset.testType
+      const wlCountInput = row.querySelector('input[name*="wl_count"]')
+      const count = parseInt(wlCountInput.value) || 0
 
-        tbody.querySelectorAll('tr').forEach(row => {
-            const testType = row.dataset.testType
-            const wlCountInput = row.querySelector('input[name*="wl_count"]')
-            const count = parseInt(wlCountInput.value) || 0
+      if (count > 0) {
+        wlCounts[testType] = count
+        maxWlCount = Math.max(maxWlCount, count)
+      }
+    })
 
-            if (count > 0) {
-                wlCounts[testType] = count
-                maxWlCount = Math.max(maxWlCount, count)
-            }
-        })
+    if (maxWlCount === 0) return
 
-        if (maxWlCount === 0) return
+    // Create workload table
+    const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+    const ipType = this.element.closest('[data-ip-type]').dataset.ipType
 
-        // Create workload table
-        const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
-        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
-
-        const table = document.createElement('div')
-        table.innerHTML = `
+    const table = document.createElement('div')
+    table.innerHTML = `
       <h6 class="font-semibold mb-2">${searchType} Workload Table</h6>
       <div class="overflow-x-auto">
         <table class="w-full border-collapse">
@@ -187,21 +207,20 @@ export default class extends Controller {
       </div>
     `
 
-        workloadContainer.appendChild(table)
-    }
+    workloadContainer.appendChild(table)
+  }
 
-    togglePowerSupply(event) {
-        const searchTypeTable = event.target.closest('[data-search-type]')
-        const specVariableInput = searchTypeTable.querySelector('input[name*="spec_variables"]')
-        const supplyInput = document.querySelector('[data-supply-field="true"]')
+  togglePowerSupply(event) {
+    const searchTypeTable = event.target.closest('[data-search-type]')
+    const specVariableInput = searchTypeTable.querySelector('input[name*="spec_variables"]')
+    const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+    const supplyInput = document.querySelector(`[data-supply-field="true"][data-core-index="${coreIndex}"]`)
 
-        if (event.target.checked && supplyInput) {
-            specVariableInput.value = supplyInput.value
-            specVariableInput.disabled = true
-        } else {
-            specVariableInput.disabled = false
-        }
+    if (event.target.checked && supplyInput) {
+      specVariableInput.value = supplyInput.value
+      specVariableInput.disabled = true
+    } else {
+      specVariableInput.disabled = false
     }
+  }
 }
-
-
