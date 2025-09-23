@@ -7789,6 +7789,15 @@ var test_settings_form_controller_default = class extends Controller {
   static targets = ["jsonContent"];
   connect() {
     this.selectedIpTypes = /* @__PURE__ */ new Set();
+    this.element.addEventListener("input", (event) => {
+      if (event.target.tagName === "INPUT" && event.target.classList.contains("error-field")) {
+        event.target.classList.remove("error-field");
+        const errorMessage = event.target.parentElement.querySelector(".error-message");
+        if (errorMessage) {
+          errorMessage.remove();
+        }
+      }
+    });
   }
   toggleIpType(event) {
     const checkbox = event.target;
@@ -7812,13 +7821,10 @@ var test_settings_form_controller_default = class extends Controller {
     event.preventDefault();
     const form = this.element;
     const formData = new FormData(form);
-    console.log("Form data being sent:");
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
+    this.clearErrors();
     const button = event.currentTarget;
     button.disabled = true;
-    button.textContent = "Generating Files...";
+    button.textContent = "Validating and Generating...";
     try {
       const response = await fetch(form.action, {
         method: "POST",
@@ -7829,7 +7835,6 @@ var test_settings_form_controller_default = class extends Controller {
         }
       });
       const responseText = await response.text();
-      console.log("Raw response:", responseText);
       let data;
       try {
         data = JSON.parse(responseText);
@@ -7843,17 +7848,120 @@ var test_settings_form_controller_default = class extends Controller {
         content.textContent = JSON.stringify(data.data, null, 2);
         preview.classList.remove("hidden");
         document.getElementById("download-button").classList.remove("hidden");
+        this.showSuccessMessage("Test settings generated successfully!");
+      } else if (data.validation_errors) {
+        this.showValidationErrors(data.validation_errors);
       } else {
-        alert(`Error: ${data.error || "Unknown error"}
-${data.details || ""}`);
+        this.showErrorMessage(data.error || "An error occurred");
       }
     } catch (error2) {
       console.error("Error:", error2);
-      alert(`Error generating settings: ${error2.message}`);
+      this.showErrorMessage(`Error: ${error2.message}`);
     } finally {
       button.disabled = false;
       button.textContent = "Generate Combined Test Settings";
     }
+  }
+  showValidationErrors(validationErrors) {
+    console.log("Validation errors:", validationErrors);
+    const errorSummary = this.createOrUpdateElement(
+      "validation-error-summary",
+      "validation-error-summary"
+    );
+    let errorHtml = "<strong>Please fix the following errors:</strong><ul>";
+    Object.entries(validationErrors).forEach(([ipType, errors]) => {
+      errorHtml += `<li class="font-semibold">${ipType} Configuration:`;
+      errorHtml += "<ul>";
+      Object.entries(errors).forEach(([field, message]) => {
+        errorHtml += `<li>${message}</li>`;
+        this.highlightErrorField(ipType, field, message);
+      });
+      errorHtml += "</ul></li>";
+    });
+    errorHtml += "</ul>";
+    errorSummary.innerHTML = errorHtml;
+    const globalActions = document.getElementById("global-actions");
+    globalActions.parentNode.insertBefore(errorSummary, globalActions);
+    errorSummary.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  highlightErrorField(ipType, fieldError, message) {
+    const configSection = document.querySelector(`[data-ip-type="${ipType}"]`);
+    if (!configSection) return;
+    let input = null;
+    if (fieldError.match(/^(core|core_count|supply|clock)_\d+$/)) {
+      const [fieldType, coreIndex] = fieldError.split("_");
+      const fieldName = fieldType === "core" ? "core" : fieldType === "supply" ? "supply" : fieldType === "clock" ? "clock" : "core_count";
+      input = configSection.querySelector(
+        `input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][${fieldName}]"]`
+      );
+    } else if (fieldError.includes("_core_")) {
+      const match = fieldError.match(/(.+)_(.+)_core_(\d+)/);
+      if (match) {
+        const [, fieldType, order, coreIdx] = match;
+        const selector = `input[name*="[production_mappings][${coreIdx}][${order}][${fieldType}]"]`;
+        input = configSection.querySelector(selector);
+      }
+    }
+    if (input) {
+      input.classList.add("error-field");
+      if (!input.parentElement.querySelector(".error-message")) {
+        const errorSpan = document.createElement("span");
+        errorSpan.className = "error-message";
+        errorSpan.textContent = this.getFieldSpecificMessage(fieldError, message);
+        input.parentElement.appendChild(errorSpan);
+      }
+    }
+  }
+  getFieldSpecificMessage(fieldError, defaultMessage) {
+    if (fieldError.includes("test_points_range")) {
+      return "Invalid range: step must divide evenly into the range";
+    }
+    if (fieldError.includes("read_type")) {
+      return "Please select exactly one read type";
+    }
+    return defaultMessage;
+  }
+  showSuccessMessage(message) {
+    const successDiv = this.createOrUpdateElement(
+      "success-message",
+      "bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"
+    );
+    successDiv.innerHTML = `<strong>Success!</strong> ${message}`;
+    const globalActions = document.getElementById("global-actions");
+    globalActions.parentNode.insertBefore(successDiv, globalActions);
+    setTimeout(() => {
+      successDiv.remove();
+    }, 5e3);
+  }
+  showErrorMessage(message) {
+    const errorDiv = this.createOrUpdateElement(
+      "error-message-general",
+      "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+    );
+    errorDiv.innerHTML = `<strong>Error!</strong> ${message}`;
+    const globalActions = document.getElementById("global-actions");
+    globalActions.parentNode.insertBefore(errorDiv, globalActions);
+  }
+  createOrUpdateElement(id, className) {
+    let element = document.getElementById(id);
+    if (!element) {
+      element = document.createElement("div");
+      element.id = id;
+      element.className = className;
+    }
+    return element;
+  }
+  clearErrors() {
+    ["validation-error-summary", "success-message", "error-message-general"].forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) element.remove();
+    });
+    document.querySelectorAll(".error-field").forEach((input) => {
+      input.classList.remove("error-field");
+    });
+    document.querySelectorAll(".error-message").forEach((msg) => {
+      msg.remove();
+    });
   }
   clearAll() {
     document.querySelectorAll('input[name="selected_ip_types[]"]').forEach((checkbox) => {
@@ -7861,6 +7969,7 @@ ${data.details || ""}`);
       checkbox.dispatchEvent(new Event("change"));
     });
     this.element.reset();
+    this.clearErrors();
     document.getElementById("json-preview").classList.add("hidden");
     document.getElementById("download-button").classList.add("hidden");
   }
@@ -7966,13 +8075,17 @@ var production_parameters_controller_default = class extends Controller {
   addFlowOrderMapping(order) {
     const template = document.getElementById("flow-order-mapping-template");
     const content = template.content.cloneNode(true);
+    const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
+    const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
     content.querySelectorAll("[data-order-placeholder]").forEach((element) => {
       element.textContent = element.textContent.replace("ORDER", order);
       element.dataset.order = order;
     });
     content.querySelectorAll("input, select").forEach((input) => {
       if (input.name) {
-        input.name = input.name.replace("ORDER", order);
+        input.name = input.name.replace(/ip_configurations\[CPU\]/g, `ip_configurations[${ipType}]`);
+        input.name = input.name.replace(/ORDER/g, order);
+        input.name = input.name.replace(/production_mappings\[\d+\]/g, `production_mappings[${coreIndex}]`);
       }
     });
     const container = content.querySelector(".flow-order-mapping");
@@ -8000,12 +8113,21 @@ var production_parameters_controller_default = class extends Controller {
   togglePowerSupply(event) {
     const container = event.target.closest(".flow-order-mapping");
     const specVariableInput = container.querySelector('[name*="spec_variable"]');
-    const supplyInput = document.querySelector('[data-supply-field="true"]');
-    if (event.target.checked && supplyInput) {
+    const productionContainer = this.element.closest("[data-core-index]");
+    const coreIndex = productionContainer ? productionContainer.dataset.coreIndex : "0";
+    const supplyInput = document.querySelector(`input[name*="[core_mappings][${coreIndex}][supply]"]`);
+    if (event.target.checked && supplyInput && supplyInput.value) {
+      specVariableInput.dataset.originalValue = specVariableInput.value;
       specVariableInput.value = supplyInput.value;
       specVariableInput.disabled = true;
+      specVariableInput.classList.add("bg-gray-100");
     } else {
+      if (specVariableInput.dataset.originalValue !== void 0) {
+        specVariableInput.value = specVariableInput.dataset.originalValue;
+        delete specVariableInput.dataset.originalValue;
+      }
       specVariableInput.disabled = false;
+      specVariableInput.classList.remove("bg-gray-100");
     }
   }
 };

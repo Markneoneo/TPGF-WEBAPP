@@ -1,1 +1,13 @@
 @import "tailwindcss";
+@import "./forms.css";
+
+/* Additional overrides to ensure error styles work */
+.error-field {
+    border-color: #ef4444 !important;
+    background-color: #fee2e2 !important;
+}
+
+input.error-field:focus {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
