@@ -6,12 +6,10 @@ export default class extends Controller {
     connect() {
         this.selectedIpTypes = new Set()
 
-        // Add event listener to clear field errors when user types
+        // Listen for form input changes to clear errors
         this.element.addEventListener('input', (event) => {
             if (event.target.tagName === 'INPUT' && event.target.classList.contains('error-field')) {
                 event.target.classList.remove('error-field')
-
-                // Remove error message for this field
                 const errorMessage = event.target.parentElement.querySelector('.error-message')
                 if (errorMessage) {
                     errorMessage.remove()
@@ -45,16 +43,21 @@ export default class extends Controller {
     async submitForm(event) {
         event.preventDefault()
 
-        const form = this.element
-        const formData = new FormData(form)
-
         // Clear any existing errors
         this.clearErrors()
 
-        // Show loading state
+        // Validate before submitting
+        if (!this.validateBeforeSubmit()) {
+            return
+        }
+
+        const form = this.element
+        const formData = new FormData(form)
+
+        // Disable the button to prevent double submission
         const button = event.currentTarget
         button.disabled = true
-        button.textContent = "Validating and Generating..."
+        button.textContent = "Generating Files..."
 
         try {
             const response = await fetch(form.action, {
@@ -85,19 +88,15 @@ export default class extends Controller {
 
                 // Show download button
                 document.getElementById('download-button').classList.remove('hidden')
-
-                // Show success message
-                this.showSuccessMessage('Test settings generated successfully!')
             } else if (data.validation_errors) {
                 // Show validation errors from server
                 this.showValidationErrors(data.validation_errors)
             } else {
-                // Show generic error
-                this.showErrorMessage(data.error || 'An error occurred')
+                alert(`Error: ${data.error || 'Unknown error'}\n${data.details || ''}`)
             }
         } catch (error) {
             console.error('Error:', error)
-            this.showErrorMessage(`Error: ${error.message}`)
+            alert(`Error generating settings: ${error.message}`)
         } finally {
             // Re-enable the button
             button.disabled = false
@@ -105,14 +104,287 @@ export default class extends Controller {
         }
     }
 
-    showValidationErrors(validationErrors) {
-        console.log('Validation errors:', validationErrors)
+    // ✅ Updated flow order + charz validation
+    validateBeforeSubmit() {
+        let hasErrors = false
+        const errors = []
 
-        // Create error summary
-        const errorSummary = this.createOrUpdateElement(
-            'validation-error-summary',
-            'validation-error-summary'
-        )
+        // Check each selected IP type
+        this.selectedIpTypes.forEach(ipType => {
+            const configSection = document.getElementById(`${ipType}-config`)
+
+            // Check core mappings
+            const coreMappings = configSection.querySelectorAll('[data-core-index]:not([data-core-index="999"])')
+
+            coreMappings.forEach((mapping, idx) => {
+                // Core name
+                const coreInput = mapping.querySelector(`input[name*="[core_mappings][${idx}][core]"]`)
+                if (coreInput && !coreInput.value.trim()) {
+                    coreInput.classList.add('error-field')
+                    this.addErrorMessage(coreInput, 'Core name is required')
+                    errors.push(`${ipType}: Core name is required for Core Type ${idx + 1}`)
+                    hasErrors = true
+                }
+
+                // Core count
+                const countInput = mapping.querySelector(`input[name*="[core_mappings][${idx}][core_count]"]`)
+                if (countInput) {
+                    const value = countInput.value.trim()
+                    if (!value) {
+                        countInput.classList.add('error-field')
+                        this.addErrorMessage(countInput, 'Core count is required')
+                        errors.push(`${ipType}: Core count is required for Core Type ${idx + 1}`)
+                        hasErrors = true
+                    } else if (isNaN(value) || parseInt(value) < 1) {
+                        countInput.classList.add('error-field')
+                        this.addErrorMessage(countInput, 'Must be a number at least 1')
+                        errors.push(`${ipType}: Core count must be a valid number at least 1 for Core Type ${idx + 1}`)
+                        hasErrors = true
+                    }
+                }
+
+                // Supply
+                const supplyInput = mapping.querySelector(`input[name*="[core_mappings][${idx}][supply]"]`)
+                if (supplyInput && !supplyInput.value.trim()) {
+                    supplyInput.classList.add('error-field')
+                    this.addErrorMessage(supplyInput, 'Supply is required')
+                    errors.push(`${ipType}: Supply is required for Core Type ${idx + 1}`)
+                    hasErrors = true
+                }
+
+                // Clock
+                const clockInput = mapping.querySelector(`input[name*="[core_mappings][${idx}][clock]"]`)
+                if (clockInput && !clockInput.value.trim()) {
+                    clockInput.classList.add('error-field')
+                    this.addErrorMessage(clockInput, 'Clock is required')
+                    errors.push(`${ipType}: Clock is required for Core Type ${idx + 1}`)
+                    hasErrors = true
+                }
+            })
+
+            // ✅ Updated production validation
+            const productionSections = configSection.querySelectorAll('[data-production-section]')
+
+            productionSections.forEach((section) => {
+                const coreIndex = section.dataset.productionSection
+
+                const productionCheckbox = configSection.querySelector(`[name*="show_production_for_core][${coreIndex}]"]`)
+                if (productionCheckbox && productionCheckbox.checked) {
+                    const flowOrders = section.querySelectorAll('input[name*="flow_orders"]:checked')
+
+                    console.log(`Checking flow orders for ${ipType} core ${coreIndex}:`, flowOrders.length)
+
+                    if (flowOrders.length === 0) {
+                        errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: At least one flow order must be selected`)
+                        hasErrors = true
+                    }
+
+                    flowOrders.forEach(checkbox => {
+                        const order = checkbox.value
+                        const container = section.querySelector(`[data-order="${order}"]`)
+
+                        if (container) {
+                            // Read type
+                            const readTypes = container.querySelectorAll('[name*="read_type"]:checked')
+                            if (readTypes.length === 0) {
+                                errors.push(`${ipType} - ${order}: Read type is required`)
+                                hasErrors = true
+                            }
+
+                            // Spec variable
+                            const specVar = container.querySelector('[name*="spec_variable"]')
+                            if (specVar && !specVar.value.trim() && !specVar.disabled) {
+                                specVar.classList.add('error-field')
+                                this.addErrorMessage(specVar, 'Spec variable is required')
+                                errors.push(`${ipType} - ${order}: Spec variable is required`)
+                                hasErrors = true
+                            }
+
+                            // Frequency
+                            const frequency = container.querySelector('[name*="frequency"]')
+                            if (frequency && !frequency.value.trim()) {
+                                frequency.classList.add('error-field')
+                                this.addErrorMessage(frequency, 'Frequency is required')
+                                errors.push(`${ipType} - ${order}: Frequency is required`)
+                                hasErrors = true
+                            }
+
+                            // Register size
+                            const registerSize = container.querySelector('[name*="register_size"]')
+                            if (registerSize && !registerSize.value.trim()) {
+                                registerSize.classList.add('error-field')
+                                this.addErrorMessage(registerSize, 'Register size is required')
+                                errors.push(`${ipType} - ${order}: Register size is required`)
+                                hasErrors = true
+                            }
+
+                            // Test points
+                            const testPointsType = container.querySelector('[name*="test_points_type"]').value
+                            if (testPointsType === 'Range') {
+                                const startInput = container.querySelector('[name*="test_points_start"]')
+                                const stopInput = container.querySelector('[name*="test_points_stop"]')
+                                const stepInput = container.querySelector('[name*="test_points_step"]')
+
+                                if (!startInput.value.trim()) {
+                                    startInput.classList.add('error-field')
+                                    this.addErrorMessage(startInput, 'Start is required')
+                                    errors.push(`${ipType} - ${order}: Test points start is required`)
+                                    hasErrors = true
+                                }
+
+                                if (!stopInput.value.trim()) {
+                                    stopInput.classList.add('error-field')
+                                    this.addErrorMessage(stopInput, 'Stop is required')
+                                    errors.push(`${ipType} - ${order}: Test points stop is required`)
+                                    hasErrors = true
+                                }
+
+                                if (!stepInput.value.trim()) {
+                                    stepInput.classList.add('error-field')
+                                    this.addErrorMessage(stepInput, 'Step is required')
+                                    errors.push(`${ipType} - ${order}: Test points step is required`)
+                                    hasErrors = true
+                                }
+                            } else {
+                                const listInput = container.querySelector('[name*="test_points"][name*="test_points"]:not([name*="test_points_"])')
+                                if (listInput && !listInput.value.trim()) {
+                                    listInput.classList.add('error-field')
+                                    this.addErrorMessage(listInput, 'Test points list is required')
+                                    errors.push(`${ipType} - ${order}: Test points list is required`)
+                                    hasErrors = true
+                                }
+                            }
+                        }
+                    })
+                }
+            })
+
+            // ✅ Added Charz validation
+            const charzSections = configSection.querySelectorAll('[data-charz-section]')
+
+            charzSections.forEach((section) => {
+                const coreIndex = section.dataset.coreIndex
+
+                const charzCheckbox = configSection.querySelector(`[name*="show_charz_for_core][${coreIndex}]"]`)
+                if (charzCheckbox && charzCheckbox.checked) {
+                    // Check search granularity
+                    const granularityChecked = section.querySelectorAll('[name*="search_granularity"]:checked')
+                    if (granularityChecked.length === 0) {
+                        errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: At least one search granularity must be selected`)
+                        hasErrors = true
+                    }
+
+                    // Check search types
+                    const searchTypesChecked = section.querySelectorAll('[name*="search_types"]:checked')
+                    if (searchTypesChecked.length === 0) {
+                        errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: At least one search type must be selected`)
+                        hasErrors = true
+                    }
+
+                    // Check each search type table
+                    searchTypesChecked.forEach(checkbox => {
+                        const searchType = checkbox.value
+                        const searchTypeTable = section.querySelector(`[data-search-type="${searchType}"]`)
+
+                        if (searchTypeTable) {
+                            // Check spec variable
+                            const specVar = searchTypeTable.querySelector('[name*="spec_variables"]')
+                            if (specVar && !specVar.value.trim() && !specVar.disabled) {
+                                specVar.classList.add('error-field')
+                                this.addErrorMessage(specVar, 'Spec variable is required')
+                                errors.push(`${ipType} Core ${parseInt(coreIndex) + 1} - ${searchType}: Spec variable is required`)
+                                hasErrors = true
+                            }
+
+                            // Check selected test types
+                            const selectedTestTypes = searchTypeTable.querySelectorAll('[name*="selected_test_types"]:checked')
+                            if (selectedTestTypes.length === 0) {
+                                errors.push(`${ipType} Core ${parseInt(coreIndex) + 1} - ${searchType}: At least one test type must be selected`)
+                                hasErrors = true
+                            }
+
+                            // Check table data for each selected test type
+                            const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
+                            tbody.querySelectorAll('tr').forEach(row => {
+                                const testType = row.dataset.testType
+
+                                // Check all required fields
+                                const requiredFields = ['wl_count', 'tp', 'search_start', 'search_end', 'search_step', 'resolution']
+                                requiredFields.forEach(field => {
+                                    const input = row.querySelector(`[name*="[${field}]"]`)
+                                    if (input && !input.value.trim()) {
+                                        input.classList.add('error-field')
+                                        this.addErrorMessage(input, `${field.replace('_', ' ')} is required`)
+                                        errors.push(`${ipType} Core ${parseInt(coreIndex) + 1} - ${searchType} ${testType}: ${field.replace('_', ' ')} is required`)
+                                        hasErrors = true
+                                    }
+                                })
+                            })
+                        }
+                    })
+
+                    // Check PSM register size
+                    const psmInput = section.querySelector('[name*="psm_register_size"]')
+                    if (psmInput && !psmInput.value.trim()) {
+                        psmInput.classList.add('error-field')
+                        this.addErrorMessage(psmInput, 'PSM register size is required')
+                        errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: PSM register size is required`)
+                        hasErrors = true
+                    }
+                }
+            })
+        })
+
+        if (hasErrors) {
+            this.showClientSideErrors(errors)
+            return false
+        }
+
+        return true
+    }
+
+    addErrorMessage(input, message) {
+        if (!input.parentElement.querySelector('.error-message')) {
+            const errorSpan = document.createElement('span')
+            errorSpan.className = 'error-message'
+            errorSpan.textContent = message
+            input.parentElement.appendChild(errorSpan)
+        }
+    }
+
+    showClientSideErrors(errors) {
+        let errorSummary = document.getElementById('validation-error-summary')
+        if (!errorSummary) {
+            errorSummary = document.createElement('div')
+            errorSummary.id = 'validation-error-summary'
+            errorSummary.className = 'validation-error-summary'
+
+            const globalActions = document.getElementById('global-actions')
+            globalActions.parentNode.insertBefore(errorSummary, globalActions)
+        }
+
+        let errorHtml = '<strong>Please fix the following errors:</strong><ul>'
+        errors.forEach(error => {
+            errorHtml += `<li>${error}</li>`
+        })
+        errorHtml += '</ul>'
+
+        errorSummary.innerHTML = errorHtml
+        errorSummary.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+
+    showValidationErrors(validationErrors) {
+        console.log('Server validation errors:', validationErrors)
+
+        let errorSummary = document.getElementById('validation-error-summary')
+        if (!errorSummary) {
+            errorSummary = document.createElement('div')
+            errorSummary.id = 'validation-error-summary'
+            errorSummary.className = 'validation-error-summary'
+
+            const globalActions = document.getElementById('global-actions')
+            globalActions.parentNode.insertBefore(errorSummary, globalActions)
+        }
 
         let errorHtml = '<strong>Please fix the following errors:</strong><ul>'
 
@@ -122,8 +394,7 @@ export default class extends Controller {
 
             Object.entries(errors).forEach(([field, message]) => {
                 errorHtml += `<li>${message}</li>`
-                // Highlight the specific field
-                this.highlightErrorField(ipType, field, message)
+                this.highlightErrorField(ipType, field)
             })
 
             errorHtml += '</ul></li>'
@@ -132,140 +403,153 @@ export default class extends Controller {
         errorHtml += '</ul>'
         errorSummary.innerHTML = errorHtml
 
-        // Insert before global actions
-        const globalActions = document.getElementById('global-actions')
-        globalActions.parentNode.insertBefore(errorSummary, globalActions)
-
-        // Scroll to errors
         errorSummary.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
 
-    highlightErrorField(ipType, fieldError, message) {
-        // Parse field error to identify the input
+    highlightErrorField(ipType, fieldError) {
+        const parts = fieldError.split('_')
+        const fieldType = parts[0] === 'core' && parts[1] === 'count'
+            ? 'core_count'
+            : parts[0]
+        const coreIndex = parts[parts.length - 1]
+
         const configSection = document.querySelector(`[data-ip-type="${ipType}"]`)
         if (!configSection) return
 
-        // Handle different field error formats
-        let input = null
-
-        // Core field errors: "core_0", "core_count_0", etc.
-        if (fieldError.match(/^(core|core_count|supply|clock)_\d+$/)) {
-            const [fieldType, coreIndex] = fieldError.split('_')
-            const fieldName = fieldType === 'core' ? 'core' :
-                fieldType === 'supply' ? 'supply' :
-                    fieldType === 'clock' ? 'clock' : 'core_count'
-
-            input = configSection.querySelector(
-                `input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][${fieldName}]"]`
-            )
-        }
-        // Production field errors: "spec_variable_AVGPSM_core_0"
-        else if (fieldError.includes('_core_')) {
-            const match = fieldError.match(/(.+)_(.+)_core_(\d+)/)
-            if (match) {
-                const [, fieldType, order, coreIdx] = match
-
-                // Find the production section
-                const selector = `input[name*="[production_mappings][${coreIdx}][${order}][${fieldType}]"]`
-                input = configSection.querySelector(selector)
-            }
+        let selector = ''
+        switch (fieldType) {
+            case 'core':
+                selector = `input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][core]"]`
+                break
+            case 'core_count':
+                selector = `input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][core_count]"]`
+                break
+            case 'supply':
+                selector = `input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][supply]"]`
+                break
+            case 'clock':
+                selector = `input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][clock]"]`
+                break
+            default:
+                if (fieldError.includes('_core_')) {
+                    const match = fieldError.match(/(.+)_(.+)_core_(\d+)/)
+                    if (match) {
+                        const [, fieldName, order, idx] = match
+                        selector = `input[name*="[production_mappings][${idx}][${order}][${fieldName}]"]`
+                    }
+                }
         }
 
+        const input = configSection.querySelector(selector)
         if (input) {
             input.classList.add('error-field')
 
-            // Add error message below field
-            if (!input.parentElement.querySelector('.error-message')) {
-                const errorSpan = document.createElement('span')
+            let errorSpan = input.parentElement.querySelector('.error-message')
+            if (!errorSpan) {
+                errorSpan = document.createElement('span')
                 errorSpan.className = 'error-message'
-                errorSpan.textContent = this.getFieldSpecificMessage(fieldError, message)
+                errorSpan.textContent = this.getErrorMessage(fieldType)
                 input.parentElement.appendChild(errorSpan)
             }
         }
-    }
 
-    getFieldSpecificMessage(fieldError, defaultMessage) {
-        // Provide more user-friendly messages
-        if (fieldError.includes('test_points_range')) {
-            return 'Invalid range: step must divide evenly into the range'
+        // Handle charz errors
+        if (fieldError.includes('charz_')) {
+            const match = fieldError.match(/charz_(.+)_core_(\d+)/)
+            if (match) {
+                const [, fieldPart, coreIndex] = match
+                const charzSection = configSection.querySelector(`[data-charz-section][data-core-index="${coreIndex}"]`)
+
+                if (!charzSection) return
+
+                // Handle different charz error types
+                if (fieldPart === 'search_granularity') {
+                    const checkboxes = charzSection.querySelectorAll('[name*="search_granularity"]')
+                    checkboxes.forEach(cb => cb.classList.add('error-field'))
+                } else if (fieldPart === 'search_types') {
+                    const checkboxes = charzSection.querySelectorAll('[name*="search_types"]')
+                    checkboxes.forEach(cb => cb.classList.add('error-field'))
+                } else if (fieldPart === 'psm_register_size') {
+                    const input = charzSection.querySelector('[name*="psm_register_size"]')
+                    if (input) {
+                        input.classList.add('error-field')
+                        this.addErrorMessage(input, 'PSM register size is required')
+                    }
+                } else if (fieldPart.includes('_')) {
+                    // Handle search type specific errors
+                    const parts = fieldPart.split('_')
+                    const searchType = parts[0].toUpperCase()
+
+                    if (parts[1] === 'spec' && parts[2] === 'variable') {
+                        const searchTypeTable = charzSection.querySelector(`[data-search-type="${searchType}"]`)
+                        if (searchTypeTable) {
+                            const input = searchTypeTable.querySelector('[name*="spec_variables"]')
+                            if (input) {
+                                input.classList.add('error-field')
+                                this.addErrorMessage(input, 'Spec variable is required')
+                            }
+                        }
+                    } else if (parts[1] === 'test' && parts[2] === 'types') {
+                        const searchTypeTable = charzSection.querySelector(`[data-search-type="${searchType}"]`)
+                        if (searchTypeTable) {
+                            const checkboxes = searchTypeTable.querySelectorAll('[name*="selected_test_types"]')
+                            checkboxes.forEach(cb => cb.classList.add('error-field'))
+                        }
+                    } else {
+                        // Handle table field errors (e.g., VMIN_CREST_wl_count)
+                        const testType = parts[1].toUpperCase()
+                        const field = parts.slice(2).join('_')
+                        const searchTypeTable = charzSection.querySelector(`[data-search-type="${searchType}"]`)
+                        if (searchTypeTable) {
+                            const row = searchTypeTable.querySelector(`[data-test-type="${testType}"]`)
+                            if (row) {
+                                const input = row.querySelector(`[name*="[${field}]"]`)
+                                if (input) {
+                                    input.classList.add('error-field')
+                                    this.addErrorMessage(input, `${field.replace('_', ' ')} is required`)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return
         }
-        if (fieldError.includes('read_type')) {
-            return 'Please select exactly one read type'
+    }
+
+    getErrorMessage(fieldType) {
+        const messages = {
+            'core': 'Core name is required',
+            'core_count': 'Must be at least 1',
+            'supply': 'Supply is required',
+            'clock': 'Clock is required'
         }
-        return defaultMessage
-    }
-
-    showSuccessMessage(message) {
-        const successDiv = this.createOrUpdateElement(
-            'success-message',
-            'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4'
-        )
-
-        successDiv.innerHTML = `<strong>Success!</strong> ${message}`
-
-        const globalActions = document.getElementById('global-actions')
-        globalActions.parentNode.insertBefore(successDiv, globalActions)
-
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            successDiv.remove()
-        }, 5000)
-    }
-
-    showErrorMessage(message) {
-        const errorDiv = this.createOrUpdateElement(
-            'error-message-general',
-            'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'
-        )
-
-        errorDiv.innerHTML = `<strong>Error!</strong> ${message}`
-
-        const globalActions = document.getElementById('global-actions')
-        globalActions.parentNode.insertBefore(errorDiv, globalActions)
-    }
-
-    createOrUpdateElement(id, className) {
-        let element = document.getElementById(id)
-        if (!element) {
-            element = document.createElement('div')
-            element.id = id
-            element.className = className
-        }
-        return element
+        return messages[fieldType] || 'This field is required'
     }
 
     clearErrors() {
-        // Remove error summaries
-        ['validation-error-summary', 'success-message', 'error-message-general'].forEach(id => {
-            const element = document.getElementById(id)
-            if (element) element.remove()
-        })
+        const errorSummary = document.getElementById('validation-error-summary')
+        if (errorSummary) {
+            errorSummary.remove()
+        }
 
-        // Remove error styling from all inputs
         document.querySelectorAll('.error-field').forEach(input => {
             input.classList.remove('error-field')
         })
 
-        // Remove all error messages
         document.querySelectorAll('.error-message').forEach(msg => {
             msg.remove()
         })
     }
 
     clearAll() {
-        // Uncheck all IP type checkboxes
         document.querySelectorAll('input[name="selected_ip_types[]"]').forEach(checkbox => {
             checkbox.checked = false
             checkbox.dispatchEvent(new Event('change'))
         })
 
-        // Reset the form
         this.element.reset()
 
-        // Clear any errors
-        this.clearErrors()
-
-        // Hide preview and download button
         document.getElementById('json-preview').classList.add('hidden')
         document.getElementById('download-button').classList.add('hidden')
     }
@@ -274,4 +558,3 @@ export default class extends Controller {
         document.getElementById('json-preview').classList.add('hidden')
     }
 }
-

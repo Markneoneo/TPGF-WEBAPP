@@ -28,13 +28,17 @@ export default class extends Controller {
       return
     }
 
-    // Clone the template content properly
+    // Get IP type and core index from the parent element
+    const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+    const ipType = this.element.closest('[data-ip-type]').dataset.ipType
+
+    // Clone the template content
     const content = template.content.cloneNode(true)
 
     // Get the actual div element from the cloned content
     const searchTypeDiv = content.querySelector('.search-type-table')
 
-    // Replace SEARCH_TYPE in all text content and attributes
+    // Replace placeholders in all text content and attributes
     const replaceInElement = (element) => {
       // Replace in text nodes
       if (element.nodeType === Node.TEXT_NODE) {
@@ -46,7 +50,11 @@ export default class extends Controller {
         // Replace in common attributes
         ['name', 'id', 'for', 'data-search-type'].forEach(attr => {
           if (element.hasAttribute(attr)) {
-            element.setAttribute(attr, element.getAttribute(attr).replace(/SEARCH_TYPE/g, searchType))
+            let value = element.getAttribute(attr)
+            value = value.replace(/SEARCH_TYPE/g, searchType)
+            value = value.replace(/IP_TYPE/g, ipType)
+            value = value.replace(/CORE_INDEX/g, coreIndex)
+            element.setAttribute(attr, value)
           }
         })
       }
@@ -196,6 +204,7 @@ export default class extends Controller {
                     ${idx < count ? `
                       <input type="text" 
                              name="ip_configurations[${ipType}][charz_data][${coreIndex}][workload_table][${searchType}][${testType}][]"
+                             placeholder="WL ${idx + 1}"
                              class="w-full px-1 py-1 border rounded">
                     ` : ''}
                   </td>
@@ -213,14 +222,36 @@ export default class extends Controller {
   togglePowerSupply(event) {
     const searchTypeTable = event.target.closest('[data-search-type]')
     const specVariableInput = searchTypeTable.querySelector('input[name*="spec_variables"]')
-    const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
-    const supplyInput = document.querySelector(`[data-supply-field="true"][data-core-index="${coreIndex}"]`)
 
-    if (event.target.checked && supplyInput) {
-      specVariableInput.value = supplyInput.value
-      specVariableInput.disabled = true
+    // Get the core index and IP type
+    const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+    const ipType = this.element.closest('[data-ip-type]').dataset.ipType
+
+    // Find the supply input for this specific core and IP type
+    const supplySelector = `[data-ip-type="${ipType}"] input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][supply]"]`
+    const supplyInput = document.querySelector(supplySelector)
+
+    if (event.target.checked) {
+      if (supplyInput && supplyInput.value) {
+        // Store original value if not already stored
+        if (!specVariableInput.dataset.originalValue) {
+          specVariableInput.dataset.originalValue = specVariableInput.value || ''
+        }
+        specVariableInput.value = supplyInput.value
+        specVariableInput.disabled = true
+        specVariableInput.classList.add('bg-gray-100')
+      } else {
+        // No supply value, uncheck and alert
+        event.target.checked = false
+        alert('Please enter a supply value first')
+      }
     } else {
+      // Restore original value
+      specVariableInput.value = specVariableInput.dataset.originalValue || ''
+      delete specVariableInput.dataset.originalValue
       specVariableInput.disabled = false
+      specVariableInput.classList.remove('bg-gray-100')
     }
   }
 }
+

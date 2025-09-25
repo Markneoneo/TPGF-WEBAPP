@@ -1,4 +1,4 @@
-<div data-controller="charz-parameters">
+<div data-controller="charz-parameters" data-core-index="<%= core_index %>" data-charz-section>
   <h5 class="font-semibold mb-3">Charz Parameters for Core Type <%= core_index + 1 %></h5>
   
   <!-- Search Granularity -->
@@ -46,8 +46,6 @@
            placeholder="Enter size"
            class="w-full px-3 py-2 border rounded">
   </div>
-  
-<!-- Make sure this is OUTSIDE the main div and uses a real template tag -->
 </div>
 
 <!-- Template for search type table -->
@@ -62,12 +60,12 @@
         <label class="flex items-center text-sm">
           <span class="mr-2">Use Power Supply?</span>
           <input type="checkbox" 
-                 name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][use_power_supply][SEARCH_TYPE]"
+                 name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][use_power_supply][SEARCH_TYPE]"
                  data-action="change->charz-parameters#togglePowerSupply">
         </label>
       </div>
       <input type="text" 
-             name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][spec_variables][SEARCH_TYPE]"
+             name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][spec_variables][SEARCH_TYPE]"
              placeholder="Enter spec variable"
              class="w-full px-3 py-2 border rounded mt-1">
     </div>
@@ -78,7 +76,7 @@
         <% %w[CREST BIST PBIST].each do |test_type| %>
           <label class="flex items-center cursor-pointer">
             <input type="checkbox" 
-                   name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][selected_test_types][SEARCH_TYPE][]"
+                   name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][selected_test_types][SEARCH_TYPE][]"
                    value="<%= test_type %>"
                    class="mr-2"
                    data-action="change->charz-parameters#toggleTestType">

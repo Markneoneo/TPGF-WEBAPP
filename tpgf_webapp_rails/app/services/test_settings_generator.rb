@@ -262,7 +262,14 @@ class Search < Test
       charztype_mapping = coretype_config[:charztype_mapping]
       return {} unless charztype_mapping && charztype_mapping[:granularity] && charztype_mapping[:searchtype]
       
-      charztype_mapping[:granularity].each_with_object({}) do |gran, gran_hash|
+      result = {}
+      
+      # Add PSM register size if available
+      if coretype_config[:psm_register_size]
+        result[:psm_register_size] = coretype_config[:psm_register_size].to_i
+      end
+      
+      charztype_mapping[:granularity].each_with_object(result) do |gran, gran_hash|
         gran_hash[gran] = {}
         charztype_mapping[:searchtype].each do |stype, stype_config|
           gran_hash[gran][stype] = {}
@@ -282,14 +289,16 @@ class Search < Test
                 spec_variable: stype_config[:specvariable] || "", 
                 wl: wl,
                 searchsettings: config[:searchsettings] || {}
-              )
-              offset = calculate_offset(stype)
-              gran_hash[gran][stype][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
+                )
+                offset = calculate_offset(stype)
+                gran_hash[gran][stype][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
+              end
             end
           end
         end
-      end
-    end  
+        
+      result
+    end    
   
     def calculate_offset(search_type)
       case search_type.to_s.downcase.to_sym

@@ -100,12 +100,12 @@
       <div class="mb-3">
         <div class="flex items-center justify-between">
           <label class="block text-sm font-medium">Spec Variable:</label>
-          <label class="flex items-center text-sm">
-            <span class="mr-2">Use Power Supply?</span>
-            <input type="checkbox" 
-                   name="ip_configurations[<%= ip_type %>][production_mappings][<%= core_index %>][ORDER][use_power_supply]"
-                   data-action="change->production-parameters#togglePowerSupply">
-          </label>
+            <label class="flex items-center text-sm">
+              <span class="mr-2">Use Power Supply?</span>
+              <input type="checkbox" 
+                    name="ip_configurations[<%= ip_type %>][production_mappings][<%= core_index %>][ORDER][use_power_supply]"
+                    data-action="change->production-parameters#togglePowerSupply">
+            </label>
         </div>
         <input type="text" 
                name="ip_configurations[<%= ip_type %>][production_mappings][<%= core_index %>][ORDER][spec_variable]"

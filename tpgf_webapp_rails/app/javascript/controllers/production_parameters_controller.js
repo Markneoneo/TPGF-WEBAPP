@@ -33,14 +33,11 @@ export default class extends Controller {
             element.dataset.order = order
         })
 
-        // Update input names - replace ORDER and fix the IP type
+        // Update input names
         content.querySelectorAll('input, select').forEach(input => {
             if (input.name) {
-                // First, replace any incorrect IP type with the correct one
                 input.name = input.name.replace(/ip_configurations\[CPU\]/g, `ip_configurations[${ipType}]`)
-                // Then replace ORDER with the actual order
                 input.name = input.name.replace(/ORDER/g, order)
-                // And replace the core index if needed
                 input.name = input.name.replace(/production_mappings\[\d+\]/g, `production_mappings[${coreIndex}]`)
             }
         })
@@ -73,29 +70,48 @@ export default class extends Controller {
     }
 
     togglePowerSupply(event) {
+        console.log('Toggle power supply called')
         const container = event.target.closest('.flow-order-mapping')
         const specVariableInput = container.querySelector('[name*="spec_variable"]')
 
-        // Get the core index from the current production parameters container
+        if (!specVariableInput) {
+            console.error('Spec variable input not found')
+            return
+        }
+
+        // Get the core index from the production parameters container
         const productionContainer = this.element.closest('[data-core-index]')
         const coreIndex = productionContainer ? productionContainer.dataset.coreIndex : '0'
 
-        // Find the supply input for this specific core
-        const supplyInput = document.querySelector(`input[name*="[core_mappings][${coreIndex}][supply]"]`)
+        // Get the IP type
+        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
 
-        if (event.target.checked && supplyInput && supplyInput.value) {
-            // Store the original value
-            specVariableInput.dataset.originalValue = specVariableInput.value
-            // Set the supply value
-            specVariableInput.value = supplyInput.value
-            specVariableInput.disabled = true
-            specVariableInput.classList.add('bg-gray-100')
-        } else {
-            // Restore the original value if it exists
-            if (specVariableInput.dataset.originalValue !== undefined) {
-                specVariableInput.value = specVariableInput.dataset.originalValue
-                delete specVariableInput.dataset.originalValue
+        // Find the supply input for this specific core and IP type
+        const supplySelector = `[data-ip-type="${ipType}"] input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][supply]"]`
+        const supplyInput = document.querySelector(supplySelector)
+
+        console.log('Supply selector:', supplySelector)
+        console.log('Supply input found:', supplyInput)
+        console.log('Supply value:', supplyInput?.value)
+
+        if (event.target.checked) {
+            if (supplyInput && supplyInput.value) {
+                // Store original value if not already stored
+                if (!specVariableInput.dataset.originalValue) {
+                    specVariableInput.dataset.originalValue = specVariableInput.value || ''
+                }
+                specVariableInput.value = supplyInput.value
+                specVariableInput.disabled = true
+                specVariableInput.classList.add('bg-gray-100')
+            } else {
+                // No supply value, uncheck and alert
+                event.target.checked = false
+                alert('Please enter a supply value first')
             }
+        } else {
+            // Restore original value
+            specVariableInput.value = specVariableInput.dataset.originalValue || ''
+            delete specVariableInput.dataset.originalValue
             specVariableInput.disabled = false
             specVariableInput.classList.remove('bg-gray-100')
         }
