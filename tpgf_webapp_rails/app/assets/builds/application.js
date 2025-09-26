@@ -7784,9 +7784,44 @@ var application = Application.start();
 application.debug = false;
 window.Stimulus = application;
 
+// app/javascript/utils/toast.js
+function showToast(message, type = "info") {
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+  toast.className = `alert alert-${type} animate-slideIn mb-2`;
+  toast.style.minWidth = "300px";
+  const icon = getIcon(type);
+  toast.innerHTML = `
+      <div class="flex items-center">
+        ${icon}
+        <span class="ml-2">${message}</span>
+        <button class="ml-auto text-current opacity-70 hover:opacity-100" onclick="this.parentElement.parentElement.remove()">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    `;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    setTimeout(() => toast.remove(), 300);
+  }, 5e3);
+}
+function getIcon(type) {
+  const icons = {
+    success: '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+    error: '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+    warning: '<svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>',
+    info: '<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+  };
+  return icons[type] || icons.info;
+}
+window.showToast = showToast;
+
 // app/javascript/controllers/test_settings_form_controller.js
 var test_settings_form_controller_default = class extends Controller {
-  static targets = ["jsonContent"];
+  static targets = ["jsonContent", "jsonPreview"];
   connect() {
     this.selectedIpTypes = /* @__PURE__ */ new Set();
     this.element.addEventListener("input", (event) => {
@@ -7798,36 +7833,53 @@ var test_settings_form_controller_default = class extends Controller {
         }
       }
     });
+    this.bindCloseButton();
   }
   toggleIpType(event) {
     const checkbox = event.target;
     const ipType = checkbox.dataset.ipType;
     const configSection = document.getElementById(`${ipType}-config`);
+    const ipCard = checkbox.closest(".ip-checkbox-card");
     if (checkbox.checked) {
       this.selectedIpTypes.add(ipType);
       configSection.classList.remove("hidden");
+      ipCard.classList.add("selected");
+      showToast(`${ipType} configuration enabled`, "info");
     } else {
       this.selectedIpTypes.delete(ipType);
       configSection.classList.add("hidden");
+      ipCard.classList.remove("selected");
+      showToast(`${ipType} configuration disabled`, "info");
     }
     const globalActions = document.getElementById("global-actions");
     if (this.selectedIpTypes.size > 0) {
       globalActions.classList.remove("hidden");
+      globalActions.classList.add("animate-fadeIn");
     } else {
       globalActions.classList.add("hidden");
     }
   }
   async submitForm(event) {
     event.preventDefault();
+    const loadingOverlay = document.getElementById("loading-overlay");
+    loadingOverlay.classList.remove("hidden");
     this.clearErrors();
     if (!this.validateBeforeSubmit()) {
+      loadingOverlay.classList.add("hidden");
+      showToast("Please fix the validation errors", "error");
       return;
     }
     const form = this.element;
     const formData = new FormData(form);
     const button = event.currentTarget;
     button.disabled = true;
-    button.textContent = "Generating Files...";
+    button.innerHTML = `
+            <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating...
+        `;
     try {
       const response = await fetch(form.action, {
         method: "POST",
@@ -7850,19 +7902,55 @@ var test_settings_form_controller_default = class extends Controller {
         const content = document.getElementById("json-content");
         content.textContent = JSON.stringify(data.data, null, 2);
         preview.classList.remove("hidden");
+        preview.classList.add("animate-fadeIn");
+        setTimeout(() => this.bindCloseButton(), 100);
         document.getElementById("download-button").classList.remove("hidden");
+        showToast("Test settings generated successfully!", "success");
       } else if (data.validation_errors) {
         this.showValidationErrors(data.validation_errors);
+        showToast("Validation errors found", "error");
       } else {
-        alert(`Error: ${data.error || "Unknown error"}
-${data.details || ""}`);
+        showToast(`Error: ${data.error || "Unknown error"}`, "error");
       }
     } catch (error2) {
       console.error("Error:", error2);
-      alert(`Error generating settings: ${error2.message}`);
+      showToast(`Error generating settings: ${error2.message}`, "error");
     } finally {
+      loadingOverlay.classList.add("hidden");
       button.disabled = false;
-      button.textContent = "Generate Combined Test Settings";
+      button.innerHTML = `
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Generate Test Settings
+            `;
+    }
+  }
+  clearAll() {
+    if (confirm("Are you sure you want to clear all configurations?")) {
+      document.querySelectorAll('input[name="selected_ip_types[]"]').forEach((checkbox) => {
+        checkbox.checked = false;
+        checkbox.dispatchEvent(new Event("change"));
+      });
+      this.element.reset();
+      document.getElementById("json-preview").classList.add("hidden");
+      document.getElementById("download-button").classList.add("hidden");
+      showToast("All configurations cleared", "info");
+    }
+  }
+  bindCloseButton() {
+    const closeButton = document.querySelector('[data-action="click->test-settings-form#closePreview"]');
+    if (closeButton) {
+      closeButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.closePreview();
+      });
+    }
+  }
+  closePreview() {
+    const preview = document.getElementById("json-preview");
+    if (preview) {
+      preview.classList.add("hidden");
     }
   }
   // ✅ Updated flow order + charz validation
@@ -7916,7 +8004,6 @@ ${data.details || ""}`);
         const productionCheckbox = configSection.querySelector(`[name*="show_production_for_core][${coreIndex}]"]`);
         if (productionCheckbox && productionCheckbox.checked) {
           const flowOrders = section.querySelectorAll('input[name*="flow_orders"]:checked');
-          console.log(`Checking flow orders for ${ipType} core ${coreIndex}:`, flowOrders.length);
           if (flowOrders.length === 0) {
             errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: At least one flow order must be selected`);
             hasErrors = true;
@@ -7951,31 +8038,32 @@ ${data.details || ""}`);
                 errors.push(`${ipType} - ${order}: Register size is required`);
                 hasErrors = true;
               }
-              const testPointsType = container.querySelector('[name*="test_points_type"]').value;
+              const testPointsTypeInput = container.querySelector('[name*="test_points_type"]');
+              const testPointsType = testPointsTypeInput ? testPointsTypeInput.value : "Range";
               if (testPointsType === "Range") {
                 const startInput = container.querySelector('[name*="test_points_start"]');
                 const stopInput = container.querySelector('[name*="test_points_stop"]');
                 const stepInput = container.querySelector('[name*="test_points_step"]');
-                if (!startInput.value.trim()) {
+                if (startInput && !startInput.value.trim()) {
                   startInput.classList.add("error-field");
                   this.addErrorMessage(startInput, "Start is required");
                   errors.push(`${ipType} - ${order}: Test points start is required`);
                   hasErrors = true;
                 }
-                if (!stopInput.value.trim()) {
+                if (stopInput && !stopInput.value.trim()) {
                   stopInput.classList.add("error-field");
                   this.addErrorMessage(stopInput, "Stop is required");
                   errors.push(`${ipType} - ${order}: Test points stop is required`);
                   hasErrors = true;
                 }
-                if (!stepInput.value.trim()) {
+                if (stepInput && !stepInput.value.trim()) {
                   stepInput.classList.add("error-field");
                   this.addErrorMessage(stepInput, "Step is required");
                   errors.push(`${ipType} - ${order}: Test points step is required`);
                   hasErrors = true;
                 }
               } else {
-                const listInput = container.querySelector('[name*="test_points"][name*="test_points"]:not([name*="test_points_"])');
+                const listInput = container.querySelector('[name*="test_points"][name$="[test_points]"]');
                 if (listInput && !listInput.value.trim()) {
                   listInput.classList.add("error-field");
                   this.addErrorMessage(listInput, "Test points list is required");
@@ -8216,18 +8304,6 @@ ${data.details || ""}`);
       msg.remove();
     });
   }
-  clearAll() {
-    document.querySelectorAll('input[name="selected_ip_types[]"]').forEach((checkbox) => {
-      checkbox.checked = false;
-      checkbox.dispatchEvent(new Event("change"));
-    });
-    this.element.reset();
-    document.getElementById("json-preview").classList.add("hidden");
-    document.getElementById("download-button").classList.add("hidden");
-  }
-  closePreview() {
-    document.getElementById("json-preview").classList.add("hidden");
-  }
 };
 
 // app/javascript/controllers/ip_configuration_controller.js
@@ -8329,25 +8405,57 @@ var production_parameters_controller_default = class extends Controller {
     const content = template.content.cloneNode(true);
     const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
     const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
-    content.querySelectorAll("[data-order-placeholder]").forEach((element) => {
-      element.textContent = element.textContent.replace("ORDER", order);
-      element.dataset.order = order;
-    });
-    content.querySelectorAll("input, select").forEach((input) => {
-      if (input.name) {
-        input.name = input.name.replace(/ip_configurations\[CPU\]/g, `ip_configurations[${ipType}]`);
-        input.name = input.name.replace(/ORDER/g, order);
-        input.name = input.name.replace(/production_mappings\[\d+\]/g, `production_mappings[${coreIndex}]`);
+    const replaceInElement = (element) => {
+      if (element.nodeType === Node.TEXT_NODE) {
+        element.textContent = element.textContent.replace(/ORDER/g, order);
       }
-    });
-    const container = content.querySelector(".flow-order-mapping");
-    container.dataset.order = order;
+      if (element.nodeType === Node.ELEMENT_NODE) {
+        ["name", "id", "for", "data-order", "data-action"].forEach((attr) => {
+          if (element.hasAttribute(attr)) {
+            let value = element.getAttribute(attr);
+            value = value.replace(/ORDER/g, order);
+            value = value.replace(/IP_TYPE/g, ipType);
+            value = value.replace(/CORE_INDEX/g, coreIndex);
+            element.setAttribute(attr, value);
+          }
+        });
+      }
+      element.childNodes.forEach((child) => replaceInElement(child));
+    };
+    const flowOrderDiv = content.querySelector(".flow-order-mapping");
+    replaceInElement(flowOrderDiv);
     this.mappingContainerTarget.appendChild(content);
+    this.initializeTestPointsToggle(order);
   }
   removeFlowOrderMapping(order) {
     const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`);
     if (mapping) {
       mapping.remove();
+    }
+  }
+  initializeTestPointsToggle(order) {
+    const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`);
+    if (!mapping) return;
+    const rangeBtn = mapping.querySelector('[data-test-points-type="range"]');
+    const listBtn = mapping.querySelector('[data-test-points-type="list"]');
+    const rangeFields = mapping.querySelector("[data-range-fields]");
+    const listField = mapping.querySelector("[data-list-field]");
+    const typeInput = mapping.querySelector('[name*="test_points_type"]');
+    if (rangeBtn && listBtn) {
+      rangeBtn.addEventListener("click", () => {
+        rangeBtn.classList.add("active");
+        listBtn.classList.remove("active");
+        rangeFields.style.display = "grid";
+        listField.style.display = "none";
+        typeInput.value = "Range";
+      });
+      listBtn.addEventListener("click", () => {
+        listBtn.classList.add("active");
+        rangeBtn.classList.remove("active");
+        rangeFields.style.display = "none";
+        listField.style.display = "block";
+        typeInput.value = "List";
+      });
     }
   }
   toggleTestPointsType(event) {
@@ -8363,7 +8471,6 @@ var production_parameters_controller_default = class extends Controller {
     }
   }
   togglePowerSupply(event) {
-    console.log("Toggle power supply called");
     const container = event.target.closest(".flow-order-mapping");
     const specVariableInput = container.querySelector('[name*="spec_variable"]');
     if (!specVariableInput) {
@@ -8375,9 +8482,6 @@ var production_parameters_controller_default = class extends Controller {
     const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
     const supplySelector = `[data-ip-type="${ipType}"] input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][supply]"]`;
     const supplyInput = document.querySelector(supplySelector);
-    console.log("Supply selector:", supplySelector);
-    console.log("Supply input found:", supplyInput);
-    console.log("Supply value:", supplyInput?.value);
     if (event.target.checked) {
       if (supplyInput && supplyInput.value) {
         if (!specVariableInput.dataset.originalValue) {
@@ -8425,24 +8529,22 @@ var charz_parameters_controller_default = class extends Controller {
     const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
     const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
     const content = template.content.cloneNode(true);
-    const searchTypeDiv = content.querySelector(".search-type-table");
     const replaceInElement = (element) => {
       if (element.nodeType === Node.TEXT_NODE) {
         element.textContent = element.textContent.replace(/SEARCH_TYPE/g, searchType);
       }
       if (element.nodeType === Node.ELEMENT_NODE) {
-        ["name", "id", "for", "data-search-type"].forEach((attr) => {
-          if (element.hasAttribute(attr)) {
-            let value = element.getAttribute(attr);
-            value = value.replace(/SEARCH_TYPE/g, searchType);
-            value = value.replace(/IP_TYPE/g, ipType);
-            value = value.replace(/CORE_INDEX/g, coreIndex);
-            element.setAttribute(attr, value);
-          }
+        Array.from(element.attributes).forEach((attr) => {
+          let value = attr.value;
+          value = value.replace(/SEARCH_TYPE/g, searchType);
+          value = value.replace(/IP_TYPE/g, ipType);
+          value = value.replace(/CORE_INDEX/g, coreIndex);
+          element.setAttribute(attr.name, value);
         });
       }
-      element.childNodes.forEach((child) => replaceInElement(child));
+      Array.from(element.childNodes).forEach((child) => replaceInElement(child));
     };
+    const searchTypeDiv = content.querySelector(".search-type-section");
     replaceInElement(searchTypeDiv);
     this.tablesContainerTarget.appendChild(searchTypeDiv);
     this.testTypes[searchType] = /* @__PURE__ */ new Set();
@@ -8461,6 +8563,9 @@ var charz_parameters_controller_default = class extends Controller {
     const searchType = searchTypeTable.dataset.searchType;
     const tbody = searchTypeTable.querySelector("[data-test-types-tbody]");
     if (checkbox.checked) {
+      if (!this.testTypes[searchType]) {
+        this.testTypes[searchType] = /* @__PURE__ */ new Set();
+      }
       this.testTypes[searchType].add(testType);
       this.addTestTypeRow(tbody, searchType, testType);
     } else {
@@ -8481,7 +8586,8 @@ var charz_parameters_controller_default = class extends Controller {
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][wl_count]"
                class="w-20 px-1 py-1 border rounded"
                min="0"
-               data-action="change->charz-parameters#updateWorkloadTable">
+               value="0"
+               data-action="input->charz-parameters#updateWorkloadTable">
       </td>
       <td class="border px-2 py-1">
         <input type="text" 
@@ -8525,28 +8631,31 @@ var charz_parameters_controller_default = class extends Controller {
   }
   updateWorkloadTable(event) {
     const searchTypeTable = event.target ? event.target.closest("[data-search-type]") : event;
+    if (!searchTypeTable) return;
     const searchType = searchTypeTable.dataset.searchType;
     const workloadContainer = searchTypeTable.querySelector("[data-workload-container]");
     const tbody = searchTypeTable.querySelector("[data-test-types-tbody]");
+    if (!workloadContainer || !tbody) return;
     workloadContainer.innerHTML = "";
     let maxWlCount = 0;
     const wlCounts = {};
     tbody.querySelectorAll("tr").forEach((row) => {
       const testType = row.dataset.testType;
       const wlCountInput = row.querySelector('input[name*="wl_count"]');
-      const count = parseInt(wlCountInput.value) || 0;
+      const count = parseInt(wlCountInput?.value) || 0;
       if (count > 0) {
         wlCounts[testType] = count;
         maxWlCount = Math.max(maxWlCount, count);
       }
     });
-    if (maxWlCount === 0) return;
+    if (maxWlCount === 0 || Object.keys(wlCounts).length === 0) return;
     const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
     const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
     const table = document.createElement("div");
+    table.className = "mt-4";
     table.innerHTML = `
       <h6 class="font-semibold mb-2">${searchType} Workload Table</h6>
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto border rounded">
         <table class="w-full border-collapse">
           <thead>
             <tr class="bg-gray-100">
@@ -8562,7 +8671,7 @@ var charz_parameters_controller_default = class extends Controller {
                       <input type="text" 
                              name="ip_configurations[${ipType}][charz_data][${coreIndex}][workload_table][${searchType}][${testType}][]"
                              placeholder="WL ${idx + 1}"
-                             class="w-full px-1 py-1 border rounded">
+                             class="w-full px-1 py-1 border rounded text-sm">
                     ` : ""}
                   </td>
                 `).join("")}
@@ -8602,11 +8711,79 @@ var charz_parameters_controller_default = class extends Controller {
   }
 };
 
+// app/javascript/controllers/ui_enhancements_controller.js
+var ui_enhancements_controller_default = class extends Controller {
+  connect() {
+    this.initializeCollapsibles();
+    this.initializeTooltips();
+    this.initializeStatusIndicators();
+  }
+  initializeCollapsibles() {
+    document.querySelectorAll(".collapsible-header").forEach((header) => {
+      header.addEventListener("click", (e) => {
+        if (e.target.type !== "checkbox") {
+          const section = header.closest(".collapsible-section");
+          const checkbox = header.querySelector('input[type="checkbox"]');
+          if (checkbox && !e.target.closest("input")) {
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+          section.classList.toggle("expanded");
+        }
+      });
+    });
+  }
+  initializeTooltips() {
+    document.querySelectorAll(".tooltip").forEach((tooltip) => {
+      const content = tooltip.querySelector(".tooltip-content");
+      if (content) {
+        tooltip.addEventListener("mouseenter", () => {
+          const rect = tooltip.getBoundingClientRect();
+          content.style.left = "50%";
+          content.style.transform = "translateX(-50%)";
+        });
+      }
+    });
+  }
+  initializeStatusIndicators() {
+    this.updateAllStatuses();
+    document.addEventListener("input", () => this.updateAllStatuses());
+    document.addEventListener("change", () => this.updateAllStatuses());
+  }
+  updateAllStatuses() {
+    document.querySelectorAll(".ip-config-section").forEach((section) => {
+      const ipType = section.closest("[data-ip-type]")?.dataset.ipType;
+      if (!ipType) return;
+      const indicator = section.querySelector(".status-indicator");
+      if (!indicator) return;
+      const isValid = this.validateIpConfig(section);
+      if (isValid) {
+        indicator.className = "status-indicator valid";
+        indicator.innerHTML = '<span class="status-dot"></span>Configuration Valid';
+      } else {
+        indicator.className = "status-indicator pending";
+        indicator.innerHTML = '<span class="status-dot"></span>Configuration Required';
+      }
+    });
+  }
+  validateIpConfig(section) {
+    const requiredFields = section.querySelectorAll('input[placeholder*="Enter"]');
+    let allFilled = true;
+    requiredFields.forEach((field) => {
+      if (!field.value.trim() && !field.closest(".hidden")) {
+        allFilled = false;
+      }
+    });
+    return allFilled;
+  }
+};
+
 // app/javascript/controllers/index.js
 application.register("test-settings-form", test_settings_form_controller_default);
 application.register("ip-configuration", ip_configuration_controller_default);
 application.register("production-parameters", production_parameters_controller_default);
 application.register("charz-parameters", charz_parameters_controller_default);
+application.register("ui-enhancements", ui_enhancements_controller_default);
 
 // app/javascript/application.js
 console.log("Application loaded");

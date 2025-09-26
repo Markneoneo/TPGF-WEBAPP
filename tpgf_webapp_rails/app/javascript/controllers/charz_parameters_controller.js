@@ -35,10 +35,7 @@ export default class extends Controller {
     // Clone the template content
     const content = template.content.cloneNode(true)
 
-    // Get the actual div element from the cloned content
-    const searchTypeDiv = content.querySelector('.search-type-table')
-
-    // Replace placeholders in all text content and attributes
+    // Replace placeholders in all elements
     const replaceInElement = (element) => {
       // Replace in text nodes
       if (element.nodeType === Node.TEXT_NODE) {
@@ -47,25 +44,28 @@ export default class extends Controller {
 
       // Replace in attributes
       if (element.nodeType === Node.ELEMENT_NODE) {
-        // Replace in common attributes
-        ['name', 'id', 'for', 'data-search-type'].forEach(attr => {
-          if (element.hasAttribute(attr)) {
-            let value = element.getAttribute(attr)
-            value = value.replace(/SEARCH_TYPE/g, searchType)
-            value = value.replace(/IP_TYPE/g, ipType)
-            value = value.replace(/CORE_INDEX/g, coreIndex)
-            element.setAttribute(attr, value)
-          }
+        // Replace in all attributes
+        Array.from(element.attributes).forEach(attr => {
+          let value = attr.value
+          value = value.replace(/SEARCH_TYPE/g, searchType)
+          value = value.replace(/IP_TYPE/g, ipType)
+          value = value.replace(/CORE_INDEX/g, coreIndex)
+          element.setAttribute(attr.name, value)
         })
       }
 
       // Recurse for child nodes
-      element.childNodes.forEach(child => replaceInElement(child))
+      Array.from(element.childNodes).forEach(child => replaceInElement(child))
     }
 
+    // Get the search type div from content
+    const searchTypeDiv = content.querySelector('.search-type-section')
     replaceInElement(searchTypeDiv)
 
+    // Append to container
     this.tablesContainerTarget.appendChild(searchTypeDiv)
+
+    // Initialize test types for this search type
     this.testTypes[searchType] = new Set()
   }
 
@@ -85,6 +85,9 @@ export default class extends Controller {
     const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
 
     if (checkbox.checked) {
+      if (!this.testTypes[searchType]) {
+        this.testTypes[searchType] = new Set()
+      }
       this.testTypes[searchType].add(testType)
       this.addTestTypeRow(tbody, searchType, testType)
     } else {
@@ -92,6 +95,7 @@ export default class extends Controller {
       this.removeTestTypeRow(tbody, testType)
     }
 
+    // Update workload table after adding/removing test type
     this.updateWorkloadTable(searchTypeTable)
   }
 
@@ -111,7 +115,8 @@ export default class extends Controller {
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][wl_count]"
                class="w-20 px-1 py-1 border rounded"
                min="0"
-               data-action="change->charz-parameters#updateWorkloadTable">
+               value="0"
+               data-action="input->charz-parameters#updateWorkloadTable">
       </td>
       <td class="border px-2 py-1">
         <input type="text" 
@@ -157,10 +162,15 @@ export default class extends Controller {
   }
 
   updateWorkloadTable(event) {
+    // Handle both direct calls and event calls
     const searchTypeTable = event.target ? event.target.closest('[data-search-type]') : event
+    if (!searchTypeTable) return
+
     const searchType = searchTypeTable.dataset.searchType
     const workloadContainer = searchTypeTable.querySelector('[data-workload-container]')
     const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
+
+    if (!workloadContainer || !tbody) return
 
     // Clear existing workload table
     workloadContainer.innerHTML = ''
@@ -172,7 +182,7 @@ export default class extends Controller {
     tbody.querySelectorAll('tr').forEach(row => {
       const testType = row.dataset.testType
       const wlCountInput = row.querySelector('input[name*="wl_count"]')
-      const count = parseInt(wlCountInput.value) || 0
+      const count = parseInt(wlCountInput?.value) || 0
 
       if (count > 0) {
         wlCounts[testType] = count
@@ -180,16 +190,18 @@ export default class extends Controller {
       }
     })
 
-    if (maxWlCount === 0) return
+    // Only create workload table if there are workloads to show
+    if (maxWlCount === 0 || Object.keys(wlCounts).length === 0) return
 
     // Create workload table
     const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
     const ipType = this.element.closest('[data-ip-type]').dataset.ipType
 
     const table = document.createElement('div')
+    table.className = 'mt-4'
     table.innerHTML = `
       <h6 class="font-semibold mb-2">${searchType} Workload Table</h6>
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto border rounded">
         <table class="w-full border-collapse">
           <thead>
             <tr class="bg-gray-100">
@@ -205,7 +217,7 @@ export default class extends Controller {
                       <input type="text" 
                              name="ip_configurations[${ipType}][charz_data][${coreIndex}][workload_table][${searchType}][${testType}][]"
                              placeholder="WL ${idx + 1}"
-                             class="w-full px-1 py-1 border rounded">
+                             class="w-full px-1 py-1 border rounded text-sm">
                     ` : ''}
                   </td>
                 `).join('')}
@@ -254,4 +266,3 @@ export default class extends Controller {
     }
   }
 }
-

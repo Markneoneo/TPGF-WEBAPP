@@ -1,25 +1,31 @@
-<div class="border rounded-lg p-4" data-controller="ip-configuration">
-  <h3 class="text-xl font-semibold mb-4"><%= ip_type %> Configuration</h3>
+<div class="ip-config-section" data-controller="ip-configuration">
+  <div class="ip-config-header">
+    <h3 class="text-xl font-semibold"><%= ip_type %> Configuration</h3>
+    <span class="status-indicator pending">
+      <span class="status-dot"></span>
+      Configuration Required
+    </span>
+  </div>
   
   <!-- Number of Core Types -->
-  <div class="mb-4">
-    <label class="block text-sm font-medium mb-2">Number of Core Types:</label>
-    <div class="flex items-center">
+  <div class="form-group">
+    <label class="form-label">Number of Core Types</label>
+    <div class="form-hint">Specify how many core types to configure</div>
+    <div class="number-input-group">
       <button type="button" 
-              class="px-3 py-1 bg-gray-200 rounded-l"
-              data-action="click->ip-configuration#decrementCores">-</button>
+              data-action="click->ip-configuration#decrementCores">−</button>
       <input type="number" 
              name="ip_configurations[<%= ip_type %>][num_core_types]"
              value="1" 
              min="1"
-             class="w-20 text-center border-t border-b"
              data-ip-configuration-target="numCores"
              data-action="change->ip-configuration#updateCoreCount">
       <button type="button" 
-              class="px-3 py-1 bg-gray-200 rounded-r"
               data-action="click->ip-configuration#incrementCores">+</button>
     </div>
   </div>
+  
+  <div class="divider"></div>
   
   <!-- Core Mappings Container -->
   <div data-ip-configuration-target="coreMappings">
@@ -29,6 +35,5 @@
   <!-- Templates for dynamic content -->
   <div data-ip-configuration-target="coreMappingTemplate" style="display: none;">
     <%= render 'core_mapping', ip_type: ip_type, core_index: 999 %>
-  </div>  
-
+  </div>
 </div>

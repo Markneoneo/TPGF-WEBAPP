@@ -1,0 +1,61 @@
+/* ===================================
+   DARK MODE SUPPORT
+   =================================== */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-gray-50: #1f2937;
+        --color-gray-100: #374151;
+        --color-gray-200: #4b5563;
+        --color-gray-300: #6b7280;
+        --color-gray-400: #9ca3af;
+        --color-gray-500: #d1d5db;
+        --color-gray-600: #e5e7eb;
+        --color-gray-700: #f3f4f6;
+        --color-gray-800: #f9fafb;
+        --color-gray-900: #ffffff;
+
+        --color-primary-50: #1e3a8a;
+        --color-primary-100: #1e40af;
+        --color-primary-200: #1d4ed8;
+        --color-primary-300: #2563eb;
+        --color-primary-400: #3b82f6;
+        --color-primary-500: #60a5fa;
+        --color-primary-600: #93c5fd;
+        --color-primary-700: #bfdbfe;
+        --color-primary-800: #dbeafe;
+        --color-primary-900: #eff6ff;
+    }
+
+    body {
+        background-color: var(--color-gray-900);
+        color: var(--color-gray-100);
+    }
+
+    .card {
+        background-color: var(--color-gray-800);
+    }
+
+    .form-input {
+        background-color: var(--color-gray-700);
+        border-color: var(--color-gray-600);
+        color: var(--color-gray-100);
+    }
+
+    .form-input:focus {
+        border-color: var(--color-primary-400);
+    }
+
+    .table thead {
+        background-color: var(--color-gray-700);
+    }
+
+    .json-preview {
+        background-color: #000000;
+    }
+}
+
+/* Dark mode toggle (if you want manual control) */
+[data-theme="dark"] {
+    /* Apply same dark mode styles here */
+}

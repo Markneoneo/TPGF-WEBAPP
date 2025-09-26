@@ -3338,3 +3338,272 @@ Generated settings for cpu
 Completed 200 OK in 923ms (Views: 0.2ms | GC: 0.0ms)
 
 
+Started GET "/" for ::1 at 2025-09-25 11:18:48 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 1.4ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 1.6ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 13.9ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.8ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 21.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.7ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.7ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 2.0ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.5ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.5ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 1.5ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 60.4ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 110.0ms | GC: 0.3ms)
+Completed 200 OK in 3132ms (Views: 138.8ms | GC: 0.3ms)
+
+
+Started GET "/assets/application-eb8c8478.js" for ::1 at 2025-09-25 11:18:52 +0800
+Started GET "/assets/application-89a1f5f4.css" for ::1 at 2025-09-25 11:18:52 +0800
+Started GET "/" for ::1 at 2025-09-25 14:58:57 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 2.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 1.9ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 27.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.5ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 42.6ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.8ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.9ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.5ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 2.6ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 4.9ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.0ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 8.5ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 147.8ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 187.8ms | GC: 0.2ms)
+Completed 200 OK in 6709ms (Views: 240.1ms | GC: 0.2ms)
+
+
+Started GET "/" for ::1 at 2025-09-25 14:59:24 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.2ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 1.3ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.8ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 4.9ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.1ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 3.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.0ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 2.9ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 14.5ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 16.0ms | GC: 0.0ms)
+Completed 200 OK in 2697ms (Views: 16.9ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-25 15:00:00 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["CPU"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "9", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Processing IP: cpu
+Generated settings for cpu
+Completed 200 OK in 2732ms (Views: 0.3ms | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2025-09-25 15:09:23 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 2.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 2.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 29.0ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.2ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 42.9ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.2ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.3ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 3.4ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.2ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.3ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 4.6ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 113.2ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 187.4ms | GC: 0.2ms)
+Completed 200 OK in 4922ms (Views: 245.1ms | GC: 0.2ms)
+
+
+Started GET "/assets/application-72442f8a.js" for ::1 at 2025-09-25 15:09:28 +0800
+Started POST "/test_settings/generate" for ::1 at 2025-09-25 15:09:45 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "9", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Processing IP: gfx
+Generated settings for gfx
+Completed 200 OK in 2325ms (Views: 0.2ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-25 15:13:16 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["CPU"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "9", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "5", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "show_production_for_core" => {"0" => "on"}, "flow_orders" => {"0" => ["MINPSM"]}, "production_mappings" => {"0" => {"MINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => "", "use_power_supply" => "on", "frequency" => "999", "register_size" => "999", "insertion" => "9,9,9", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}, "show_charz_for_core" => {"0" => "on"}, "charz_data" => {"0" => {"search_granularity" => ["bycore"], "psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Processing IP: cpu
+Generated settings for cpu
+Completed 200 OK in 934ms (Views: 0.1ms | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2025-09-25 15:16:07 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 1.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 0.9ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.3ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.4ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.0ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 0.7ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 1.3ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 4.9ms | GC: 0.0ms)
+  Rendered layout layouts/application.html.erb (Duration: 5.6ms | GC: 0.0ms)
+Completed 200 OK in 905ms (Views: 6.1ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-25 15:18:20 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "9", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "show_production_for_core" => {"0" => "on"}, "flow_orders" => {"0" => ["DLDOMINPSM"]}, "production_mappings" => {"0" => {"DLDOMINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => "1,2,3,4,5", "use_power_supply" => "on", "frequency" => "9", "register_size" => "9", "insertion" => "9", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Flow order DLDOMINPSM: use_power_supply=on, spec_variable=SUPPLY
+Processing IP: gfx
+Generated settings for gfx
+Completed 200 OK in 919ms (Views: 0.1ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-25 15:18:28 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "9", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "show_production_for_core" => {"0" => "on"}, "flow_orders" => {"0" => ["DLDOMINPSM"]}, "production_mappings" => {"0" => {"DLDOMINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => "", "use_power_supply" => "on", "frequency" => "9", "register_size" => "9", "insertion" => "9", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Flow order DLDOMINPSM: use_power_supply=on, spec_variable=SUPPLY
+Processing IP: gfx
+Generated settings for gfx
+Completed 200 OK in 917ms (Views: 0.1ms | GC: 0.0ms)
+
+
+Started GET "/favicon.ico" for ::1 at 2025-09-26 08:15:17 +0800
+  
+ActionController::RoutingError (No route matches [GET] "/favicon.ico"):
+  
+Started GET "/" for ::1 at 2025-09-26 09:02:44 +0800
+Processing by TestSettingsController#new as HTML
+  Rendering layout layouts/application.html.erb
+  Rendering test_settings/new.html.erb within layouts/application
+  Rendered test_settings/_production_parameters.html.erb (Duration: 2.8ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 2.3ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 30.3ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.9ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 43.1ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 2.0ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.9ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 5.7ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.9ms | GC: 0.0ms)
+  Rendered test_settings/_production_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_charz_parameters.html.erb (Duration: 0.1ms | GC: 0.0ms)
+  Rendered test_settings/_core_mapping.html.erb (Duration: 1.2ms | GC: 0.0ms)
+  Rendered test_settings/_ip_configuration_form.html.erb (Duration: 6.0ms | GC: 0.0ms)
+  Rendered test_settings/new.html.erb within layouts/application (Duration: 146.4ms | GC: 0.2ms)
+  Rendered layout layouts/application.html.erb (Duration: 182.2ms | GC: 0.2ms)
+Completed 200 OK in 5127ms (Views: 231.9ms | GC: 0.2ms)
+
+
+Started GET "/assets/application-117a2b30.js" for ::1 at 2025-09-26 09:02:49 +0800
+Started GET "/assets/application-16182415.css" for ::1 at 2025-09-26 09:02:49 +0800
+Started POST "/test_settings/generate" for ::1 at 2025-09-26 09:03:30 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}, "production_mappings" => {"0" => {"MINPSM" => {"use_power_supply" => "on", "frequency" => "999", "register_size" => "999", "insertion" => "WS1,FT1", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "999", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "show_production_for_core" => {"0" => "on"}, "flow_orders" => {"0" => ["MINPSM"]}, "production_mappings" => {"0" => {"MINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => ""}}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Completed 422 Unprocessable Content in 2271ms (Views: 0.3ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-26 09:04:00 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}, "production_mappings" => {"0" => {"MINPSM" => {"use_power_supply" => "on", "frequency" => "999", "register_size" => "9", "insertion" => "WS1,FT1", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "999", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "show_production_for_core" => {"0" => "on"}, "flow_orders" => {"0" => ["MINPSM"]}, "production_mappings" => {"0" => {"MINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => ""}}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Completed 422 Unprocessable Content in 2250ms (Views: 0.3ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-26 09:04:30 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}, "production_mappings" => {"0" => {"MINPSM" => {"use_power_supply" => "on", "frequency" => "999", "register_size" => "9", "insertion" => "WS1,FT1", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "999", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "show_production_for_core" => {"0" => "on"}, "flow_orders" => {"0" => ["MINPSM"]}, "production_mappings" => {"0" => {"MINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => ""}}}, "show_charz_for_core" => {"0" => "on"}, "charz_data" => {"0" => {"search_granularity" => ["bycore"], "search_types" => ["FMAX"], "use_power_supply" => {"FMAX" => "on"}, "selected_test_types" => {"FMAX" => ["CREST", "BIST", "PBIST"]}, "table" => {"FMAX" => {"PBIST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}, "BIST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}, "CREST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}}}, "workload_table" => {"FMAX" => {"PBIST" => ["1"], "BIST" => ["1"], "CREST" => ["1"]}}, "psm_register_size" => "1"}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Completed 422 Unprocessable Content in 2184ms (Views: 0.2ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-26 09:04:36 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}, "production_mappings" => {"0" => {"MINPSM" => {"use_power_supply" => "on", "frequency" => "999", "register_size" => "9", "insertion" => "WS1,FT1", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "999", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "show_production_for_core" => {"0" => "on"}, "flow_orders" => {"0" => ["MINPSM"]}, "production_mappings" => {"0" => {"MINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => ""}}}, "show_charz_for_core" => {"0" => "on"}, "charz_data" => {"0" => {"search_granularity" => ["bycore"], "search_types" => ["FMAX"], "use_power_supply" => {"FMAX" => "on"}, "selected_test_types" => {"FMAX" => ["CREST", "BIST", "PBIST"]}, "table" => {"FMAX" => {"PBIST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}, "BIST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}, "CREST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}}}, "workload_table" => {"FMAX" => {"PBIST" => ["1"], "BIST" => ["1"], "CREST" => ["1"]}}, "psm_register_size" => "1"}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Completed 422 Unprocessable Content in 2098ms (Views: 0.2ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-26 09:04:51 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}, "production_mappings" => {"0" => {"MINPSM" => {"use_power_supply" => "on", "frequency" => "999", "register_size" => "9", "insertion" => "WS1,FT1", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "999", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "flow_orders" => {"0" => ["MINPSM"]}, "production_mappings" => {"0" => {"MINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => ""}}}, "show_charz_for_core" => {"0" => "on"}, "charz_data" => {"0" => {"search_granularity" => ["bycore"], "search_types" => ["FMAX"], "use_power_supply" => {"FMAX" => "on"}, "selected_test_types" => {"FMAX" => ["CREST", "BIST", "PBIST"]}, "table" => {"FMAX" => {"PBIST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}, "BIST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}, "CREST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}}}, "workload_table" => {"FMAX" => {"PBIST" => ["1"], "BIST" => ["1"], "CREST" => ["1"]}}, "psm_register_size" => "1"}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Processing IP: gfx
+Generated settings for gfx
+Completed 200 OK in 2554ms (Views: 0.3ms | GC: 0.0ms)
+
+
+Started POST "/test_settings/generate" for ::1 at 2025-09-26 09:05:27 +0800
+Processing by TestSettingsController#generate as JSON
+  Parameters: {"authenticity_token" => "[FILTERED]", "selected_ip_types" => ["GFX"], "ip_configurations" => {"CPU" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}, "production_mappings" => {"0" => {"MINPSM" => {"use_power_supply" => "on", "frequency" => "999", "register_size" => "9", "insertion" => "WS1,FT1", "binnable" => "on", "softsetenable" => "on", "fallbackenable" => "on"}}}}, "GFX" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "CORE", "core_count" => "999", "supply" => "SUPPLY", "clock" => "CLOCK"}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "show_production_for_core" => {"0" => "on"}, "flow_orders" => {"0" => ["MINPSM"]}, "production_mappings" => {"0" => {"MINPSM" => {"read_type_fw" => "on", "test_points_type" => "Range", "test_points_start" => "1", "test_points_stop" => "2", "test_points_step" => "1", "test_points" => ""}}}, "show_charz_for_core" => {"0" => "on"}, "charz_data" => {"0" => {"search_granularity" => ["bycore"], "search_types" => ["FMAX"], "use_power_supply" => {"FMAX" => "on"}, "selected_test_types" => {"FMAX" => ["CREST", "BIST", "PBIST"]}, "table" => {"FMAX" => {"PBIST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}, "BIST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}, "CREST" => {"wl_count" => "1", "tp" => "1", "search_start" => "1", "search_end" => "1", "search_step" => "1", "resolution" => "1"}}}, "workload_table" => {"FMAX" => {"PBIST" => ["1"], "BIST" => ["1"], "CREST" => ["1"]}}, "psm_register_size" => "1"}, "999" => {"psm_register_size" => ""}}}, "SOC" => {"num_core_types" => "1", "core_mappings" => {"0" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}, "999" => {"core" => "", "core_count" => "", "supply" => "", "clock" => ""}}, "charz_data" => {"0" => {"psm_register_size" => ""}, "999" => {"psm_register_size" => ""}}}}}
+Completed 422 Unprocessable Content in 2165ms (Views: 0.3ms | GC: 0.0ms)
+
+

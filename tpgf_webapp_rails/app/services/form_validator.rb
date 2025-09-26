@@ -77,83 +77,76 @@ class FormValidator
     # Validate read type
     has_jtag = mapping[:read_type_jtag] == "on"
     has_fw = mapping[:read_type_fw] == "on"
-
+    
     unless has_jtag || has_fw
-      @errors["read_type_#{order}_core_#{core_idx}"] =
-        "#{order}: Read type (JTAG or FW) must be selected"
+      @errors["read_type_#{order}_core_#{core_idx}"] = "#{order}: Read type (JTAG or FW) must be selected"
     end
-
+    
     if has_jtag && has_fw
-      @errors["read_type_#{order}_core_#{core_idx}"] =
-        "#{order}: Only one read type can be selected"
+      @errors["read_type_#{order}_core_#{core_idx}"] = "#{order}: Only one read type can be selected"
     end
-
-    # Validate test points
-    if mapping[:test_points_type] == "List"
+    
+    # Validate test points based on type
+    test_points_type = mapping[:test_points_type] || 'Range'
+    
+    if test_points_type == "List"
       if mapping[:test_points].blank?
-        @errors["test_points_#{order}_core_#{core_idx}"] =
-          "#{order}: Test points list is required"
+        @errors["test_points_#{order}_core_#{core_idx}"] = "#{order}: Test points list is required"
       else
         # Validate list format
-        points = mapping[:test_points].split(",").map(&:strip)
+        points = mapping[:test_points].split(',').map(&:strip)
         if points.any? { |p| !p.match?(/^-?\d*\.?\d+$/) }
-          @errors["test_points_#{order}_core_#{core_idx}"] =
-            "#{order}: Test points must be comma-separated numbers"
+          @errors["test_points_#{order}_core_#{core_idx}"] = "#{order}: Test points must be comma-separated numbers"
         end
       end
     else
-      # Range validation
+      # Range validation - only validate if type is Range
       if mapping[:test_points_start].blank?
-        @errors["test_points_start_#{order}_core_#{core_idx}"] =
-          "#{order}: Start point is required"
+        @errors["test_points_start_#{order}_core_#{core_idx}"] = "#{order}: Start point is required"
       elsif !mapping[:test_points_start].match?(/^-?\d*\.?\d+$/)
-        @errors["test_points_start_#{order}_core_#{core_idx}"] =
-          "#{order}: Start point must be a number"
+        @errors["test_points_start_#{order}_core_#{core_idx}"] = "#{order}: Start point must be a number"
       end
-
+      
       if mapping[:test_points_stop].blank?
-        @errors["test_points_stop_#{order}_core_#{core_idx}"] =
-          "#{order}: Stop point is required"
+        @errors["test_points_stop_#{order}_core_#{core_idx}"] = "#{order}: Stop point is required"
       elsif !mapping[:test_points_stop].match?(/^-?\d*\.?\d+$/)
-        @errors["test_points_stop_#{order}_core_#{core_idx}"] =
-          "#{order}: Stop point must be a number"
+        @errors["test_points_stop_#{order}_core_#{core_idx}"] = "#{order}: Stop point must be a number"
       end
-
+      
       if mapping[:test_points_step].blank?
-        @errors["test_points_step_#{order}_core_#{core_idx}"] =
-          "#{order}: Step is required"
+        @errors["test_points_step_#{order}_core_#{core_idx}"] = "#{order}: Step is required"
       elsif !mapping[:test_points_step].match?(/^-?\d*\.?\d+$/)
-        @errors["test_points_step_#{order}_core_#{core_idx}"] =
-          "#{order}: Step must be a number"
+        @errors["test_points_step_#{order}_core_#{core_idx}"] = "#{order}: Step must be a number"
       elsif mapping[:test_points_step].to_f == 0
-        @errors["test_points_step_#{order}_core_#{core_idx}"] =
-          "#{order}: Step cannot be zero"
+        @errors["test_points_step_#{order}_core_#{core_idx}"] = "#{order}: Step cannot be zero"
       end
-
+      
       # Validate range if all values present
-      if mapping[:test_points_start].present? &&
-         mapping[:test_points_stop].present? &&
+      if mapping[:test_points_start].present? && 
+         mapping[:test_points_stop].present? && 
          mapping[:test_points_step].present? &&
          mapping[:test_points_start].match?(/^-?\d*\.?\d+$/) &&
          mapping[:test_points_stop].match?(/^-?\d*\.?\d+$/) &&
          mapping[:test_points_step].match?(/^-?\d*\.?\d+$/)
-
+        
         start = mapping[:test_points_start].to_f
-        stop  = mapping[:test_points_stop].to_f
-        step  = mapping[:test_points_step].to_f
-
+        stop = mapping[:test_points_stop].to_f
+        step = mapping[:test_points_step].to_f
+        
+        # Special case: if start equals stop, it's invalid (no range to traverse)
         if start == stop
-          @errors["test_points_range_#{order}_core_#{core_idx}"] =
+          @errors["test_points_range_#{order}_core_#{core_idx}"] = 
             "#{order}: When start equals stop, no range exists to traverse"
         elsif (stop > start && step < 0) || (stop < start && step > 0)
-          @errors["test_points_range_#{order}_core_#{core_idx}"] =
+          @errors["test_points_range_#{order}_core_#{core_idx}"] = 
             "#{order}: Step direction must match range direction"
         elsif step != 0
+          # Check if range is divisible by step
           range = (stop - start).abs
           steps = range / step.abs
-
+          
           if (steps - steps.round).abs > 0.0001
-            @errors["test_points_range_#{order}_core_#{core_idx}"] =
+            @errors["test_points_range_#{order}_core_#{core_idx}"] = 
               "#{order}: Step #{step} cannot generate steady intervals from #{start} to #{stop}"
           end
         end

@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import { showToast } from "../utils/toast"
 
 export default class extends Controller {
-    static targets = ["jsonContent"]
+    static targets = ["jsonContent", "jsonPreview"]
 
     connect() {
         this.selectedIpTypes = new Set()
@@ -16,25 +17,34 @@ export default class extends Controller {
                 }
             }
         })
+
+        // Bind close button event if preview exists
+        this.bindCloseButton()
     }
 
     toggleIpType(event) {
         const checkbox = event.target
         const ipType = checkbox.dataset.ipType
         const configSection = document.getElementById(`${ipType}-config`)
+        const ipCard = checkbox.closest('.ip-checkbox-card')
 
         if (checkbox.checked) {
             this.selectedIpTypes.add(ipType)
             configSection.classList.remove('hidden')
+            ipCard.classList.add('selected')
+            showToast(`${ipType} configuration enabled`, 'info')
         } else {
             this.selectedIpTypes.delete(ipType)
             configSection.classList.add('hidden')
+            ipCard.classList.remove('selected')
+            showToast(`${ipType} configuration disabled`, 'info')
         }
 
-        // Show/hide global actions
+        // Show/hide global actions with animation
         const globalActions = document.getElementById('global-actions')
         if (this.selectedIpTypes.size > 0) {
             globalActions.classList.remove('hidden')
+            globalActions.classList.add('animate-fadeIn')
         } else {
             globalActions.classList.add('hidden')
         }
@@ -43,11 +53,17 @@ export default class extends Controller {
     async submitForm(event) {
         event.preventDefault()
 
+        // Show loading overlay
+        const loadingOverlay = document.getElementById('loading-overlay')
+        loadingOverlay.classList.remove('hidden')
+
         // Clear any existing errors
         this.clearErrors()
 
         // Validate before submitting
         if (!this.validateBeforeSubmit()) {
+            loadingOverlay.classList.add('hidden')
+            showToast('Please fix the validation errors', 'error')
             return
         }
 
@@ -57,7 +73,13 @@ export default class extends Controller {
         // Disable the button to prevent double submission
         const button = event.currentTarget
         button.disabled = true
-        button.textContent = "Generating Files..."
+        button.innerHTML = `
+            <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating...
+        `
 
         try {
             const response = await fetch(form.action, {
@@ -80,27 +102,75 @@ export default class extends Controller {
             }
 
             if (response.ok && data.status === 'success') {
-                // Show JSON preview
+                // Show JSON preview with animation
                 const preview = document.getElementById('json-preview')
                 const content = document.getElementById('json-content')
                 content.textContent = JSON.stringify(data.data, null, 2)
                 preview.classList.remove('hidden')
+                preview.classList.add('animate-fadeIn')
+
+                // Re-bind close button after showing preview
+                setTimeout(() => this.bindCloseButton(), 100)
 
                 // Show download button
                 document.getElementById('download-button').classList.remove('hidden')
+
+                showToast('Test settings generated successfully!', 'success')
             } else if (data.validation_errors) {
                 // Show validation errors from server
                 this.showValidationErrors(data.validation_errors)
+                showToast('Validation errors found', 'error')
             } else {
-                alert(`Error: ${data.error || 'Unknown error'}\n${data.details || ''}`)
+                showToast(`Error: ${data.error || 'Unknown error'}`, 'error')
             }
         } catch (error) {
             console.error('Error:', error)
-            alert(`Error generating settings: ${error.message}`)
+            showToast(`Error generating settings: ${error.message}`, 'error')
         } finally {
+            // Hide loading overlay
+            loadingOverlay.classList.add('hidden')
+
             // Re-enable the button
             button.disabled = false
-            button.textContent = "Generate Combined Test Settings"
+            button.innerHTML = `
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Generate Test Settings
+            `
+        }
+    }
+
+    clearAll() {
+        if (confirm('Are you sure you want to clear all configurations?')) {
+            document.querySelectorAll('input[name="selected_ip_types[]"]').forEach(checkbox => {
+                checkbox.checked = false
+                checkbox.dispatchEvent(new Event('change'))
+            })
+
+            this.element.reset()
+
+            document.getElementById('json-preview').classList.add('hidden')
+            document.getElementById('download-button').classList.add('hidden')
+
+            showToast('All configurations cleared', 'info')
+        }
+    }
+
+    bindCloseButton() {
+        const closeButton = document.querySelector('[data-action="click->test-settings-form#closePreview"]')
+        if (closeButton) {
+            closeButton.addEventListener('click', (e) => {
+                e.preventDefault()
+                this.closePreview()
+            })
+        }
+    }
+
+    closePreview() {
+        const preview = document.getElementById('json-preview')
+        if (preview) {
+            preview.classList.add('hidden')
         }
     }
 
@@ -162,7 +232,7 @@ export default class extends Controller {
                 }
             })
 
-            // ✅ Updated production validation
+            // Check production mappings
             const productionSections = configSection.querySelectorAll('[data-production-section]')
 
             productionSections.forEach((section) => {
@@ -171,8 +241,6 @@ export default class extends Controller {
                 const productionCheckbox = configSection.querySelector(`[name*="show_production_for_core][${coreIndex}]"]`)
                 if (productionCheckbox && productionCheckbox.checked) {
                     const flowOrders = section.querySelectorAll('input[name*="flow_orders"]:checked')
-
-                    console.log(`Checking flow orders for ${ipType} core ${coreIndex}:`, flowOrders.length)
 
                     if (flowOrders.length === 0) {
                         errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: At least one flow order must be selected`)
@@ -218,35 +286,39 @@ export default class extends Controller {
                                 hasErrors = true
                             }
 
-                            // Test points
-                            const testPointsType = container.querySelector('[name*="test_points_type"]').value
+                            // Test points - check the type first
+                            const testPointsTypeInput = container.querySelector('[name*="test_points_type"]')
+                            const testPointsType = testPointsTypeInput ? testPointsTypeInput.value : 'Range'
+
                             if (testPointsType === 'Range') {
+                                // Only validate range fields if Range is selected
                                 const startInput = container.querySelector('[name*="test_points_start"]')
                                 const stopInput = container.querySelector('[name*="test_points_stop"]')
                                 const stepInput = container.querySelector('[name*="test_points_step"]')
 
-                                if (!startInput.value.trim()) {
+                                if (startInput && !startInput.value.trim()) {
                                     startInput.classList.add('error-field')
                                     this.addErrorMessage(startInput, 'Start is required')
                                     errors.push(`${ipType} - ${order}: Test points start is required`)
                                     hasErrors = true
                                 }
 
-                                if (!stopInput.value.trim()) {
+                                if (stopInput && !stopInput.value.trim()) {
                                     stopInput.classList.add('error-field')
                                     this.addErrorMessage(stopInput, 'Stop is required')
                                     errors.push(`${ipType} - ${order}: Test points stop is required`)
                                     hasErrors = true
                                 }
 
-                                if (!stepInput.value.trim()) {
+                                if (stepInput && !stepInput.value.trim()) {
                                     stepInput.classList.add('error-field')
                                     this.addErrorMessage(stepInput, 'Step is required')
                                     errors.push(`${ipType} - ${order}: Test points step is required`)
                                     hasErrors = true
                                 }
                             } else {
-                                const listInput = container.querySelector('[name*="test_points"][name*="test_points"]:not([name*="test_points_"])')
+                                // Validate list field if List is selected
+                                const listInput = container.querySelector('[name*="test_points"][name$="[test_points]"]')
                                 if (listInput && !listInput.value.trim()) {
                                     listInput.classList.add('error-field')
                                     this.addErrorMessage(listInput, 'Test points list is required')
@@ -540,21 +612,5 @@ export default class extends Controller {
         document.querySelectorAll('.error-message').forEach(msg => {
             msg.remove()
         })
-    }
-
-    clearAll() {
-        document.querySelectorAll('input[name="selected_ip_types[]"]').forEach(checkbox => {
-            checkbox.checked = false
-            checkbox.dispatchEvent(new Event('change'))
-        })
-
-        this.element.reset()
-
-        document.getElementById('json-preview').classList.add('hidden')
-        document.getElementById('download-button').classList.add('hidden')
-    }
-
-    closePreview() {
-        document.getElementById('json-preview').classList.add('hidden')
     }
 }

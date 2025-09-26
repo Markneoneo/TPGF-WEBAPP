@@ -10,9 +10,18 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </head>
 
-  <body>
-    <div class="container mx-auto px-4 py-8">
-      <%= yield %>
+  <body data-controller="ui-enhancements">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
     </div>
+    
+    <!-- Main Content -->
+    <main>
+      <%= yield %>
+    </main>
+    
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
   </body>
 </html>

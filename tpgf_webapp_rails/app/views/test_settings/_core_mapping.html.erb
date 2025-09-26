@@ -1,71 +1,88 @@
-<div class="border-t pt-4 mt-4" data-core-index="<%= core_index %>">
-  <h4 class="font-semibold mb-3">Core Type <%= core_index.to_i + 1 %></h4>
+<div class="core-mapping animate-slideIn" data-core-index="<%= core_index %>">
+  <div class="core-mapping-header">
+    <span>Core Type <%= core_index.to_i + 1 %></span>
+  </div>
   
-  <div class="grid grid-cols-2 gap-4 mb-4">
-    <div>
-      <label class="block text-sm font-medium mb-1">Core Name:</label>
+  <div class="core-config-grid">
+    <div class="form-group">
+      <label class="form-label">Core Name <span class="text-red-500">*</span></label>
       <input type="text" 
              name="ip_configurations[<%= ip_type %>][core_mappings][<%= core_index %>][core]"
-             class="w-full px-3 py-2 border rounded"
-             placeholder="Enter core name">
+             class="form-input"
+             placeholder="e.g., core_a">
     </div>
     
-    <div>
-      <label class="block text-sm font-medium mb-1">Core Count:</label>
+    <div class="form-group">
+      <label class="form-label">Core Count <span class="text-red-500">*</span></label>
       <input type="text" 
              name="ip_configurations[<%= ip_type %>][core_mappings][<%= core_index %>][core_count]"
-             class="w-full px-3 py-2 border rounded"
-             placeholder="Enter count">
+             class="form-input"
+             placeholder="e.g., 4">
     </div>
     
-    <div>
-      <label class="block text-sm font-medium mb-1">Supply Name:</label>
-      <input type="text" 
-            name="ip_configurations[<%= ip_type %>][core_mappings][<%= core_index %>][supply]"
-            class="w-full px-3 py-2 border rounded"
-            placeholder="Enter supply"
-            data-supply-field="true"
-            data-core-index="<%= core_index %>">
+    <div class="form-group">
+      <label class="form-label">Supply Name <span class="text-red-500">*</span></label>
+      <div class="tooltip">
+        <input type="text" 
+               name="ip_configurations[<%= ip_type %>][core_mappings][<%= core_index %>][supply]"
+               class="form-input"
+               placeholder="e.g., VDD"
+               data-supply-field="true"
+               data-core-index="<%= core_index %>">
+        <span class="tooltip-content">This value can be used in production/charz parameters</span>
+      </div>
     </div>
     
-    <div>
-      <label class="block text-sm font-medium mb-1">Clock:</label>
+    <div class="form-group">
+      <label class="form-label">Clock <span class="text-red-500">*</span></label>
       <input type="text" 
              name="ip_configurations[<%= ip_type %>][core_mappings][<%= core_index %>][clock]"
-             class="w-full px-3 py-2 border rounded"
-             placeholder="Enter clock">
+             class="form-input"
+             placeholder="e.g., CLK">
     </div>
   </div>
   
-  <!-- Production Parameters Toggle -->
-  <div class="mb-4">
-    <label class="flex items-center cursor-pointer">
-      <input type="checkbox" 
-             name="ip_configurations[<%= ip_type %>][show_production_for_core][<%= core_index %>]"
-             class="mr-2"
-             data-action="change->ip-configuration#toggleProduction"
-             data-core-index="<%= core_index %>">
-      <span>Production Parameters for Core Type <%= core_index + 1 %></span>
-    </label>
-  </div>
+  <div class="spacer-md"></div>
   
-  <div class="hidden pl-4" data-production-section="<%= core_index %>">
-    <%= render 'production_parameters', ip_type: ip_type, core_index: core_index %>
+  <!-- Production Parameters Toggle -->
+  <div class="collapsible-section">
+    <div class="collapsible-header">
+      <label class="toggle-group">
+        <input type="checkbox" 
+               name="ip_configurations[<%= ip_type %>][show_production_for_core][<%= core_index %>]"
+               class="mr-2"
+               data-action="change->ip-configuration#toggleProduction"
+               data-core-index="<%= core_index %>">
+        <span class="toggle-label">Production Parameters</span>
+      </label>
+      <svg class="collapsible-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
+    
+    <div class="collapsible-content" data-production-section="<%= core_index %>">
+      <%= render 'production_parameters', ip_type: ip_type, core_index: core_index %>
+    </div>
   </div>
   
   <!-- Charz Parameters Toggle -->
-  <div class="mb-4">
-    <label class="flex items-center cursor-pointer">
-      <input type="checkbox" 
-             name="ip_configurations[<%= ip_type %>][show_charz_for_core][<%= core_index %>]"
-             class="mr-2"
-             data-action="change->ip-configuration#toggleCharz"
-             data-core-index="<%= core_index %>">
-      <span>Charz Parameters for Core Type <%= core_index + 1 %></span>
-    </label>
-  </div>
-  
-  <div class="hidden pl-4" data-charz-section="<%= core_index %>">
-    <%= render 'charz_parameters', ip_type: ip_type, core_index: core_index %>
+  <div class="collapsible-section">
+    <div class="collapsible-header">
+      <label class="toggle-group">
+        <input type="checkbox" 
+               name="ip_configurations[<%= ip_type %>][show_charz_for_core][<%= core_index %>]"
+               class="mr-2"
+               data-action="change->ip-configuration#toggleCharz"
+               data-core-index="<%= core_index %>">
+        <span class="toggle-label">Charz Parameters</span>
+      </label>
+      <svg class="collapsible-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
+    
+    <div class="collapsible-content" data-charz-section="<%= core_index %>">
+      <%= render 'charz_parameters', ip_type: ip_type, core_index: core_index %>
+    </div>
   </div>
 </div>
