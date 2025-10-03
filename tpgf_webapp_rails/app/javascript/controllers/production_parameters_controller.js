@@ -1,10 +1,81 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["flowOrders", "mappingContainer", "testPointsType", "rangeFields", "listField"]
+    static targets = ["flowOrders", "mappingContainer", "testPointsType", "rangeFields", "listField", "flowOrdersSelect"]
 
     connect() {
         this.flowOrders = new Set()
+
+        // Skip initialization for template instances
+        const coreIndex = this.element.closest('[data-core-index]')?.dataset.coreIndex
+        if (coreIndex === '999') {
+            console.log('Skipping Tom Select initialization for template')
+            return
+        }
+
+        // Add a small delay to ensure DOM is ready
+        setTimeout(() => {
+            if (this.hasFlowOrdersSelectTarget) {
+                const selectElement = this.flowOrdersSelectTarget
+
+                // Check if Tom Select is already initialized
+                if (selectElement.tomselect) {
+                    console.log('Tom Select already initialized, skipping')
+                    return
+                }
+
+                this.initializeFlowOrdersSelect()
+            }
+        }, 100)
+    }
+
+    initializeFlowOrdersSelect() {
+        const selectElement = this.flowOrdersSelectTarget
+        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
+        const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+
+        console.log(`Initializing Tom Select for ${ipType} core ${coreIndex}`)
+
+        // Initialize Tom Select
+        this.tomSelect = new TomSelect(selectElement, {
+            plugins: ['remove_button'],
+            create: false,
+            maxItems: null,
+            placeholder: 'Search and select flow orders...',
+            searchField: ['text'],
+            closeAfterSelect: false,
+            onItemAdd: (value) => {
+                this.flowOrders.add(value)
+                this.addFlowOrderMapping(value)
+            },
+            onItemRemove: (value) => {
+                this.flowOrders.delete(value)
+                this.removeFlowOrderMapping(value)
+            }
+        })
+    }
+
+    addHiddenFlowOrderInput(order, ipType, coreIndex) {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = `ip_configurations[${ipType}][flow_orders][${coreIndex}][]`
+        input.value = order
+        input.dataset.flowOrder = order
+        this.element.appendChild(input)
+    }
+
+    removeHiddenFlowOrderInput(order, ipType, coreIndex) {
+        const input = this.element.querySelector(`input[type="hidden"][data-flow-order="${order}"]`)
+        if (input) {
+            input.remove()
+        }
+    }
+
+    disconnect() {
+        // Clean up Tom Select instance
+        if (this.tomSelect) {
+            this.tomSelect.destroy()
+        }
     }
 
     toggleFlowOrder(event) {
@@ -21,45 +92,30 @@ export default class extends Controller {
 
     addFlowOrderMapping(order) {
         const template = document.getElementById('flow-order-mapping-template')
-        const content = template.content.cloneNode(true)
 
         // Get the current IP type and core index
         const ipType = this.element.closest('[data-ip-type]').dataset.ipType
         const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
 
-        // Replace ORDER placeholder in all elements
-        const replaceInElement = (element) => {
-            // Replace in text nodes
-            if (element.nodeType === Node.TEXT_NODE) {
-                element.textContent = element.textContent.replace(/ORDER/g, order)
-            }
+        // Get template HTML and replace all placeholders
+        let html = template.innerHTML
+        html = html.replace(/ORDER/g, order)
+        html = html.replace(/IP_TYPE/g, ipType)
+        html = html.replace(/CORE_INDEX/g, coreIndex)
 
-            // Replace in attributes
-            if (element.nodeType === Node.ELEMENT_NODE) {
-                ['name', 'id', 'for', 'data-order', 'data-action'].forEach(attr => {
-                    if (element.hasAttribute(attr)) {
-                        let value = element.getAttribute(attr)
-                        value = value.replace(/ORDER/g, order)
-                        value = value.replace(/IP_TYPE/g, ipType)
-                        value = value.replace(/CORE_INDEX/g, coreIndex)
-                        element.setAttribute(attr, value)
-                    }
-                })
-            }
+        // Create a div and set the HTML
+        const div = document.createElement('div')
+        div.innerHTML = html
 
-            // Recurse for child nodes
-            element.childNodes.forEach(child => replaceInElement(child))
-        }
+        // Append the flow-order-mapping div
+        const flowOrderDiv = div.querySelector('.flow-order-mapping')
+        this.mappingContainerTarget.appendChild(flowOrderDiv)
 
-        // Get the flow-order-mapping div from the cloned content
-        const flowOrderDiv = content.querySelector('.flow-order-mapping')
-        replaceInElement(flowOrderDiv)
-
-        // Set up test points toggle after adding to DOM
-        this.mappingContainerTarget.appendChild(content)
-
-        // Initialize test points toggle for this mapping
-        this.initializeTestPointsToggle(order)
+        // Initialize components after DOM insertion
+        setTimeout(() => {
+            this.initializeTestPointsToggle(order)
+            this.initializeInsertionSelect(order)
+        }, 100)
     }
 
     removeFlowOrderMapping(order) {
@@ -153,5 +209,87 @@ export default class extends Controller {
             specVariableInput.disabled = false
             specVariableInput.classList.remove('bg-gray-100')
         }
+    }
+
+    toggleCoreFrequency(event) {
+        const container = event.target.closest('.flow-order-mapping')
+        const frequencyInput = container.querySelector('[data-frequency-input]')
+
+        if (!frequencyInput) {
+            console.error('Frequency input not found')
+            return
+        }
+
+        // Get the core index from the production parameters container
+        const productionContainer = this.element.closest('[data-core-index]')
+        const coreIndex = productionContainer ? productionContainer.dataset.coreIndex : '0'
+
+        // Get the IP type
+        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
+
+        // Find the frequency input for this specific core and IP type
+        const frequencySelector = `[data-ip-type="${ipType}"] input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][frequency]"]`
+        const coreFrequencyInput = document.querySelector(frequencySelector)
+
+        if (event.target.checked) {
+            if (coreFrequencyInput && coreFrequencyInput.value) {
+                // Store original value if not already stored
+                if (!frequencyInput.dataset.originalValue) {
+                    frequencyInput.dataset.originalValue = frequencyInput.value || ''
+                }
+                frequencyInput.value = coreFrequencyInput.value
+                frequencyInput.disabled = true
+                frequencyInput.classList.add('bg-gray-100')
+
+                // Add a hidden input to ensure the checkbox state is sent
+                const hiddenInput = document.createElement('input')
+                hiddenInput.type = 'hidden'
+                hiddenInput.name = frequencyInput.name
+                hiddenInput.value = coreFrequencyInput.value
+                hiddenInput.dataset.coreFrequencyHidden = 'true'
+                frequencyInput.parentElement.appendChild(hiddenInput)
+            } else {
+                // No frequency value, uncheck and alert
+                event.target.checked = false
+                alert('Please enter a frequency value in the core configuration first')
+            }
+        } else {
+            // Restore original value
+            frequencyInput.value = frequencyInput.dataset.originalValue || ''
+            delete frequencyInput.dataset.originalValue
+            frequencyInput.disabled = false
+            frequencyInput.classList.remove('bg-gray-100')
+
+            // Remove hidden input
+            const hiddenInput = frequencyInput.parentElement.querySelector('[data-core-frequency-hidden="true"]')
+            if (hiddenInput) {
+                hiddenInput.remove()
+            }
+        }
+    }
+
+    initializeInsertionSelect(order) {
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        if (!mapping) {
+            console.error('Mapping not found for order:', order)
+            return
+        }
+
+        const selectElement = mapping.querySelector(`select[data-insertion-select="${order}"]`)
+        if (!selectElement) {
+            console.error('Insertion select not found for order:', order)
+            return
+        }
+
+        // Initialize Tom Select for insertion list
+        new TomSelect(selectElement, {
+            plugins: ['remove_button'],
+            create: false,
+            maxItems: null,
+            placeholder: 'Select insertions...',
+            searchField: ['text'],
+            closeAfterSelect: false,
+            maxOptions: null
+        })
     }
 }

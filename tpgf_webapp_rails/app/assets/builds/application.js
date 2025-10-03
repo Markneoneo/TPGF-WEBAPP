@@ -8003,13 +8003,20 @@ var test_settings_form_controller_default = class extends Controller {
         const coreIndex = section.dataset.productionSection;
         const productionCheckbox = configSection.querySelector(`[name*="show_production_for_core][${coreIndex}]"]`);
         if (productionCheckbox && productionCheckbox.checked) {
-          const flowOrders = section.querySelectorAll('input[name*="flow_orders"]:checked');
-          if (flowOrders.length === 0) {
+          const selectElement = section.querySelector('select[name*="flow_orders"]');
+          let flowOrdersSelected = [];
+          if (selectElement && selectElement.tomselect) {
+            flowOrdersSelected = selectElement.tomselect.items || [];
+          } else {
+            const flowOrders = section.querySelectorAll('input[name*="flow_orders"]:checked');
+            flowOrdersSelected = Array.from(flowOrders).map((cb) => cb.value);
+          }
+          if (flowOrdersSelected.length === 0) {
             errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: At least one flow order must be selected`);
             hasErrors = true;
+            return;
           }
-          flowOrders.forEach((checkbox) => {
-            const order = checkbox.value;
+          flowOrdersSelected.forEach((order) => {
             const container = section.querySelector(`[data-order="${order}"]`);
             if (container) {
               const readTypes = container.querySelectorAll('[name*="read_type"]:checked');
@@ -8024,8 +8031,9 @@ var test_settings_form_controller_default = class extends Controller {
                 errors.push(`${ipType} - ${order}: Spec variable is required`);
                 hasErrors = true;
               }
+              const usesCoreFreq = container.querySelector('[name*="use_core_frequency"]');
               const frequency = container.querySelector('[name*="frequency"]');
-              if (frequency && !frequency.value.trim()) {
+              if (frequency && !frequency.value.trim() && (!usesCoreFreq || !usesCoreFreq.checked)) {
                 frequency.classList.add("error-field");
                 this.addErrorMessage(frequency, "Frequency is required");
                 errors.push(`${ipType} - ${order}: Frequency is required`);
@@ -8353,7 +8361,7 @@ var ip_configuration_controller_default = class extends Controller {
     template = template.replace(/data-core-index="999"/g, `data-core-index="${index}"`);
     template = template.replace(/data-production-section="999"/g, `data-production-section="${index}"`);
     template = template.replace(/data-charz-section="999"/g, `data-charz-section="${index}"`);
-    template = template.replace(/data-coreIndex="999"/g, `data-core-index="${index}"`);
+    template = template.replace(/flow-orders-([^-]+)-999/g, `flow-orders-$1-${index}`);
     template = template.replace(/\[core_mappings\]\[999\]/g, `[core_mappings][${index}]`);
     template = template.replace(/\[flow_orders\]\[999\]/g, `[flow_orders][${index}]`);
     template = template.replace(/\[production_mappings\]\[999\]/g, `[production_mappings][${index}]`);
@@ -8363,32 +8371,117 @@ var ip_configuration_controller_default = class extends Controller {
     template = template.replace(/_999/g, `_${index}`);
     template = template.replace(/="999"/g, `="${index}"`);
     this.coreMappingsTarget.insertAdjacentHTML("beforeend", template);
+    console.log(`Added core mapping ${index}`);
+    setTimeout(() => {
+      this.initializeCollapsibleSections(index);
+    }, 200);
+  }
+  initializeCollapsibleSections(coreIndex) {
+    const newCoreMapping = this.coreMappingsTarget.querySelector(`[data-core-index="${coreIndex}"]:last-child`);
+    if (!newCoreMapping) return;
+    const collapsibleHeaders = newCoreMapping.querySelectorAll(".collapsible-header");
+    collapsibleHeaders.forEach((header) => {
+      header.addEventListener("click", (e) => {
+        if (e.target.type !== "checkbox") {
+          const section = header.closest(".collapsible-section");
+          const checkbox = header.querySelector('input[type="checkbox"]');
+          if (checkbox && !e.target.closest("input")) {
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+          section.classList.toggle("expanded");
+        }
+      });
+    });
+    this.initializeProductionSelect(coreIndex);
   }
   toggleProduction(event) {
     const coreIndex = event.target.dataset.coreIndex;
     const section = this.element.querySelector(`[data-production-section="${coreIndex}"]`);
+    const collapsibleSection = event.target.closest(".collapsible-section");
     if (event.target.checked) {
       section.classList.remove("hidden");
+      collapsibleSection.classList.add("expanded");
     } else {
       section.classList.add("hidden");
+      collapsibleSection.classList.remove("expanded");
     }
   }
   toggleCharz(event) {
     const coreIndex = event.target.dataset.coreIndex;
     const section = this.element.querySelector(`[data-charz-section="${coreIndex}"]`);
+    const collapsibleSection = event.target.closest(".collapsible-section");
     if (event.target.checked) {
       section.classList.remove("hidden");
+      collapsibleSection.classList.add("expanded");
     } else {
       section.classList.add("hidden");
+      collapsibleSection.classList.remove("expanded");
     }
   }
 };
 
 // app/javascript/controllers/production_parameters_controller.js
 var production_parameters_controller_default = class extends Controller {
-  static targets = ["flowOrders", "mappingContainer", "testPointsType", "rangeFields", "listField"];
+  static targets = ["flowOrders", "mappingContainer", "testPointsType", "rangeFields", "listField", "flowOrdersSelect"];
   connect() {
     this.flowOrders = /* @__PURE__ */ new Set();
+    const coreIndex = this.element.closest("[data-core-index]")?.dataset.coreIndex;
+    if (coreIndex === "999") {
+      console.log("Skipping Tom Select initialization for template");
+      return;
+    }
+    setTimeout(() => {
+      if (this.hasFlowOrdersSelectTarget) {
+        const selectElement = this.flowOrdersSelectTarget;
+        if (selectElement.tomselect) {
+          console.log("Tom Select already initialized, skipping");
+          return;
+        }
+        this.initializeFlowOrdersSelect();
+      }
+    }, 100);
+  }
+  initializeFlowOrdersSelect() {
+    const selectElement = this.flowOrdersSelectTarget;
+    const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
+    const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
+    console.log(`Initializing Tom Select for ${ipType} core ${coreIndex}`);
+    this.tomSelect = new TomSelect(selectElement, {
+      plugins: ["remove_button"],
+      create: false,
+      maxItems: null,
+      placeholder: "Search and select flow orders...",
+      searchField: ["text"],
+      closeAfterSelect: false,
+      onItemAdd: (value) => {
+        this.flowOrders.add(value);
+        this.addFlowOrderMapping(value);
+      },
+      onItemRemove: (value) => {
+        this.flowOrders.delete(value);
+        this.removeFlowOrderMapping(value);
+      }
+    });
+  }
+  addHiddenFlowOrderInput(order, ipType, coreIndex) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = `ip_configurations[${ipType}][flow_orders][${coreIndex}][]`;
+    input.value = order;
+    input.dataset.flowOrder = order;
+    this.element.appendChild(input);
+  }
+  removeHiddenFlowOrderInput(order, ipType, coreIndex) {
+    const input = this.element.querySelector(`input[type="hidden"][data-flow-order="${order}"]`);
+    if (input) {
+      input.remove();
+    }
+  }
+  disconnect() {
+    if (this.tomSelect) {
+      this.tomSelect.destroy();
+    }
   }
   toggleFlowOrder(event) {
     const order = event.target.value;
@@ -8402,30 +8495,20 @@ var production_parameters_controller_default = class extends Controller {
   }
   addFlowOrderMapping(order) {
     const template = document.getElementById("flow-order-mapping-template");
-    const content = template.content.cloneNode(true);
     const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
     const coreIndex = this.element.closest("[data-core-index]").dataset.coreIndex;
-    const replaceInElement = (element) => {
-      if (element.nodeType === Node.TEXT_NODE) {
-        element.textContent = element.textContent.replace(/ORDER/g, order);
-      }
-      if (element.nodeType === Node.ELEMENT_NODE) {
-        ["name", "id", "for", "data-order", "data-action"].forEach((attr) => {
-          if (element.hasAttribute(attr)) {
-            let value = element.getAttribute(attr);
-            value = value.replace(/ORDER/g, order);
-            value = value.replace(/IP_TYPE/g, ipType);
-            value = value.replace(/CORE_INDEX/g, coreIndex);
-            element.setAttribute(attr, value);
-          }
-        });
-      }
-      element.childNodes.forEach((child) => replaceInElement(child));
-    };
-    const flowOrderDiv = content.querySelector(".flow-order-mapping");
-    replaceInElement(flowOrderDiv);
-    this.mappingContainerTarget.appendChild(content);
-    this.initializeTestPointsToggle(order);
+    let html = template.innerHTML;
+    html = html.replace(/ORDER/g, order);
+    html = html.replace(/IP_TYPE/g, ipType);
+    html = html.replace(/CORE_INDEX/g, coreIndex);
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    const flowOrderDiv = div.querySelector(".flow-order-mapping");
+    this.mappingContainerTarget.appendChild(flowOrderDiv);
+    setTimeout(() => {
+      this.initializeTestPointsToggle(order);
+      this.initializeInsertionSelect(order);
+    }, 100);
   }
   removeFlowOrderMapping(order) {
     const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`);
@@ -8501,6 +8584,68 @@ var production_parameters_controller_default = class extends Controller {
       specVariableInput.classList.remove("bg-gray-100");
     }
   }
+  toggleCoreFrequency(event) {
+    const container = event.target.closest(".flow-order-mapping");
+    const frequencyInput = container.querySelector("[data-frequency-input]");
+    if (!frequencyInput) {
+      console.error("Frequency input not found");
+      return;
+    }
+    const productionContainer = this.element.closest("[data-core-index]");
+    const coreIndex = productionContainer ? productionContainer.dataset.coreIndex : "0";
+    const ipType = this.element.closest("[data-ip-type]").dataset.ipType;
+    const frequencySelector = `[data-ip-type="${ipType}"] input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][frequency]"]`;
+    const coreFrequencyInput = document.querySelector(frequencySelector);
+    if (event.target.checked) {
+      if (coreFrequencyInput && coreFrequencyInput.value) {
+        if (!frequencyInput.dataset.originalValue) {
+          frequencyInput.dataset.originalValue = frequencyInput.value || "";
+        }
+        frequencyInput.value = coreFrequencyInput.value;
+        frequencyInput.disabled = true;
+        frequencyInput.classList.add("bg-gray-100");
+        const hiddenInput = document.createElement("input");
+        hiddenInput.type = "hidden";
+        hiddenInput.name = frequencyInput.name;
+        hiddenInput.value = coreFrequencyInput.value;
+        hiddenInput.dataset.coreFrequencyHidden = "true";
+        frequencyInput.parentElement.appendChild(hiddenInput);
+      } else {
+        event.target.checked = false;
+        alert("Please enter a frequency value in the core configuration first");
+      }
+    } else {
+      frequencyInput.value = frequencyInput.dataset.originalValue || "";
+      delete frequencyInput.dataset.originalValue;
+      frequencyInput.disabled = false;
+      frequencyInput.classList.remove("bg-gray-100");
+      const hiddenInput = frequencyInput.parentElement.querySelector('[data-core-frequency-hidden="true"]');
+      if (hiddenInput) {
+        hiddenInput.remove();
+      }
+    }
+  }
+  initializeInsertionSelect(order) {
+    const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`);
+    if (!mapping) {
+      console.error("Mapping not found for order:", order);
+      return;
+    }
+    const selectElement = mapping.querySelector(`select[data-insertion-select="${order}"]`);
+    if (!selectElement) {
+      console.error("Insertion select not found for order:", order);
+      return;
+    }
+    new TomSelect(selectElement, {
+      plugins: ["remove_button"],
+      create: false,
+      maxItems: null,
+      placeholder: "Select insertions...",
+      searchField: ["text"],
+      closeAfterSelect: false,
+      maxOptions: null
+    });
+  }
 };
 
 // app/javascript/controllers/charz_parameters_controller.js
@@ -8548,6 +8693,12 @@ var charz_parameters_controller_default = class extends Controller {
     replaceInElement(searchTypeDiv);
     this.tablesContainerTarget.appendChild(searchTypeDiv);
     this.testTypes[searchType] = /* @__PURE__ */ new Set();
+    if (searchType === "FMAX") {
+      const specVariableInput = searchTypeDiv.querySelector('input[name*="spec_variables"]');
+      if (specVariableInput) {
+        specVariableInput.value = "TIM.1.refclk_freq[MHz]";
+      }
+    }
   }
   removeSearchTypeTable(searchType) {
     const table = this.tablesContainerTarget.querySelector(`[data-search-type="${searchType}"]`);

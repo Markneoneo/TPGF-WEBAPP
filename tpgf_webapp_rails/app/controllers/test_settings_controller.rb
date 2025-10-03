@@ -1,5 +1,5 @@
 class TestSettingsController < ApplicationController
-    skip_before_action :verify_authenticity_token, only: [:generate] # For AJAX requests
+    skip_before_action :verify_authenticity_token, only: [:generate]
     
     def new
       @ip_options = ['CPU', 'GFX', 'SOC']
@@ -28,7 +28,7 @@ class TestSettingsController < ApplicationController
           status: 'error',
           error: 'Validation failed',
           validation_errors: validation_errors
-        }, status: :unprocessable_content  # Changed from :unprocessable_entity
+        }, status: :unprocessable_content
         return
       end
   
@@ -124,8 +124,15 @@ class TestSettingsController < ApplicationController
         end
       end
       
-      # Store in session for download
-      session[:generated_settings] = combined_results
+      # Store in cache instead of session
+      cache_key = "generated_settings_#{SecureRandom.hex(16)}"
+      Rails.cache.write(cache_key, combined_results, expires_in: 1.hour)
+      
+      # Store only the cache key in session
+      session[:settings_cache_key] = cache_key
+      
+      # Clean up old cache entries periodically
+      cleanup_expired_cache_entries
       
       render json: {
         status: 'success',
@@ -136,20 +143,38 @@ class TestSettingsController < ApplicationController
     end      
   
     def download
-      settings = session[:generated_settings]
+      cache_key = session[:settings_cache_key]
       
-      if settings.nil?
+      if cache_key.nil?
         redirect_to root_path, alert: "No settings to download. Please generate settings first."
         return
       end
       
+      settings = Rails.cache.read(cache_key)
+      
+      if settings.nil?
+        redirect_to root_path, alert: "Settings have expired. Please generate settings again."
+        return
+      end
+      
       send_data JSON.pretty_generate(settings),
-                filename: "tsettings.json",
+                filename: "tsettings_#{Time.current.strftime('%Y%m%d_%H%M%S')}.json",
                 type: "application/json",
                 disposition: "attachment"
+                
+      # Clean up after download
+      Rails.cache.delete(cache_key)
+      session.delete(:settings_cache_key)
     end
     
     private
+    
+    def cleanup_expired_cache_entries
+      # This is a simple cleanup mechanism
+      # In production, you might want to use a background job
+      # For now, we'll just log that cleanup would happen
+      Rails.logger.info "Cache cleanup triggered"
+    end
   
     def validate_test_point_range(start, stop, step)
         # Check for empty values
@@ -226,30 +251,22 @@ class TestSettingsController < ApplicationController
             production_mappings = config[:production_mappings] && config[:production_mappings][idx] || {}
             
             flow_orders.each do |order|
-              mapping_data = production_mappings[order] || {}
+                mapping_data = production_mappings[order] || {}
               
-              # If use_power_supply is checked, use the supply value for spec_variable
-              spec_variable = if mapping_data[:use_power_supply].present?
-                supply_value  # Use the supply value from the core mapping
-              else
-                mapping_data[:spec_variable] || ''
+                floworder_mapping[order.downcase] = {
+                  test_points: parse_test_points(mapping_data),
+                  frequency: mapping_data[:use_core_frequency].present? ? mapping[:frequency].to_f : mapping_data[:frequency].to_f,
+                  register_size: mapping_data[:register_size].to_i,
+                  binnable: mapping_data[:binnable].present?,
+                  softsetenable: mapping_data[:softsetenable].present?,
+                  fallbackenable: mapping_data[:fallbackenable].present?,
+                  insertionlist: parse_insertion_list(mapping_data[:insertion]),
+                  readtype: build_read_type(mapping_data),
+                  specvariable: mapping_data[:use_power_supply].present? ? mapping[:supply] : (mapping_data[:spec_variable] || ''),
+                  use_power_supply: mapping_data[:use_power_supply].present?
+                }
               end
               
-              Rails.logger.info "Flow order #{order}: use_power_supply=#{mapping_data[:use_power_supply]}, spec_variable=#{spec_variable}"
-              
-              floworder_mapping[order.downcase] = {
-                test_points: parse_test_points(mapping_data),
-                frequency: mapping_data[:frequency].to_f,
-                register_size: mapping_data[:register_size].to_i,
-                binnable: mapping_data[:binnable].present?,
-                softsetenable: mapping_data[:softsetenable].present?,
-                fallbackenable: mapping_data[:fallbackenable].present?,
-                insertionlist: parse_insertion_list(mapping_data[:insertion]),
-                readtype: build_read_type(mapping_data),
-                specvariable: spec_variable,
-                use_power_supply: mapping_data[:use_power_supply].present?
-              }
-            end
           end
           
           # Build charztype_mapping if enabled
@@ -266,14 +283,16 @@ class TestSettingsController < ApplicationController
             end
           end
           
-          core_mapping[core_name] = {
+            # Build the core mapping entry
+            core_mapping[core_name] = {
             count: mapping[:core_count].to_i,
-            supply: mapping[:supply],
-            clk: mapping[:clock],
-            freq: 1000,
+            power_supply: mapping[:supply] || '',
+            clock: mapping[:clock] || '',
+            freq: mapping[:frequency].to_f,  # Change from hardcoded 1000 to actual frequency
             floworder_mapping: floworder_mapping,
             charztype_mapping: charztype_mapping
-          }
+            }
+
         end
         
         core_mapping
@@ -366,10 +385,16 @@ class TestSettingsController < ApplicationController
       result
     end      
   
-    def parse_insertion_list(insertion_string)
-      return [] if insertion_string.blank?
-      insertion_string.split(',').map(&:strip)
-    end
+    def parse_insertion_list(insertion_data)
+        return [] if insertion_data.blank?
+        
+        # Handle both string (legacy) and array formats
+        if insertion_data.is_a?(Array)
+          insertion_data.select(&:present?)
+        else
+          insertion_data.split(',').map(&:strip).select(&:present?)
+        end
+    end      
   
     def build_read_type(mapping)
       types = []

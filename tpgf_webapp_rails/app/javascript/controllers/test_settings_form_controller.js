@@ -236,19 +236,32 @@ export default class extends Controller {
             const productionSections = configSection.querySelectorAll('[data-production-section]')
 
             productionSections.forEach((section) => {
+
                 const coreIndex = section.dataset.productionSection
 
                 const productionCheckbox = configSection.querySelector(`[name*="show_production_for_core][${coreIndex}]"]`)
-                if (productionCheckbox && productionCheckbox.checked) {
-                    const flowOrders = section.querySelectorAll('input[name*="flow_orders"]:checked')
 
-                    if (flowOrders.length === 0) {
-                        errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: At least one flow order must be selected`)
-                        hasErrors = true
+                if (productionCheckbox && productionCheckbox.checked) {
+                    // Check for Tom Select instance
+                    const selectElement = section.querySelector('select[name*="flow_orders"]')
+                    let flowOrdersSelected = []
+
+                    if (selectElement && selectElement.tomselect) {
+                        // Get values from Tom Select
+                        flowOrdersSelected = selectElement.tomselect.items || []
+                    } else {
+                        // Fallback to checking checkboxes
+                        const flowOrders = section.querySelectorAll('input[name*="flow_orders"]:checked')
+                        flowOrdersSelected = Array.from(flowOrders).map(cb => cb.value)
                     }
 
-                    flowOrders.forEach(checkbox => {
-                        const order = checkbox.value
+                    if (flowOrdersSelected.length === 0) {
+                        errors.push(`${ipType} Core ${parseInt(coreIndex) + 1}: At least one flow order must be selected`)
+                        hasErrors = true
+                        return
+                    }
+
+                    flowOrdersSelected.forEach(order => {
                         const container = section.querySelector(`[data-order="${order}"]`)
 
                         if (container) {
@@ -269,8 +282,9 @@ export default class extends Controller {
                             }
 
                             // Frequency
+                            const usesCoreFreq = container.querySelector('[name*="use_core_frequency"]')
                             const frequency = container.querySelector('[name*="frequency"]')
-                            if (frequency && !frequency.value.trim()) {
+                            if (frequency && !frequency.value.trim() && (!usesCoreFreq || !usesCoreFreq.checked)) {
                                 frequency.classList.add('error-field')
                                 this.addErrorMessage(frequency, 'Frequency is required')
                                 errors.push(`${ipType} - ${order}: Frequency is required`)

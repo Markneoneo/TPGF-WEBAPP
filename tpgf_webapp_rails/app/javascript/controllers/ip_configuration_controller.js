@@ -60,50 +60,87 @@ export default class extends Controller {
         let template = this.coreMappingTemplateTarget.innerHTML
 
         // Replace all occurrences systematically
-        // Replace display text
         template = template.replace(/Core Type 1000/g, `Core Type ${index + 1}`)
-
-        // Replace data attributes
         template = template.replace(/data-core-index="999"/g, `data-core-index="${index}"`)
         template = template.replace(/data-production-section="999"/g, `data-production-section="${index}"`)
         template = template.replace(/data-charz-section="999"/g, `data-charz-section="${index}"`)
-        template = template.replace(/data-coreIndex="999"/g, `data-core-index="${index}"`)
-
-        // Replace form field names - be specific to avoid replacing other numbers
+        template = template.replace(/flow-orders-([^-]+)-999/g, `flow-orders-$1-${index}`)
         template = template.replace(/\[core_mappings\]\[999\]/g, `[core_mappings][${index}]`)
         template = template.replace(/\[flow_orders\]\[999\]/g, `[flow_orders][${index}]`)
         template = template.replace(/\[production_mappings\]\[999\]/g, `[production_mappings][${index}]`)
         template = template.replace(/\[show_production_for_core\]\[999\]/g, `[show_production_for_core][${index}]`)
         template = template.replace(/\[show_charz_for_core\]\[999\]/g, `[show_charz_for_core][${index}]`)
         template = template.replace(/\[charz_data\]\[999\]/g, `[charz_data][${index}]`)
-
-        // Replace any remaining 999s (for IDs, etc)
         template = template.replace(/_999/g, `_${index}`)
         template = template.replace(/="999"/g, `="${index}"`)
 
         // Append the modified template
         this.coreMappingsTarget.insertAdjacentHTML('beforeend', template)
+
+        console.log(`Added core mapping ${index}`)
+
+        // Initialize collapsible sections after a delay
+        setTimeout(() => {
+            this.initializeCollapsibleSections(index)
+        }, 200)
+    }
+
+    initializeCollapsibleSections(coreIndex) {
+        // Find the newly added core mapping
+        const newCoreMapping = this.coreMappingsTarget.querySelector(`[data-core-index="${coreIndex}"]:last-child`)
+        if (!newCoreMapping) return
+
+        // Initialize collapsible headers
+        const collapsibleHeaders = newCoreMapping.querySelectorAll('.collapsible-header')
+
+        collapsibleHeaders.forEach(header => {
+            header.addEventListener('click', (e) => {
+                if (e.target.type !== 'checkbox') {
+                    const section = header.closest('.collapsible-section')
+                    const checkbox = header.querySelector('input[type="checkbox"]')
+
+                    // Toggle the checkbox if clicking on header (not the checkbox itself)
+                    if (checkbox && !e.target.closest('input')) {
+                        checkbox.checked = !checkbox.checked
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }))
+                    }
+
+                    section.classList.toggle('expanded')
+                }
+            })
+        })
+
+        // Initialize Tom Select for production parameters if present
+        this.initializeProductionSelect(coreIndex)
     }
 
     toggleProduction(event) {
         const coreIndex = event.target.dataset.coreIndex
         const section = this.element.querySelector(`[data-production-section="${coreIndex}"]`)
+        const collapsibleSection = event.target.closest('.collapsible-section')
 
         if (event.target.checked) {
             section.classList.remove('hidden')
+            collapsibleSection.classList.add('expanded')
+            // Remove the Tom Select initialization from here
         } else {
             section.classList.add('hidden')
+            collapsibleSection.classList.remove('expanded')
         }
     }
 
     toggleCharz(event) {
         const coreIndex = event.target.dataset.coreIndex
         const section = this.element.querySelector(`[data-charz-section="${coreIndex}"]`)
+        const collapsibleSection = event.target.closest('.collapsible-section')
 
         if (event.target.checked) {
             section.classList.remove('hidden')
+            collapsibleSection.classList.add('expanded')
         } else {
             section.classList.add('hidden')
+            collapsibleSection.classList.remove('expanded')
         }
     }
+
 }

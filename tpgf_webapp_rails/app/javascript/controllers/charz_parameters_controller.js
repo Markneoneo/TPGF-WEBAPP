@@ -67,6 +67,14 @@ export default class extends Controller {
 
     // Initialize test types for this search type
     this.testTypes[searchType] = new Set()
+
+    // Set default value for FMAX spec variable
+    if (searchType === 'FMAX') {
+      const specVariableInput = searchTypeDiv.querySelector('input[name*="spec_variables"]')
+      if (specVariableInput) {
+        specVariableInput.value = 'TIM.1.refclk_freq[MHz]'
+      }
+    }
   }
 
   removeSearchTypeTable(searchType) {

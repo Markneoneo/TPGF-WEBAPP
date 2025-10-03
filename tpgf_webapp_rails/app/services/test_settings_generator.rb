@@ -116,12 +116,13 @@ end
 
 class Parametric < Test
   include TestHelper
-  attr_accessor :spec_variable, :insertionlist, :readtype
+  attr_accessor :spec_variable, :insertionlist, :readtype, :frequency 
 
   def post_initialize(options)
     @spec_variable = options[:spec_variable] || ""
     @insertionlist = options[:insertionlist] || default_insertionlist
     @readtype = options[:readtype] || ['fw']
+    @frequency = options[:frequency] || 0  
   end
 
   def default_insertionlist
@@ -137,12 +138,31 @@ class Parametric < Test
   end
 
   def testsettings
-    settings = tpsettings.merge(regreadsetup)
+    settings = {}
+    
+    # Start with burst and binnable
+    settings['burst'] = burst
+    settings['binnable'] = binnable
+    
+    # Add frequency right after binnable
+    settings['frequency'] = @frequency
+    
+    # Then add test_points
+    settings['test_points'] = {
+      'spec_variable' => spec_variable,
+      'values' => gentp
+    }
+    
+    # Add register_setup
+    settings.merge!(regreadsetup)
+    
+    # Finally add the remaining fields
     settings['softsets'] = softsetprofile if softsetenable
     settings['insertion_list'] = insertionlist
     settings['fallback_enable'] = fallbackenable
+    
     settings
-  end
+  end  
 end
 
 class Search < Test
@@ -220,19 +240,21 @@ class Search < Test
   
     def generate_core_settings(coretype, coretype_config)
       {
-        supply: coretype_config[:supply],
-        clk: coretype_config[:clk],
-        fwload_settings: generate_fwload_settings(coretype),
+        power_supply: coretype_config[:power_supply], 
+        clock: coretype_config[:clock],                 
+        frequency: coretype_config[:freq],        
+        setup_settings: generate_setup_settings(coretype),
         prod_settings: generate_prod_settings(coretype, coretype_config),
         charz_settings: generate_charz_settings(coretype, coretype_config)
       }
-    end
-  
-    def generate_fwload_settings(coretype)
+    end     
+
+    # Changed this method name from generate_fwload_settings to generate_setup_settings
+    def generate_setup_settings(coretype)
       fwload_test = Test.new(
         ip: ip,
         coretype: coretype,
-        testtype: 'fwload'
+        testtype: 'fw_load'  # Changed from 'fwload'
       )
       fwload_test.testsettings
     end
@@ -252,7 +274,8 @@ class Search < Test
           softsetenable: config[:softsetenable] || false,
           fallbackenable: config[:fallbackenable] || false,
           insertionlist: config[:insertionlist] || [],
-          readtype: config[:readtype] || ['fw']
+          readtype: config[:readtype] || ['fw'],
+          frequency: config[:frequency] || 0 
         )
         result[testtype.to_s] = param_obj.testsettings
       end

@@ -48,6 +48,11 @@ class FormValidator
       if mapping[:clock].blank?
         @errors["clock_#{idx}"] = "Clock is required for Core Type #{idx.to_i + 1}"
       end
+
+      if mapping[:frequency].blank?
+        @errors["frequency_#{idx}"] = "Frequency is required."
+      end
+      
     end
   end # validate_core_mappings
 
@@ -160,10 +165,10 @@ class FormValidator
     end
 
     # Validate frequency
-    if mapping[:frequency].blank?
+    if mapping[:use_core_frequency] != "on" && mapping[:frequency].blank?
       @errors["frequency_#{order}_core_#{core_idx}"] =
         "#{order}: Frequency is required"
-    elsif !mapping[:frequency].match?(/^\d+$/)
+    elsif mapping[:use_core_frequency] != "on" && !mapping[:frequency].match?(/^\d+$/)
       @errors["frequency_#{order}_core_#{core_idx}"] =
         "#{order}: Frequency must be a number"
     end
@@ -177,14 +182,20 @@ class FormValidator
         "#{order}: Register size must be a number"
     end
 
-    # Insertion list (optional)
+    # Insertion list is optional but validate format if present
     if mapping[:insertion].present?
-      insertions = mapping[:insertion].split(",").map(&:strip)
+      # Handle both array (from multi-select) and string (legacy) formats
+      insertions = if mapping[:insertion].is_a?(Array)
+        mapping[:insertion].select(&:present?)
+      else
+        mapping[:insertion].split(',').map(&:strip)
+      end
+      
       if insertions.any?(&:blank?)
-        @errors["insertion_#{order}_core_#{core_idx}"] =
-          "#{order}: Insertion list has empty values"
+        @errors["insertion_#{order}_core_#{idx}"] = "#{order}: Insertion list has empty values"
       end
     end
+
   end # validate_production_mapping
 
   def validate_charz_parameters
