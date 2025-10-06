@@ -1,0 +1,25 @@
+{
+  "cpu": {
+    "_v_d_d_c_r": {
+      "supply": "VDDCR",
+      "clk": "1",
+      "fwload_settings": {
+        "fwload": {
+          "burst": "avfs_cpu_fwload_burst",
+          "softsets": "SoftsetProfile_avfs_cpu_fwload"
+        }
+      },
+      "prod_settings": {},
+      "charz_settings": {
+        "allcore": {
+          "_v_m_i_n": {
+            "crest": {}
+          },
+          "_f_m_a_x": {
+            "crest": {}
+          }
+        }
+      }
+    }
+  }
+}

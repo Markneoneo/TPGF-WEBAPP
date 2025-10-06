@@ -1,0 +1,97 @@
+<div class="test-settings-container">
+  <header class="section-header text-center">
+    <h1 class="section-title">Test Settings Generator</h1>
+    <p class="section-subtitle">Configure IP types and generate test settings</p>
+  </header>
+  
+  <%= form_with url: generate_test_settings_path, local: false, data: { 
+    controller: "test-settings-form"
+  } do |form| %>
+
+    <!-- IP Type Selection -->
+    <div class="ip-selection-card">
+      <div class="card-header">
+        <h3 class="text-lg font-semibold">Select IP Types</h3>
+      </div>
+      <div class="card-body">
+        <div class="ip-selection-grid">
+          <% @ip_options.each do |ip_type| %>
+            <label class="ip-checkbox-card" data-ip-type="<%= ip_type %>">
+              <%= check_box_tag "selected_ip_types[]", ip_type, false, 
+                  class: "mr-2", 
+                  data: { 
+                    action: "change->test-settings-form#toggleIpType",
+                    ip_type: ip_type 
+                  } %>
+              <span class="font-medium"><%= ip_type %></span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Dynamic IP Configuration Forms -->
+    <div id="ip-configurations" class="space-y-6">
+      <% @ip_options.each do |ip_type| %>
+        <div id="<%= ip_type %>-config" class="hidden animate-fadeIn" data-ip-type="<%= ip_type %>">
+          <%= render 'ip_configuration_form', ip_type: ip_type %>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Global Actions -->
+    <div id="global-actions" class="action-buttons-container hidden">
+      <div class="action-buttons-grid">
+        <button type="button"
+                class="btn btn-primary btn-lg"
+                data-action="click->test-settings-form#submitForm">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Generate Test Settings
+        </button>
+        
+        <div id="download-button" class="hidden">
+          <%= link_to download_test_settings_path, 
+              class: "btn btn-success btn-lg",
+              target: "_blank" do %>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+            </svg>
+            Download JSON
+          <% end %>
+        </div>
+      
+        <button type="button" 
+                class="btn btn-outline btn-lg"
+                data-action="click->test-settings-form#clearAll">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          Clear All
+        </button>
+      </div>
+    </div>
+  <% end %>
+  
+  <!-- JSON Preview Modal -->
+  <div id="json-preview" class="hidden">
+    <div class="loading-overlay">
+      <div class="card" style="width: 90%; max-width: 1200px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="card-header">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold">Generated JSON Preview</h3>
+            <button type="button" 
+                    class="text-gray-500 hover:text-gray-700 text-2xl"
+                    data-action="click->test-settings-form#closePreview">
+              ×
+            </button>
+          </div>
+        </div>
+        <div class="card-body" style="overflow-y: auto;">
+          <pre class="json-preview"><code id="json-content"></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
