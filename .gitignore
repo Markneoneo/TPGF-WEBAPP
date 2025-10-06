@@ -3,54 +3,68 @@
 # ==================================================
 
 # dependencies (ignore node_modules anywhere)
-node_modules/
-/vendor/bundle
+**/node_modules/
+**/vendor/bundle
 
 # production builds
-dist/
-build/
+**/dist/
+**/build/
 
 # misc
 .DS_Store
 Thumbs.db
 
 # local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
 
 # logs
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
+**/npm-debug.log*
+**/yarn-debug.log*
+**/pnpm-debug.log*
 
 # ==================================================
-# Rails ignores
+# Rails ignores (specific to tpgf_webapp_rails)
 # ==================================================
 
-# Ignore bundler config
-.bundle/
+# Rails logs, temp files, and storage
+tpgf_webapp_rails/log/*
+tpgf_webapp_rails/tmp/*
+tpgf_webapp_rails/storage/*
+!tpgf_webapp_rails/log/.keep
+!tpgf_webapp_rails/tmp/.keep
+!tpgf_webapp_rails/storage/.keep
 
-# Ignore logs, temp files, and storage
-log/*
-tmp/*
-storage/*
-!log/.keep
-!tmp/.keep
-!storage/.keep
+# Ignore ALL tmp cache including bootsnap
+tpgf_webapp_rails/tmp/cache/
+tpgf_webapp_rails/tmp/pids/
+tpgf_webapp_rails/tmp/sockets/
 
 # Ignore sqlite databases
-*.sqlite3
-*.sqlite3-*
+**/*.sqlite3
+**/*.sqlite3-*
 
 # Ignore credentials and master key
-config/master.key
-config/credentials.yml.enc
+tpgf_webapp_rails/config/master.key
+tpgf_webapp_rails/config/credentials.yml.enc
 
-# Ignore coverage reports
-coverage/
+# Ignore Rails compiled assets
+tpgf_webapp_rails/app/assets/builds/*
+!tpgf_webapp_rails/app/assets/builds/.keep
+
+# Ignore bundler config
+**/.bundle/
+
+# ==================================================
+# React ignores (specific to tpgf_webapp_react)
+# ==================================================
+
+tpgf_webapp_react/frontend/dist/
+tpgf_webapp_react/frontend/build/
+tpgf_webapp_react/backend/tsettings.json
 
 # ==================================================
 # Editor / system junk
