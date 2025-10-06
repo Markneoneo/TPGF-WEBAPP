@@ -1,5 +1,0 @@
-@echo off
-start cmd /k "cd /d frontend && npm run dev"
-start cmd /k "cd /d backend && ruby app.rb"
-timeout /t 3
-start http://localhost:5173

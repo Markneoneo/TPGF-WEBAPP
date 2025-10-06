@@ -4,6 +4,7 @@
 
 # dependencies (ignore node_modules anywhere)
 node_modules/
+/vendor/bundle
 
 # production builds
 dist/
