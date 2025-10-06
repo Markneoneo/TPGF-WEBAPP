@@ -1,0 +1,143 @@
+.form-group label {
+  color: black;
+  display: block;
+  padding-left: 3px;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  margin: 0; /* remove default bottom margin */
+  white-space: nowrap; /* keep label on one line */
+}
+
+.core-types-group {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centers horizontally */
+  gap: 0.5rem;
+  width: 100%; /* make sure it can center in the container */
+  font-size: 1.2rem;
+}
+
+.core-types-group .error-message {
+  margin-left: 0.5rem; /* optional spacing tweak */
+}
+
+/* Number input styling */
+.number-input-container {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.number-input {
+  border: none;
+  padding: 0.5rem;
+  text-align: center;
+  width: 40px;
+  font-size: 1rem;
+  background: white;
+  color: black ;
+}
+
+.number-btn:focus {
+  outline: none;
+}
+
+.number-btn:focus-visible {
+  outline: 2px solid #007bff; /* optional custom focus style for keyboard users */
+}
+
+.number-btn {
+  background: #007bff;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  width: 40px; /* fixed width so both buttons are same size */
+  text-align: center;
+  line-height: 1; /* centers symbol vertically better */
+}
+
+.number-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.number-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Section headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.section-header h5 {
+  margin: 0;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.section-badge {
+  background: #e9ecef;
+  color: #495057;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Form actions */
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.clear-button {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.clear-button:hover {
+  background: #f5c6cb;
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .number-input-container {
+    width: 100%;
+  }
+  
+  .number-input {
+    flex: 1;
+  }
+}

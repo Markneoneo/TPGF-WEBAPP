@@ -1,0 +1,192 @@
+<div class="production-params-container" data-controller="production-parameters" data-production-section="<%= core_index %>">
+  <div class="parameter-header">
+    <span>Production Configuration</span>
+  </div>
+  
+  <!-- Flow Orders Selection -->
+  <div class="form-group">
+    <label class="form-label">Flow Orders</label>
+    <div class="form-hint">Select one or more flow orders</div>
+    <select id="flow-orders-<%= ip_type %>-<%= core_index %>" 
+            name="ip_configurations[<%= ip_type %>][flow_orders][<%= core_index %>][]" 
+            multiple
+            placeholder="Search and select flow orders..."
+            data-production-parameters-target="flowOrdersSelect">
+      <% %w[AVGPSM MINPSM DLDOAVGPSM DLDOMINPSM CPO FAVFS MAFDD DFLL XVMIN XVMINDD].each do |order| %>
+        <option value="<%= order %>"><%= order %></option>
+      <% end %>
+    </select>
+  </div>  
+  
+  <!-- Flow Order Mappings Container -->
+  <div data-production-parameters-target="mappingContainer" class="spacer-md"></div>
+  
+  <!-- Template for flow order mapping -->
+<template id="flow-order-mapping-template">
+  <div class="flow-order-mapping" data-order="ORDER">
+    <div class="flow-order-header">ORDER Configuration</div>
+    
+    <!-- Read Type -->
+    <div class="form-group">
+      <label class="form-label">Read Type <span class="text-red-500">*</span></label>
+      <div class="form-hint">Select one read type (JTAG or FW)</div>
+      <div class="form-checkbox-group">
+        <label class="form-checkbox-label">
+          <input type="checkbox" 
+                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][read_type_jtag]">
+          <span>JTAG</span>
+        </label>
+        <label class="form-checkbox-label">
+          <input type="checkbox" 
+                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][read_type_fw]">
+          <span>FW</span>
+        </label>
+      </div>
+    </div>
+    
+    <!-- Test Points Configuration -->
+    <div class="test-points-config">
+      <div class="form-group">
+        <label class="form-label">Test Points Configuration</label>
+        <div class="test-points-toggle">
+          <button type="button" class="active" data-test-points-type="range">
+            Range
+          </button>
+          <button type="button" data-test-points-type="list">
+            List
+          </button>
+        </div>
+        <input type="hidden" name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points_type]" value="Range">
+      </div>
+      
+      <!-- Test Points Range -->
+      <div data-range-fields class="test-points-range-grid">
+        <div class="form-group">
+          <label class="form-label">Start</label>
+          <div class="input-group">
+            <input type="text" 
+                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points_start]"
+                   class="form-input form-input-sm">
+            <span class="input-addon">V</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stop</label>
+          <div class="input-group">
+            <input type="text" 
+                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points_stop]"
+                   class="form-input form-input-sm">
+            <span class="input-addon">V</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Step</label>
+          <div class="input-group">
+            <input type="text" 
+                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points_step]"
+                   class="form-input form-input-sm">
+            <span class="input-addon">V</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Test Points List -->
+      <div data-list-field style="display: none;">
+        <div class="form-group">
+          <input type="text" 
+                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points]"
+                 placeholder="Enter comma-separated values (e.g., 0.5, 0.6, 0.7)"
+                 class="form-input">
+        </div>
+      </div>
+    </div>
+      
+      <!-- Other Parameters Grid -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Spec Variable -->
+        <div class="form-group">
+          <div class="flex items-center justify-between mb-2">
+            <label class="form-label mb-0">Spec Variable <span class="text-red-500">*</span></label>
+            <label class="form-checkbox-label text-sm">
+              <input type="checkbox" 
+                     name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][use_power_supply]"
+                     data-action="change->production-parameters#togglePowerSupply">
+              <span>Use Power Supply</span>
+            </label>
+          </div>
+          <input type="text" 
+                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][spec_variable]"
+                 placeholder="e.g., VDDCR"
+                 class="form-input">
+        </div>
+        
+        <!-- Frequency -->
+        <div class="form-group">
+          <div class="flex items-center justify-between mb-2">
+            <label class="form-label mb-0">Frequency <span class="text-red-500">*</span></label>
+            <label class="form-checkbox-label text-sm">
+              <input type="checkbox" 
+                    name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][use_core_frequency]"
+                    data-action="change->production-parameters#toggleCoreFrequency">
+              <span>Use Core Frequency</span>
+            </label>
+          </div>
+          <div class="input-group">
+            <input type="text" 
+                  name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][frequency]"
+                  placeholder="e.g., 1000"
+                  class="form-input"
+                  data-frequency-input="ORDER">
+            <span class="input-addon">MHz</span>
+          </div>
+        </div>
+        
+        <!-- Register Size -->
+        <div class="form-group">
+          <label class="form-label">Register Size <span class="text-red-500">*</span></label>
+          <input type="text" 
+                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][register_size]"
+                 placeholder="e.g., 512"
+                 class="form-input">
+        </div>
+        
+        <!-- Insertion List -->
+        <div class="form-group">
+          <label class="form-label">Insertion List</label>
+          <select name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][insertion][]"
+                  multiple
+                  placeholder="Select insertions..."
+                  data-insertion-select="ORDER"
+                  class="form-input">
+            <option value="WS1">WS1</option>
+            <option value="WS2">WS2</option>
+            <option value="FT1">FT1</option>
+            <option value="FTCOLD">FTCOLD</option>
+            <option value="FTCHARZ">FTCHARZ</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Boolean Options -->
+      <div class="card-nested">
+        <div class="grid grid-cols-3 gap-4">
+          <label class="form-checkbox-label">
+            <input type="checkbox" 
+                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][binnable]">
+            <span>Binnable</span>
+          </label>
+          <label class="form-checkbox-label">
+            <input type="checkbox" 
+                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][softsetenable]">
+            <span>Softset Enable</span>
+          </label>
+          <label class="form-checkbox-label">
+            <input type="checkbox" 
+                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][fallbackenable]">
+            <span>FallBack Enable</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </template>
+</div>

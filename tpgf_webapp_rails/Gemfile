@@ -1,0 +1,66 @@
+source "https://rubygems.org"
+
+# Core Rails
+gem "rails", "~> 8.0.2", ">= 8.0.2.1"
+
+# Database
+# gem "pg", "~> 1.1"
+# gem "sqlite3", ">= 1.4"
+
+# Web server
+gem "puma", ">= 5.0"
+
+# Asset pipeline
+gem "propshaft"
+
+# JavaScript & CSS bundling
+gem "jsbundling-rails"
+gem "cssbundling-rails"
+
+# Hotwire
+gem "turbo-rails"
+gem "stimulus-rails"
+
+# JSON builder
+gem "jbuilder"
+
+# Background jobs, caching, Action Cable
+# gem "solid_cache"
+# gem "solid_queue"
+# gem "solid_cable"
+
+# Performance
+gem "bootsnap", require: false
+
+# Deployment
+gem "kamal", require: false
+gem "thruster", require: false
+
+# Windows time zone data
+gem "tzinfo-data", platforms: %i[windows jruby]
+
+# Development & Test
+group :development, :test do
+  # Debugging
+  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
+
+  # Security scanning
+  gem "brakeman", require: false
+
+  # RuboCop for formatting & linting
+  gem "rubocop", require: false
+  gem "rubocop-rails", require: false
+end
+
+# Development only
+group :development do
+  gem "web-console"
+end
+
+# Test only
+group :test do
+  gem "capybara"
+  gem "selenium-webdriver"
+  # gem "rspec-rails"  # Comment out - requires database
+  # gem "factory_bot_rails"  # Comment out - requires database
+end

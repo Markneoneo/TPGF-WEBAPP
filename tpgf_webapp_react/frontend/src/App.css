@@ -1,0 +1,452 @@
+/* CSS Class Breakdown:
+Layout & Structure:
+.App - Main app container (inherits full width from html/body/#root)
+#root - Page wrapper with max-width 90%, auto margins, and 2rem padding
+.card - Main content container with background, shadow, rounded corners, and large padding
+
+Typography:
+.title - Main heading (center-aligned, large font)
+.subheading - Subtitle text (center-aligned, muted color)
+.form-title - Form section headers with bottom border
+
+Form Layout:
+.ip-selection-container - IP type selection section with background and padding
+.forms-container - Flexbox container for multiple forms
+.extended-form - Individual form wrapper with padding and shadow
+.global-actions - Bottom action buttons container with background and padding */
+
+/* CSS Custom Properties for consistent theming */
+:root {
+  --primary-color: #007bff;
+  --primary-hover: #0056b3;
+  --success-color: #28a745;
+  --success-hover: #218838;
+  --secondary-color: #6c757d;
+  --secondary-hover: #545b62;
+  --error-color: #dc3545;
+  --text-primary: #222;
+  --text-secondary: #666;
+  --text-muted: #555;
+  --bg-primary: #f7f9fb;
+  --bg-card: #fff;
+  --bg-section: #f8f9fa;
+  --bg-success: #d4edda;
+  --border-color: #ccc;
+  --border-light: #e9ecef;
+  --border-success: #c3e6cb;
+  --shadow-light: 0 2px 16px rgba(0, 0, 0, 0.07);
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
+  --border-radius-small: 4px;
+  --border-radius-large: 12px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --font-size-sm: 0.75rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.1rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 1.8rem;
+  --font-size-3xl: 2.2rem;
+  --font-size-4xl: 4.4rem;
+  --transition-fast: 0.2s ease;
+}
+
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg-primary);
+}
+
+p, h4 {
+  margin: 0;
+  padding: 0;
+}
+
+/* Full-bleed layout */
+html, body, #root, .App {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Layout */
+#root {
+  max-width: 90%;
+  margin: 2rem auto;
+  text-align: left;
+}
+
+.card {
+  background: var(--bg-card);
+  max-width: 90%;
+  margin: 0 auto;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--shadow-light);
+  padding: var(--spacing-xl) 2.5rem;
+}
+
+/* Typography */
+.title {
+  text-align: center;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+}
+
+.subheading {
+  text-align: center;
+  color: var(--text-muted);
+  margin: var(--spacing-md) 0 var(--spacing-xl);
+  font-size: var(--font-size-2xl);
+}
+
+.form-title {
+  margin: 0 0 var(--spacing-lg);
+  color: var(--primary-color);
+  font-size: var(--font-size-2xl);
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: var(--spacing-sm);
+}
+
+/* Form Elements */
+label {
+  display: block;
+  padding-left: 3px;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.single-input {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-small);
+  font-size: var(--font-size-base);
+  background: var(--bg-card);
+  color: black;
+  transition: border-color var(--transition-fast);
+}
+
+.single-input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.single-input.error {
+  border-color: var(--error-color) !important;
+  background: #fff0f0 !important;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: var(--font-size-sm);
+  padding-left: 3px;
+  margin-top: 5px;
+  display: block;
+}
+
+.input-hint {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: 5px;
+  font-style: italic;
+}
+
+/* Simplified Button Styles */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  transition: background-color var(--transition-fast);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 500;
+}
+
+/* Blue - Generate Button */
+.btn-primary {
+  background-color: var(--primary-color);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.btn-primary:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Green - Download Button */
+.btn-success {
+  background-color: var(--success-color);
+}
+
+.btn-success:hover {
+  background-color: var(--success-hover);
+}
+
+/* Grey - Clear All Button */
+.btn-secondary {
+  background-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-hover);
+}
+
+/* Layout Components */
+.global-button-group {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.forms-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.extended-form {
+  padding: var(--spacing-lg);
+  background-color: var(--bg-card);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-light);
+  flex: 1;
+  min-width: 350px;
+  width: 800px;
+}
+
+.global-actions {
+  padding: var(--spacing-lg);
+  background-color: var(--bg-section);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-light);
+}
+
+.result-container {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background-color: var(--bg-success);
+  border-radius: var(--border-radius-small);
+  border: 1px solid var(--border-success);
+}
+
+.success-message {
+  color: #155724;
+}
+
+.success-message p {
+  margin: 5px 0;
+}
+
+.processing-results {
+  margin: 0;
+}
+
+/* IP Selection Styles */
+.ip-selection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-md);
+  background-color: var(--bg-section);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-light);
+}
+
+.ip-selection-container h3 {
+  margin: 0 0 0.4rem;
+  color: #333;
+  font-size: var(--font-size-xl);
+}
+
+/* Checkbox Grid Layouts */
+.checkbox-group,
+.checkbox-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.checkbox-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.checkbox-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.checkbox-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.checkbox-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.checkbox-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Compact Variants */
+.compact {
+  gap: var(--spacing-sm);
+}
+
+.compact .checkbox-label {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.95rem;
+}
+
+.compact .checkbox-custom {
+  width: 18px;
+  height: 18px;
+  margin-right: var(--spacing-sm);
+}
+
+/* Checkbox Styles */
+.checkbox-label,
+label.checkbox-label {
+  display: inline-flex !important;
+  align-items: center;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: #333;
+  padding: 0.3rem var(--spacing-sm);
+  user-select: none;
+  white-space: nowrap;
+  margin: 0;
+  min-width: fit-content;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
+  padding-left: 0;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--primary-color);
+  border-radius: 5px;
+  margin-right: 0.7rem;
+  position: relative;
+  transition: all var(--transition-fast);
+  background: var(--bg-card);
+  display: inline-block;
+}
+
+.checkbox-input:checked+.checkbox-custom {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.checkbox-input:checked+.checkbox-custom::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 7px;
+  height: 13px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  border-radius: 1px;
+  transform: translate(-50%, -55%) rotate(45deg);
+  display: block;
+  pointer-events: none;
+}
+
+.checkbox-label:hover .checkbox-custom {
+  border-color: var(--primary-hover);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+/* CPU/GFX/SOC checkbox labels */
+label.checkbox-label.ip-checkbox {
+  font-size: var(--font-size-xl);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #root {
+    max-width: 95%;
+    padding: var(--spacing-md);
+  }
+
+  .title {
+    font-size: 3rem;
+  }
+
+  .subheading {
+    font-size: 1.4rem;
+  }
+
+  .global-button-group {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .forms-container {
+    flex-direction: column;
+  }
+
+  .extended-form {
+    min-width: unset;
+    padding: var(--spacing-md);
+  }
+
+  .checkbox-grid-3,
+  .checkbox-grid-4,
+  .checkbox-grid-5 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.3rem;
+  }
+
+  .checkbox-grid-auto {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .form-title {
+    font-size: var(--font-size-xl);
+  }
+}
+
