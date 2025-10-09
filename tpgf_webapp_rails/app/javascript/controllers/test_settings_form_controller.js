@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { showToast } from "../utils/toast"
+import { showSuccess, showError, showWarning, showInfo, showLoading } from "../utils/toast"
 
 export default class extends Controller {
     static targets = ["jsonContent", "jsonPreview"]
@@ -32,12 +32,12 @@ export default class extends Controller {
             this.selectedIpTypes.add(ipType)
             configSection.classList.remove('hidden')
             ipCard.classList.add('selected')
-            showToast(`${ipType} configuration enabled`, 'info')
+            showInfo(`${ipType} configuration enabled`)
         } else {
             this.selectedIpTypes.delete(ipType)
             configSection.classList.add('hidden')
             ipCard.classList.remove('selected')
-            showToast(`${ipType} configuration disabled`, 'info')
+            showInfo(`${ipType} configuration disabled`)
         }
 
         // Show/hide global actions with animation
@@ -53,6 +53,9 @@ export default class extends Controller {
     async submitForm(event) {
         event.preventDefault()
 
+        // Show loading toast
+        const loadingToast = showLoading('Generating test settings...')
+
         // Show loading overlay
         const loadingOverlay = document.getElementById('loading-overlay')
         loadingOverlay.classList.remove('hidden')
@@ -63,7 +66,8 @@ export default class extends Controller {
         // Validate before submitting
         if (!this.validateBeforeSubmit()) {
             loadingOverlay.classList.add('hidden')
-            showToast('Please fix the validation errors', 'error')
+            loadingToast.remove()
+            showError('Please fix the validation errors')
             return
         }
 
@@ -101,6 +105,9 @@ export default class extends Controller {
                 throw new Error('Invalid JSON response from server')
             }
 
+            // Remove loading toast
+            loadingToast.remove()
+
             if (response.ok && data.status === 'success') {
                 // Show JSON preview with animation
                 const preview = document.getElementById('json-preview')
@@ -115,17 +122,18 @@ export default class extends Controller {
                 // Show download button
                 document.getElementById('download-button').classList.remove('hidden')
 
-                showToast('Test settings generated successfully!', 'success')
+                showSuccess('Test settings generated successfully!', { duration: 4000 })
             } else if (data.validation_errors) {
                 // Show validation errors from server
                 this.showValidationErrors(data.validation_errors)
-                showToast('Validation errors found', 'error')
+                showError('Validation failed. Please check the errors below.', { duration: 6000 })
             } else {
-                showToast(`Error: ${data.error || 'Unknown error'}`, 'error')
+                showError(data.error || 'Unknown error occurred', { duration: 6000 })
             }
         } catch (error) {
             console.error('Error:', error)
-            showToast(`Error generating settings: ${error.message}`, 'error')
+            loadingToast.remove()
+            showError(`Error generating settings: ${error.message}`, { duration: 7000 })
         } finally {
             // Hide loading overlay
             loadingOverlay.classList.add('hidden')
@@ -143,17 +151,83 @@ export default class extends Controller {
 
     clearAll() {
         if (confirm('Are you sure you want to clear all configurations?')) {
+            // Clear all errors first
+            this.clearErrors()
+
+            // Uncheck all IP types
             document.querySelectorAll('input[name="selected_ip_types[]"]').forEach(checkbox => {
-                checkbox.checked = false
-                checkbox.dispatchEvent(new Event('change'))
+                if (checkbox.checked) {
+                    checkbox.checked = false
+
+                    // Remove selected class from IP card
+                    const ipCard = checkbox.closest('.ip-checkbox-card')
+                    if (ipCard) {
+                        ipCard.classList.remove('selected')
+                    }
+
+                    // Hide the config section
+                    const ipType = checkbox.dataset.ipType
+                    const configSection = document.getElementById(`${ipType}-config`)
+                    if (configSection) {
+                        configSection.classList.add('hidden')
+                    }
+                }
             })
 
+            // Clear all Tom Select instances (flow orders and insertions)
+            document.querySelectorAll('select').forEach(select => {
+                if (select.tomselect) {
+                    select.tomselect.clear()
+                    select.tomselect.clearOptions()
+                }
+            })
+
+            // Remove all dynamically added flow order mappings
+            document.querySelectorAll('[data-production-section]').forEach(section => {
+                const mappingContainer = section.querySelector('[data-production-parameters-target="mappingContainer"]')
+                if (mappingContainer) {
+                    mappingContainer.innerHTML = ''
+                }
+            })
+
+            // Remove all dynamically added search type tables
+            document.querySelectorAll('[data-charz-section]').forEach(section => {
+                const tablesContainer = section.querySelector('[data-charz-parameters-target="tablesContainer"]')
+                if (tablesContainer) {
+                    tablesContainer.innerHTML = ''
+                }
+            })
+
+            // Reset all button states (read type, boolean options, etc.)
+            document.querySelectorAll('button.active').forEach(button => {
+                button.classList.remove('active')
+                const checkbox = button.querySelector('input[type="checkbox"]')
+                if (checkbox) {
+                    checkbox.checked = false
+                }
+            })
+
+            // Reset the form
             this.element.reset()
 
+            // Clear selected IP types set
+            this.selectedIpTypes.clear()
+
+            // Hide global actions
+            const globalActions = document.getElementById('global-actions')
+            globalActions.classList.add('hidden')
+
+            // Hide JSON preview and download button
             document.getElementById('json-preview').classList.add('hidden')
             document.getElementById('download-button').classList.add('hidden')
 
-            showToast('All configurations cleared', 'info')
+            // Clear JSON content
+            const jsonContent = document.getElementById('json-content')
+            if (jsonContent) {
+                jsonContent.textContent = ''
+            }
+
+            showWarning('All configurations cleared')
         }
     }
 
