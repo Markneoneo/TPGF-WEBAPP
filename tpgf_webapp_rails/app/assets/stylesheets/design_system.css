@@ -151,7 +151,6 @@
     margin-bottom: var(--spacing-lg);
 }
 
-/* Add this new class */
 .form-group-inline {
     display: flex;
     align-items: center;
@@ -161,11 +160,17 @@
     background-color: var(--color-gray-50);
     border-radius: var(--radius-md);
     border: 1px solid var(--color-gray-200);
+    gap: var(--spacing-md);
 }
 
 .form-group-inline .form-label {
     margin-bottom: 0;
     font-size: var(--text-base);
+    flex-shrink: 0;
+}
+
+.form-group-inline .number-input-group {
+    flex-shrink: 0;
 }
 
 .form-label {
@@ -467,13 +472,43 @@
 /* ===================================
      SPECIFIC COMPONENTS
      =================================== */
+
 /* IP Configuration Section */
 .ip-config-section {
-    background-color: var(--color-gray-50);
-    border: 1px solid var(--color-gray-200);
+    background: linear-gradient(to bottom, var(--color-primary-50), white);
+    border: 2px solid var(--color-primary-200);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+}
+
+.ip-config-section .form-group-inline {
+    background: linear-gradient(to right, var(--color-primary-50), white);
+    border: 2px solid var(--color-primary-200);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.05);
+    padding: var(--spacing-md) var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
+}
+
+.ip-config-section .form-group-inline .form-label {
+    color: var(--color-primary-800);
+    font-weight: 600;
+}
+
+.ip-config-section .number-input-group {
+    border: 1px solid var(--color-primary-200);
+    background-color: white;
+}
+
+.ip-config-section .number-input-group button {
+    background-color: var(--color-primary-50);
+    color: var(--color-primary-700);
+}
+
+.ip-config-section .number-input-group button:hover {
+    background-color: var(--color-primary-100);
 }
 
 .ip-config-header {
@@ -481,23 +516,43 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--color-primary-300);
+}
+
+.ip-config-header h3 {
+    color: var(--color-primary-800);
+}
+
+/* Visual Separator Between IP Types */
+.ip-config-section:not(:last-child)::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--color-primary-300), transparent);
+    margin-top: var(--spacing-xl);
 }
 
 /* Core Mapping Section */
 .core-mapping {
-    background-color: white;
-    border: 1px solid var(--color-gray-200);
+    background: white;
+    border: 2px solid var(--color-primary-200);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.05);
 }
 
 .core-mapping-header {
     font-weight: 600;
-    color: var(--color-gray-800);
+    color: var(--color-primary-800);
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-gray-200);
+    border-bottom: 2px solid var(--color-primary-200);
+    background: linear-gradient(to right, var(--color-primary-50), transparent);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-md);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 /* Parameter Sections */

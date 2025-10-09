@@ -90,13 +90,46 @@
     gap: var(--spacing-md);
 }
 
-/* Production Parameters */
+/* Production Parameters - Orange Theme */
 .production-params-container {
-    background-color: var(--color-primary-50);
-    border: 1px solid var(--color-primary-200);
+    background: linear-gradient(to bottom, #fff7ed, white);
+    border: 2px solid #fed7aa;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    box-shadow: 0 4px 6px rgba(249, 115, 22, 0.1);
+}
+
+.parameter-header {
+    font-weight: 600;
+    color: #9a3412;
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    color: white;
+    border-radius: var(--radius-sm);
+    margin: calc(var(--spacing-lg) * -1) calc(var(--spacing-lg) * -1) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.flow-order-mapping {
+    background-color: white;
+    border: 2px solid #fed7aa;
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
+    box-shadow: 0 2px 4px rgba(249, 115, 22, 0.05);
+}
+
+.flow-order-header {
+    font-weight: 600;
+    color: #9a3412;
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(to right, #ffedd5, transparent);
+    border-left: 4px solid #fb923c;
+    margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-md);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
 .flow-order-grid {
@@ -160,14 +193,15 @@
     flex: 1;
 }
 
-.test-points-toggle button:hover {
-    background-color: var(--color-gray-50);
-}
-
 .test-points-toggle button.active {
-    background-color: var(--color-primary-600);
+    background-color: #fb923c;
     color: white;
     border-color: transparent;
+}
+
+.test-points-toggle button:hover {
+    background-color: #ffedd5;
+    border-color: #fed7aa;
 }
 
 .test-points-range-grid {
@@ -199,14 +233,15 @@
     flex: 1;
 }
 
-.read-type-toggle button:hover {
-    background-color: var(--color-gray-50);
-}
-
 .read-type-toggle button.active {
-    background-color: var(--color-primary-600);
+    background-color: #fb923c;
     color: white;
     border-color: transparent;
+}
+
+.read-type-toggle button:hover {
+    background-color: #ffedd5;
+    border-color: #fed7aa;
 }
 
 /* Add Boolean Options Toggle styles */
@@ -232,14 +267,15 @@
     flex: 1;
 }
 
-.boolean-options-toggle button:hover {
-    background-color: var(--color-gray-50);
-}
-
 .boolean-options-toggle button.active {
-    background-color: var(--color-success-600);
+    background-color: #fb923c;
     color: white;
     border-color: transparent;
+}
+
+.boolean-options-toggle button:hover {
+    background-color: #ffedd5;
+    border-color: #fed7aa;
 }
 
 /* Charz Parameters Toggle Styles */
@@ -278,9 +314,16 @@
 .charz-granularity-toggle button.active,
 .charz-search-toggle button.active,
 .test-type-toggle button.active {
-    background-color: var(--color-warning-600);
+    background-color: #8b5cf6;
     color: white;
     border-color: transparent;
+}
+
+.charz-granularity-toggle button:hover,
+.charz-search-toggle button:hover,
+.test-type-toggle button:hover {
+    background-color: #faf5ff;
+    border-color: #d8b4fe;
 }
 
 /* Use Option Button Styles */
@@ -306,31 +349,47 @@
 }
 
 .use-option-btn.active {
-    background-color: var(--color-primary-600);
+    background-color: #fb923c;
     color: white;
     border-color: transparent;
+}
+
+/* Production section use option buttons */
+.production-params-container .use-option-btn.active {
+    background-color: #fb923c;
+}
+
+/* Charz section use option buttons */
+.charz-params-container .use-option-btn.active,
+.charz-search-type-card .use-option-btn.active {
+    background-color: #8b5cf6;
+}
+
+.use-option-btn:hover {
+    background-color: var(--color-gray-50);
+    border-color: var(--color-gray-400);
 }
 
 /* Charz Search Type Card Styles */
 .charz-search-type-card {
     background: white;
-    border: 2px solid var(--color-warning-200);
+    border: 2px solid #e9d5ff;
     border-radius: var(--radius-lg);
     margin-bottom: var(--spacing-lg);
     overflow: hidden;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 6px rgba(168, 85, 247, 0.1);
     transition: all var(--transition-base);
 }
 
 .charz-search-type-card:hover {
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-warning-300);
+    box-shadow: 0 6px 12px rgba(168, 85, 247, 0.15);
+    border-color: #d8b4fe;
 }
 
 .charz-card-header {
-    background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-600) 100%);
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
     padding: var(--spacing-md) var(--spacing-lg);
-    border-bottom: 2px solid var(--color-warning-600);
+    border-bottom: 2px solid #8b5cf6;
 }
 
 .charz-header-title {
@@ -353,21 +412,22 @@
 /* Charz Table Section */
 .charz-table-section {
     margin-top: var(--spacing-lg);
-    background: var(--color-gray-50);
+    background: #faf5ff;
     border-radius: var(--radius-md);
     overflow: hidden;
+    border: 1px solid #e9d5ff;
 }
 
 .charz-table-header {
-    background: var(--color-gray-100);
+    background: linear-gradient(to right, #f3e8ff, #faf5ff);
     padding: var(--spacing-sm) var(--spacing-md);
-    border-bottom: 2px solid var(--color-gray-300);
+    border-bottom: 2px solid #d8b4fe;
 }
 
 .charz-table-header h4 {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--color-gray-700);
+    color: #6b21a8;
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -394,7 +454,7 @@
 }
 
 .charz-table thead tr {
-    background: linear-gradient(to bottom, var(--color-warning-50), var(--color-warning-100));
+    background: linear-gradient(to bottom, #f3e8ff, #e9d5ff);
 }
 
 .charz-th,
@@ -402,15 +462,15 @@
     padding: var(--spacing-sm) var(--spacing-md);
     text-align: left;
     font-weight: 600;
-    color: var(--color-warning-800);
-    border-bottom: 2px solid var(--color-warning-300);
+    color: #6b21a8;
+    border-bottom: 2px solid #d8b4fe;
     white-space: nowrap;
 }
 
 .charz-th-fixed {
     position: sticky;
     left: 0;
-    background: linear-gradient(to bottom, var(--color-warning-50), var(--color-warning-100));
+    background: linear-gradient(to bottom, #f3e8ff, #e9d5ff);
     z-index: 11;
     min-width: 100px;
 }
@@ -424,7 +484,7 @@
 }
 
 .charz-table tbody tr:hover {
-    background-color: var(--color-warning-50);
+    background-color: #faf5ff;
 }
 
 .charz-table tbody td {
@@ -456,8 +516,8 @@
 .charz-table input[type="number"]:focus,
 .charz-table input[type="text"]:focus {
     outline: none;
-    border-color: var(--color-warning-500);
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
 }
 
 .charz-table input::placeholder {
@@ -468,14 +528,14 @@
 /* Workload Table Styles */
 .charz-workload-section {
     margin-top: var(--spacing-lg);
-    background: var(--color-primary-50);
-    border: 2px solid var(--color-primary-200);
+    background: #f3e8ff;
+    border: 2px solid #d8b4fe;
     border-radius: var(--radius-md);
     overflow: hidden;
 }
 
 .charz-workload-header {
-    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
     padding: var(--spacing-sm) var(--spacing-md);
     display: flex;
     align-items: center;
@@ -512,15 +572,15 @@
     position: sticky;
     top: 0;
     z-index: 10;
-    background: var(--color-primary-100);
+    background: #e9d5ff;
 }
 
 .charz-workload-table th {
     padding: var(--spacing-sm) var(--spacing-md);
     text-align: left;
     font-weight: 600;
-    color: var(--color-primary-800);
-    border-bottom: 2px solid var(--color-primary-300);
+    color: #6b21a8;
+    border-bottom: 2px solid #d8b4fe;
     white-space: nowrap;
 }
 
@@ -529,7 +589,7 @@
 }
 
 .charz-workload-table tbody tr:hover {
-    background-color: var(--color-primary-50);
+    background-color: #faf5ff;
 }
 
 .charz-workload-table td {
@@ -555,8 +615,8 @@
 
 .charz-workload-table input:focus {
     outline: none;
-    border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
 }
 
 .charz-workload-table input::placeholder {
@@ -579,12 +639,21 @@
     color: var(--color-gray-400);
 }
 
+/* Charz Parameters - Purple Theme */
 .charz-params-container {
-    background-color: var(--color-warning-50);
-    border: 1px solid var(--color-warning-200);
+    background: linear-gradient(to bottom, #faf5ff, white);
+    border: 2px solid #e9d5ff;
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
     margin-bottom: var(--spacing-md);
+    box-shadow: 0 4px 6px rgba(168, 85, 247, 0.1);
+}
+
+.charz-params-container .parameter-header {
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    color: white;
+    margin: calc(var(--spacing-lg) * -1) calc(var(--spacing-lg) * -1) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
 }
 
 .charz-granularity-options,
@@ -757,6 +826,56 @@
 .collapsible-section.expanded .collapsible-content {
     display: block;
     animation: slideDown var(--transition-base) ease-out;
+}
+
+/* Collapsible Section Color Coding */
+.collapsible-section[data-section-type="production"] {
+    border-color: #fed7aa;
+}
+
+.collapsible-section[data-section-type="production"] .collapsible-header {
+    background-color: #ffedd5;
+}
+
+.collapsible-section[data-section-type="production"] .collapsible-header:hover {
+    background-color: #fed7aa;
+}
+
+.collapsible-section[data-section-type="production"].expanded .collapsible-header {
+    background-color: #fb923c;
+    color: white;
+    border-bottom: 1px solid #f97316;
+}
+
+.collapsible-section[data-section-type="production"].expanded .toggle-label {
+    color: white;
+}
+
+.collapsible-section[data-section-type="charz"] {
+    border-color: #e9d5ff;
+}
+
+.collapsible-section[data-section-type="charz"] .collapsible-header {
+    background-color: #faf5ff;
+}
+
+.collapsible-section[data-section-type="charz"] .collapsible-header:hover {
+    background-color: #f3e8ff;
+}
+
+.collapsible-section[data-section-type="charz"].expanded .collapsible-header {
+    background-color: #a78bfa;
+    color: white;
+    border-bottom: 1px solid #8b5cf6;
+}
+
+.collapsible-section[data-section-type="charz"].expanded .toggle-label {
+    color: white;
+}
+
+.collapsible-section[data-section-type="charz"].expanded .collapsible-icon,
+.collapsible-section[data-section-type="production"].expanded .collapsible-icon {
+    color: white;
 }
 
 /* Update toggle-label to remove the old checkbox spacing */
