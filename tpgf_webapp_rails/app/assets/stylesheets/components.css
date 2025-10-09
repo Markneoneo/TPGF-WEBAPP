@@ -311,6 +311,274 @@
     border-color: transparent;
 }
 
+/* Charz Search Type Card Styles */
+.charz-search-type-card {
+    background: white;
+    border: 2px solid var(--color-warning-200);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+}
+
+.charz-search-type-card:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-warning-300);
+}
+
+.charz-card-header {
+    background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-600) 100%);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 2px solid var(--color-warning-600);
+}
+
+.charz-header-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: white;
+    font-size: var(--text-lg);
+    font-weight: 600;
+}
+
+.charz-header-title svg {
+    flex-shrink: 0;
+}
+
+.charz-card-body {
+    padding: var(--spacing-lg);
+}
+
+/* Charz Table Section */
+.charz-table-section {
+    margin-top: var(--spacing-lg);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.charz-table-header {
+    background: var(--color-gray-100);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 2px solid var(--color-gray-300);
+}
+
+.charz-table-header h4 {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.charz-table-container {
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.charz-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--text-sm);
+}
+
+.charz-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+}
+
+.charz-table thead tr {
+    background: linear-gradient(to bottom, var(--color-warning-50), var(--color-warning-100));
+}
+
+.charz-th,
+.charz-th-fixed {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-warning-800);
+    border-bottom: 2px solid var(--color-warning-300);
+    white-space: nowrap;
+}
+
+.charz-th-fixed {
+    position: sticky;
+    left: 0;
+    background: linear-gradient(to bottom, var(--color-warning-50), var(--color-warning-100));
+    z-index: 11;
+    min-width: 100px;
+}
+
+.charz-table tbody tr {
+    transition: background-color var(--transition-fast);
+}
+
+.charz-table tbody tr:nth-child(even) {
+    background-color: var(--color-gray-50);
+}
+
+.charz-table tbody tr:hover {
+    background-color: var(--color-warning-50);
+}
+
+.charz-table tbody td {
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.charz-table tbody td:first-child {
+    position: sticky;
+    left: 0;
+    background: inherit;
+    font-weight: 600;
+    color: var(--color-gray-800);
+    z-index: 9;
+}
+
+.charz-table input[type="number"],
+.charz-table input[type="text"] {
+    width: 100%;
+    min-width: 80px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+    background: white;
+}
+
+.charz-table input[type="number"]:focus,
+.charz-table input[type="text"]:focus {
+    outline: none;
+    border-color: var(--color-warning-500);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.charz-table input::placeholder {
+    color: var(--color-gray-400);
+    font-size: var(--text-xs);
+}
+
+/* Workload Table Styles */
+.charz-workload-section {
+    margin-top: var(--spacing-lg);
+    background: var(--color-primary-50);
+    border: 2px solid var(--color-primary-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.charz-workload-header {
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
+    padding: var(--spacing-sm) var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.charz-workload-header svg {
+    color: white;
+    flex-shrink: 0;
+}
+
+.charz-workload-header h6 {
+    color: white;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin: 0;
+}
+
+.charz-workload-table-container {
+    overflow-x: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+}
+
+.charz-workload-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--text-sm);
+}
+
+.charz-workload-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--color-primary-100);
+}
+
+.charz-workload-table th {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-primary-800);
+    border-bottom: 2px solid var(--color-primary-300);
+    white-space: nowrap;
+}
+
+.charz-workload-table tbody tr:nth-child(even) {
+    background-color: var(--color-gray-50);
+}
+
+.charz-workload-table tbody tr:hover {
+    background-color: var(--color-primary-50);
+}
+
+.charz-workload-table td {
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-gray-200);
+    border-right: 1px solid var(--color-gray-200);
+}
+
+.charz-workload-table td:last-child {
+    border-right: none;
+}
+
+.charz-workload-table input {
+    width: 100%;
+    min-width: 100px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+    background: white;
+}
+
+.charz-workload-table input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.charz-workload-table input::placeholder {
+    color: var(--color-gray-400);
+    font-size: var(--text-xs);
+}
+
+/* Empty state for tables */
+.charz-empty-state {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--color-gray-500);
+    font-size: var(--text-sm);
+}
+
+.charz-empty-state svg {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--spacing-md);
+    color: var(--color-gray-400);
+}
+
 .charz-params-container {
     background-color: var(--color-warning-50);
     border: 1px solid var(--color-warning-200);

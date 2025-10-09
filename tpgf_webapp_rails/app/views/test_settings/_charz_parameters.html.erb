@@ -50,63 +50,77 @@
 
 <!-- Template for search type table -->
 <template id="search-type-table-template">
-  <div class="search-type-section" data-search-type="SEARCH_TYPE">
-    <div class="search-type-header">SEARCH_TYPE Test Types</div>
-    
-    <!-- Spec Variable -->
-    <div class="form-group">
-      <div class="flex items-center justify-between mb-2">
-        <label class="form-label mb-0">SEARCH_TYPE Spec Variable <span class="text-red-500">*</span></label>
-        <button type="button" class="use-option-btn" data-use-power-supply-charz>
-          <input type="checkbox" 
-                 name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][use_power_supply][SEARCH_TYPE]"
-                 class="sr-only">
-          Use Power Supply
-        </button>
+  <div class="charz-search-type-card" data-search-type="SEARCH_TYPE">
+    <div class="charz-card-header">
+      <div class="charz-header-title">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        <span>SEARCH_TYPE Configuration</span>
       </div>
-      <input type="text" 
-             name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][spec_variables][SEARCH_TYPE]"
-             placeholder="Enter spec variable"
-             class="form-input">
     </div>
     
-    <!-- Test Type Selection -->
-    <div class="form-group">
-      <label class="form-label">Test Types</label>
-      <div class="test-type-toggle">
-        <% %w[CREST BIST PBIST].each do |test_type| %>
-          <button type="button" data-test-type-btn="<%= test_type %>">
+    <div class="charz-card-body">
+      <!-- Spec Variable -->
+      <div class="form-group">
+        <div class="flex items-center justify-between mb-2">
+          <label class="form-label mb-0">Spec Variable <span class="text-red-500">*</span></label>
+          <button type="button" class="use-option-btn" data-use-power-supply-charz>
             <input type="checkbox" 
-                   name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][selected_test_types][SEARCH_TYPE][]"
-                   value="<%= test_type %>"
+                   name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][use_power_supply][SEARCH_TYPE]"
                    class="sr-only">
-            <%= test_type %>
+            Use Power Supply
           </button>
-        <% end %>
+        </div>
+        <input type="text" 
+               name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][spec_variables][SEARCH_TYPE]"
+               placeholder="Enter spec variable"
+               class="form-input">
       </div>
+      
+      <!-- Test Type Selection -->
+      <div class="form-group">
+        <label class="form-label">Select Test Types</label>
+        <div class="test-type-toggle">
+          <% %w[CREST BIST PBIST].each do |test_type| %>
+            <button type="button" data-test-type-btn="<%= test_type %>">
+              <input type="checkbox" 
+                     name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][selected_test_types][SEARCH_TYPE][]"
+                     value="<%= test_type %>"
+                     class="sr-only">
+              <%= test_type %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Test Type Parameters Table -->
+      <div class="charz-table-section">
+        <div class="charz-table-header">
+          <h4>Test Parameters</h4>
+        </div>
+        <div class="charz-table-container">
+          <table class="charz-table">
+            <thead>
+              <tr>
+                <th class="charz-th-fixed">Test Type</th>
+                <th class="charz-th">WL Count</th>
+                <th class="charz-th">Test Points</th>
+                <th class="charz-th">Search Start</th>
+                <th class="charz-th">Search End</th>
+                <th class="charz-th">Search Step</th>
+                <th class="charz-th">Resolution</th>
+              </tr>
+            </thead>
+            <tbody data-test-types-tbody>
+              <!-- Rows will be added dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Workload Table Container -->
+      <div data-workload-container></div>
     </div>
-    
-    <!-- Test Type Table -->
-    <div class="table-container">
-      <table class="table table-compact">
-        <thead>
-          <tr>
-            <th>Test Type</th>
-            <th>WL Count</th>
-            <th>Test Points</th>
-            <th>Search Start</th>
-            <th>Search End</th>
-            <th>Search Step</th>
-            <th>Resolution</th>
-          </tr>
-        </thead>
-        <tbody data-test-types-tbody>
-          <!-- Rows will be added dynamically -->
-        </tbody>
-      </table>
-    </div>
-    
-    <!-- Workload Table Container -->
-    <div class="workload-table-wrapper" data-workload-container></div>
   </div>
 </template>

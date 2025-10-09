@@ -115,45 +115,28 @@ export default class extends Controller {
     const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
     const ipType = this.element.closest('[data-ip-type]').dataset.ipType
 
-    // Clone the template content
-    const content = template.content.cloneNode(true)
+    // Get template HTML and replace all placeholders
+    let html = template.innerHTML
+    html = html.replace(/SEARCH_TYPE/g, searchType)
+    html = html.replace(/IP_TYPE/g, ipType)
+    html = html.replace(/CORE_INDEX/g, coreIndex)
 
-    // Replace placeholders in all elements
-    const replaceInElement = (element) => {
-      // Replace in text nodes
-      if (element.nodeType === Node.TEXT_NODE) {
-        element.textContent = element.textContent.replace(/SEARCH_TYPE/g, searchType)
-      }
+    // Create a temporary div to hold the HTML
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = html
 
-      // Replace in attributes
-      if (element.nodeType === Node.ELEMENT_NODE) {
-        // Replace in all attributes
-        Array.from(element.attributes).forEach(attr => {
-          let value = attr.value
-          value = value.replace(/SEARCH_TYPE/g, searchType)
-          value = value.replace(/IP_TYPE/g, ipType)
-          value = value.replace(/CORE_INDEX/g, coreIndex)
-          element.setAttribute(attr.name, value)
-        })
-      }
-
-      // Recurse for child nodes
-      Array.from(element.childNodes).forEach(child => replaceInElement(child))
-    }
-
-    // Get the search type div from content
-    const searchTypeDiv = content.querySelector('.search-type-section')
-    replaceInElement(searchTypeDiv)
+    // Get the search type card
+    const searchTypeCard = tempDiv.querySelector('.charz-search-type-card')
 
     // Append to container
-    this.tablesContainerTarget.appendChild(searchTypeDiv)
+    this.tablesContainerTarget.appendChild(searchTypeCard)
 
     // Initialize test types for this search type
     this.testTypes[searchType] = new Set()
 
     // Set default value for FMAX spec variable
     if (searchType === 'FMAX') {
-      const specVariableInput = searchTypeDiv.querySelector('input[name*="spec_variables"]')
+      const specVariableInput = searchTypeCard.querySelector('input[name*="spec_variables"]')
       if (specVariableInput) {
         specVariableInput.value = 'TIM.1.refclk_freq[MHz]'
       }
@@ -161,8 +144,8 @@ export default class extends Controller {
 
     // Initialize test type buttons and use power supply button for this search type table
     setTimeout(() => {
-      this.initializeTestTypeButtons(searchTypeDiv)
-      this.initializeUsePowerSupplyButton(searchTypeDiv)  // Add this line
+      this.initializeTestTypeButtons(searchTypeCard)
+      this.initializeUsePowerSupplyButton(searchTypeCard)
     }, 100)
   }
 
@@ -184,44 +167,39 @@ export default class extends Controller {
       : { tp: 'V', search: 'MHz' }
 
     row.innerHTML = `
-      <td class="border px-2 py-1">${testType}</td>
-      <td class="border px-2 py-1">
+      <td>${testType}</td>
+      <td>
         <input type="number" 
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][wl_count]"
-               class="w-20 px-1 py-1 border rounded"
                min="0"
                value="0"
+               placeholder="0"
                data-action="input->charz-parameters#updateWorkloadTable">
       </td>
-      <td class="border px-2 py-1">
+      <td>
         <input type="text" 
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][tp]"
-               placeholder="${units.tp}"
-               class="w-24 px-1 py-1 border rounded">
+               placeholder="${units.tp}">
       </td>
-      <td class="border px-2 py-1">
+      <td>
         <input type="text" 
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][search_start]"
-               placeholder="${units.search}"
-               class="w-24 px-1 py-1 border rounded">
+               placeholder="${units.search}">
       </td>
-      <td class="border px-2 py-1">
+      <td>
         <input type="text" 
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][search_end]"
-               placeholder="${units.search}"
-               class="w-24 px-1 py-1 border rounded">
+               placeholder="${units.search}">
       </td>
-      <td class="border px-2 py-1">
+      <td>
         <input type="text" 
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][search_step]"
-               placeholder="${units.search}"
-               class="w-24 px-1 py-1 border rounded">
+               placeholder="${units.search}">
       </td>
-      <td class="border px-2 py-1">
+      <td>
         <input type="text" 
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][resolution]"
-               placeholder="${units.search}"
-               class="w-24 px-1 py-1 border rounded">
+               placeholder="${units.search}">
       </td>
     `
 
@@ -273,26 +251,30 @@ export default class extends Controller {
     const ipType = this.element.closest('[data-ip-type]').dataset.ipType
 
     const table = document.createElement('div')
-    table.className = 'mt-4'
+    table.className = 'charz-workload-section'
     table.innerHTML = `
-      <h6 class="font-semibold mb-2">${searchType} Workload Table</h6>
-      <div class="overflow-x-auto border rounded">
-        <table class="w-full border-collapse">
+      <div class="charz-workload-header">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+        </svg>
+        <h6>${searchType} Workload Configuration</h6>
+      </div>
+      <div class="charz-workload-table-container">
+        <table class="charz-workload-table">
           <thead>
-            <tr class="bg-gray-100">
-              ${Object.keys(wlCounts).map(tt => `<th class="border px-2 py-1 text-sm">${tt}</th>`).join('')}
+            <tr>
+              ${Object.keys(wlCounts).map(tt => `<th>${tt}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
             ${Array.from({ length: maxWlCount }).map((_, idx) => `
               <tr>
                 ${Object.entries(wlCounts).map(([testType, count]) => `
-                  <td class="border px-2 py-1">
+                  <td>
                     ${idx < count ? `
                       <input type="text" 
                              name="ip_configurations[${ipType}][charz_data][${coreIndex}][workload_table][${searchType}][${testType}][]"
-                             placeholder="WL ${idx + 1}"
-                             class="w-full px-1 py-1 border rounded text-sm">
+                             placeholder="Workload ${idx + 1}">
                     ` : ''}
                   </td>
                 `).join('')}
