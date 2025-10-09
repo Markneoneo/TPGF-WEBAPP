@@ -4,7 +4,78 @@ export default class extends Controller {
     static targets = ["numCores", "coreMappings", "coreMappingTemplate"]
 
     connect() {
-        this.ipType = this.element.closest('[data-ip-type]').dataset.ipType
+        this.ipType = this.element.dataset.ipType || this.element.closest('[data-ip-type]')?.dataset.ipType
+
+        if (!this.ipType) {
+            console.error('IP type not found for controller')
+        }
+
+        console.log('IP Configuration controller connected for:', this.ipType)
+
+        // Bind all collapsible headers manually
+        this.bindCollapsibleHeaders()
+    }
+
+    bindCollapsibleHeaders() {
+        // Find all collapsible headers within this controller's scope
+        const headers = this.element.querySelectorAll('.collapsible-header[data-section-name]')
+
+        console.log(`Found ${headers.length} collapsible headers`)
+
+        headers.forEach(header => {
+            // Remove existing listener if any
+            const newHeader = header.cloneNode(true)
+            header.parentNode.replaceChild(newHeader, header)
+
+            // Add click listener
+            newHeader.addEventListener('click', (event) => {
+                this.handleCollapsibleClick(event)
+            })
+        })
+    }
+
+    handleCollapsibleClick(event) {
+        event.preventDefault()
+        event.stopPropagation()
+
+        const header = event.currentTarget
+        const coreIndex = header.dataset.coreIndex
+        const sectionName = header.dataset.sectionName
+        const collapsibleSection = header.closest('.collapsible-section')
+
+        console.log('Collapsible clicked:', { coreIndex, sectionName })
+
+        // Find the checkbox
+        const checkbox = collapsibleSection.querySelector(`[data-${sectionName}-checkbox="${coreIndex}"]`)
+
+        // Find the content section
+        const contentSection = this.element.querySelector(`[data-${sectionName}-section="${coreIndex}"]`)
+
+        if (!checkbox || !contentSection) {
+            console.error(`Could not find checkbox or content section for ${sectionName}`, { checkbox, contentSection })
+            return
+        }
+
+        // Toggle checkbox
+        checkbox.checked = !checkbox.checked
+
+        console.log('Toggled checkbox to:', checkbox.checked)
+
+        // Toggle UI
+        if (checkbox.checked) {
+            contentSection.classList.remove('hidden')
+            collapsibleSection.classList.add('expanded')
+
+            // Initialize Tom Select for production parameters if needed
+            if (sectionName === 'production') {
+                setTimeout(() => {
+                    this.initializeProductionSelect(coreIndex)
+                }, 100)
+            }
+        } else {
+            contentSection.classList.add('hidden')
+            collapsibleSection.classList.remove('expanded')
+        }
     }
 
     incrementCores() {
@@ -63,7 +134,9 @@ export default class extends Controller {
         template = template.replace(/Core Type 1000/g, `Core Type ${index + 1}`)
         template = template.replace(/data-core-index="999"/g, `data-core-index="${index}"`)
         template = template.replace(/data-production-section="999"/g, `data-production-section="${index}"`)
+        template = template.replace(/data-production-checkbox="999"/g, `data-production-checkbox="${index}"`)
         template = template.replace(/data-charz-section="999"/g, `data-charz-section="${index}"`)
+        template = template.replace(/data-charz-checkbox="999"/g, `data-charz-checkbox="${index}"`)
         template = template.replace(/flow-orders-([^-]+)-999/g, `flow-orders-$1-${index}`)
         template = template.replace(/\[core_mappings\]\[999\]/g, `[core_mappings][${index}]`)
         template = template.replace(/\[flow_orders\]\[999\]/g, `[flow_orders][${index}]`)
@@ -79,68 +152,36 @@ export default class extends Controller {
 
         console.log(`Added core mapping ${index}`)
 
-        // Initialize collapsible sections after a delay
+        // Re-bind collapsible headers after adding new core
         setTimeout(() => {
-            this.initializeCollapsibleSections(index)
-        }, 200)
+            this.bindCollapsibleHeaders()
+        }, 100)
     }
 
-    initializeCollapsibleSections(coreIndex) {
-        // Find the newly added core mapping
-        const newCoreMapping = this.coreMappingsTarget.querySelector(`[data-core-index="${coreIndex}"]:last-child`)
-        if (!newCoreMapping) return
+    initializeProductionSelect(coreIndex) {
+        const selectElement = this.element.querySelector(`#flow-orders-${this.ipType}-${coreIndex}`)
 
-        // Initialize collapsible headers
-        const collapsibleHeaders = newCoreMapping.querySelectorAll('.collapsible-header')
+        if (!selectElement) {
+            console.log(`No flow orders select found for core ${coreIndex}`)
+            return
+        }
 
-        collapsibleHeaders.forEach(header => {
-            header.addEventListener('click', (e) => {
-                if (e.target.type !== 'checkbox') {
-                    const section = header.closest('.collapsible-section')
-                    const checkbox = header.querySelector('input[type="checkbox"]')
+        // Check if Tom Select is already initialized
+        if (selectElement.tomselect) {
+            console.log('Tom Select already initialized for core', coreIndex)
+            return
+        }
 
-                    // Toggle the checkbox if clicking on header (not the checkbox itself)
-                    if (checkbox && !e.target.closest('input')) {
-                        checkbox.checked = !checkbox.checked
-                        checkbox.dispatchEvent(new Event('change', { bubbles: true }))
-                    }
+        console.log(`Initializing Tom Select for ${this.ipType} core ${coreIndex}`)
 
-                    section.classList.toggle('expanded')
-                }
-            })
+        // Initialize Tom Select
+        new TomSelect(selectElement, {
+            plugins: ['remove_button'],
+            create: false,
+            maxItems: null,
+            placeholder: 'Search and select flow orders...',
+            searchField: ['text'],
+            closeAfterSelect: false
         })
-
-        // Initialize Tom Select for production parameters if present
-        this.initializeProductionSelect(coreIndex)
     }
-
-    toggleProduction(event) {
-        const coreIndex = event.target.dataset.coreIndex
-        const section = this.element.querySelector(`[data-production-section="${coreIndex}"]`)
-        const collapsibleSection = event.target.closest('.collapsible-section')
-
-        if (event.target.checked) {
-            section.classList.remove('hidden')
-            collapsibleSection.classList.add('expanded')
-            // Remove the Tom Select initialization from here
-        } else {
-            section.classList.add('hidden')
-            collapsibleSection.classList.remove('expanded')
-        }
-    }
-
-    toggleCharz(event) {
-        const coreIndex = event.target.dataset.coreIndex
-        const section = this.element.querySelector(`[data-charz-section="${coreIndex}"]`)
-        const collapsibleSection = event.target.closest('.collapsible-section')
-
-        if (event.target.checked) {
-            section.classList.remove('hidden')
-            collapsibleSection.classList.add('expanded')
-        } else {
-            section.classList.add('hidden')
-            collapsibleSection.classList.remove('expanded')
-        }
-    }
-
 }

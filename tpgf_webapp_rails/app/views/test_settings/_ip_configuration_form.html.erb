@@ -1,4 +1,4 @@
-<div class="ip-config-section" data-controller="ip-configuration">
+<div class="ip-config-section" data-controller="ip-configuration" data-ip-type="<%= ip_type %>">
   <div class="ip-config-header">
     <h3 class="text-xl font-semibold"><%= ip_type %> Configuration</h3>
     <span class="status-indicator pending">
@@ -8,9 +8,8 @@
   </div>
   
   <!-- Number of Core Types -->
-  <div class="form-group">
+  <div class="form-group-inline">
     <label class="form-label">Number of Core Types</label>
-    <div class="form-hint">Specify how many core types to configure</div>
     <div class="number-input-group">
       <button type="button" 
               data-action="click->ip-configuration#decrementCores">−</button>
@@ -24,8 +23,6 @@
               data-action="click->ip-configuration#incrementCores">+</button>
     </div>
   </div>
-  
-  <div class="divider"></div>
   
   <!-- Core Mappings Container -->
   <div data-ip-configuration-target="coreMappings">

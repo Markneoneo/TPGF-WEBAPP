@@ -114,6 +114,9 @@ export default class extends Controller {
         // Initialize components after DOM insertion
         setTimeout(() => {
             this.initializeTestPointsToggle(order)
+            this.initializeReadTypeToggle(order)
+            this.initializeBooleanOptionsToggle(order)
+            this.initializeUseOptionButtons(order)
             this.initializeInsertionSelect(order)
         }, 100)
     }
@@ -154,6 +157,100 @@ export default class extends Controller {
         }
     }
 
+    initializeReadTypeToggle(order) {
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        if (!mapping) return
+
+        const jtagBtn = mapping.querySelector('[data-read-type="jtag"]')
+        const fwBtn = mapping.querySelector('[data-read-type="fw"]')
+        const jtagCheckbox = jtagBtn?.querySelector('input[type="checkbox"]')
+        const fwCheckbox = fwBtn?.querySelector('input[type="checkbox"]')
+
+        if (jtagBtn && fwBtn && jtagCheckbox && fwCheckbox) {
+            jtagBtn.addEventListener('click', () => {
+                // Toggle JTAG
+                jtagCheckbox.checked = !jtagCheckbox.checked
+
+                // Uncheck FW (only one can be selected)
+                if (jtagCheckbox.checked) {
+                    fwCheckbox.checked = false
+                    fwBtn.classList.remove('active')
+                }
+
+                // Update button state
+                jtagBtn.classList.toggle('active', jtagCheckbox.checked)
+            })
+
+            fwBtn.addEventListener('click', () => {
+                // Toggle FW
+                fwCheckbox.checked = !fwCheckbox.checked
+
+                // Uncheck JTAG (only one can be selected)
+                if (fwCheckbox.checked) {
+                    jtagCheckbox.checked = false
+                    jtagBtn.classList.remove('active')
+                }
+
+                // Update button state
+                fwBtn.classList.toggle('active', fwCheckbox.checked)
+            })
+        }
+    }
+
+    initializeBooleanOptionsToggle(order) {
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        if (!mapping) return
+
+        const booleanButtons = mapping.querySelectorAll('[data-boolean-option]')
+
+        booleanButtons.forEach(button => {
+            const checkbox = button.querySelector('input[type="checkbox"]')
+
+            if (checkbox) {
+                button.addEventListener('click', () => {
+                    // Toggle checkbox
+                    checkbox.checked = !checkbox.checked
+
+                    // Update button state
+                    button.classList.toggle('active', checkbox.checked)
+                })
+            }
+        })
+    }
+
+    initializeUseOptionButtons(order) {
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        if (!mapping) return
+
+        // Initialize Use Power Supply button
+        const usePowerSupplyBtn = mapping.querySelector('[data-use-power-supply]')
+        if (usePowerSupplyBtn) {
+            const checkbox = usePowerSupplyBtn.querySelector('input[type="checkbox"]')
+
+            usePowerSupplyBtn.addEventListener('click', () => {
+                checkbox.checked = !checkbox.checked
+                usePowerSupplyBtn.classList.toggle('active', checkbox.checked)
+
+                // Trigger the togglePowerSupply logic
+                this.togglePowerSupply({ target: checkbox, currentTarget: usePowerSupplyBtn })
+            })
+        }
+
+        // Initialize Use Core Frequency button
+        const useCoreFreqBtn = mapping.querySelector('[data-use-core-frequency]')
+        if (useCoreFreqBtn) {
+            const checkbox = useCoreFreqBtn.querySelector('input[type="checkbox"]')
+
+            useCoreFreqBtn.addEventListener('click', () => {
+                checkbox.checked = !checkbox.checked
+                useCoreFreqBtn.classList.toggle('active', checkbox.checked)
+
+                // Trigger the toggleCoreFrequency logic
+                this.toggleCoreFrequency({ target: checkbox, currentTarget: useCoreFreqBtn })
+            })
+        }
+    }
+
     toggleTestPointsType(event) {
         const container = event.target.closest('.flow-order-mapping')
         const rangeFields = container.querySelector('.test-points-range')
@@ -171,6 +268,7 @@ export default class extends Controller {
     togglePowerSupply(event) {
         const container = event.target.closest('.flow-order-mapping')
         const specVariableInput = container.querySelector('[name*="spec_variable"]')
+        const button = event.currentTarget
 
         if (!specVariableInput) {
             console.error('Spec variable input not found')
@@ -200,6 +298,7 @@ export default class extends Controller {
             } else {
                 // No supply value, uncheck and alert
                 event.target.checked = false
+                if (button) button.classList.remove('active')
                 alert('Please enter a supply value first')
             }
         } else {
@@ -214,6 +313,7 @@ export default class extends Controller {
     toggleCoreFrequency(event) {
         const container = event.target.closest('.flow-order-mapping')
         const frequencyInput = container.querySelector('[data-frequency-input]')
+        const button = event.currentTarget
 
         if (!frequencyInput) {
             console.error('Frequency input not found')
@@ -251,6 +351,7 @@ export default class extends Controller {
             } else {
                 // No frequency value, uncheck and alert
                 event.target.checked = false
+                if (button) button.classList.remove('active')
                 alert('Please enter a frequency value in the core configuration first')
             }
         } else {

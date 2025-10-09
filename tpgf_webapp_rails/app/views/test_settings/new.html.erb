@@ -18,12 +18,12 @@
           <% @ip_options.each do |ip_type| %>
             <label class="ip-checkbox-card" data-ip-type="<%= ip_type %>">
               <%= check_box_tag "selected_ip_types[]", ip_type, false, 
-                  class: "mr-2", 
+                  class: "sr-only", 
                   data: { 
                     action: "change->test-settings-form#toggleIpType",
                     ip_type: ip_type 
                   } %>
-              <span class="font-medium"><%= ip_type %></span>
+              <span class="ip-type-label"><%= ip_type %></span>
             </label>
           <% end %>
         </div>

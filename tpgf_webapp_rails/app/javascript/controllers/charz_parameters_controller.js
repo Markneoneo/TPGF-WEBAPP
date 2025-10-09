@@ -6,17 +6,100 @@ export default class extends Controller {
   connect() {
     this.searchTypes = new Set()
     this.testTypes = {}
+
+    // Initialize granularity buttons
+    this.initializeGranularityButtons()
+    // Initialize search type buttons
+    this.initializeSearchTypeButtons()
   }
 
-  toggleSearchType(event) {
-    const searchType = event.target.value
+  initializeGranularityButtons() {
+    const buttons = this.element.querySelectorAll('[data-granularity]')
 
-    if (event.target.checked) {
-      this.searchTypes.add(searchType)
-      this.addSearchTypeTable(searchType)
-    } else {
-      this.searchTypes.delete(searchType)
-      this.removeSearchTypeTable(searchType)
+    buttons.forEach(button => {
+      const checkbox = button.querySelector('input[type="checkbox"]')
+
+      if (checkbox) {
+        button.addEventListener('click', () => {
+          checkbox.checked = !checkbox.checked
+          button.classList.toggle('active', checkbox.checked)
+        })
+      }
+    })
+  }
+
+  initializeSearchTypeButtons() {
+    const buttons = this.element.querySelectorAll('[data-search-type-btn]')
+
+    buttons.forEach(button => {
+      const checkbox = button.querySelector('input[type="checkbox"]')
+
+      if (checkbox) {
+        button.addEventListener('click', () => {
+          checkbox.checked = !checkbox.checked
+          button.classList.toggle('active', checkbox.checked)
+
+          // Trigger the toggleSearchType logic
+          const searchType = checkbox.value
+          if (checkbox.checked) {
+            this.searchTypes.add(searchType)
+            this.addSearchTypeTable(searchType)
+          } else {
+            this.searchTypes.delete(searchType)
+            this.removeSearchTypeTable(searchType)
+          }
+        })
+      }
+    })
+  }
+
+  initializeTestTypeButtons(searchTypeTable) {
+    const buttons = searchTypeTable.querySelectorAll('[data-test-type-btn]')
+
+    buttons.forEach(button => {
+      const checkbox = button.querySelector('input[type="checkbox"]')
+
+      if (checkbox) {
+        button.addEventListener('click', () => {
+          checkbox.checked = !checkbox.checked
+          button.classList.toggle('active', checkbox.checked)
+
+          // Trigger the toggleTestType logic
+          const testType = checkbox.value
+          const searchType = searchTypeTable.dataset.searchType
+          const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
+
+          if (checkbox.checked) {
+            if (!this.testTypes[searchType]) {
+              this.testTypes[searchType] = new Set()
+            }
+            this.testTypes[searchType].add(testType)
+            this.addTestTypeRow(tbody, searchType, testType)
+          } else {
+            this.testTypes[searchType].delete(testType)
+            this.removeTestTypeRow(tbody, testType)
+          }
+
+          // Update workload table after adding/removing test type
+          this.updateWorkloadTable(searchTypeTable)
+        })
+      }
+    })
+  }
+
+  initializeUsePowerSupplyButton(searchTypeTable) {
+    const usePowerSupplyBtn = searchTypeTable.querySelector('[data-use-power-supply-charz]')
+
+    if (usePowerSupplyBtn) {
+      const checkbox = usePowerSupplyBtn.querySelector('input[type="checkbox"]')
+
+      usePowerSupplyBtn.addEventListener('click', () => {
+        checkbox.checked = !checkbox.checked
+        usePowerSupplyBtn.classList.toggle('active', checkbox.checked)
+
+        // Trigger the togglePowerSupply logic
+        this.togglePowerSupply({ target: checkbox, currentTarget: usePowerSupplyBtn })
+      })
     }
   }
 
@@ -75,6 +158,12 @@ export default class extends Controller {
         specVariableInput.value = 'TIM.1.refclk_freq[MHz]'
       }
     }
+
+    // Initialize test type buttons and use power supply button for this search type table
+    setTimeout(() => {
+      this.initializeTestTypeButtons(searchTypeDiv)
+      this.initializeUsePowerSupplyButton(searchTypeDiv)  // Add this line
+    }, 100)
   }
 
   removeSearchTypeTable(searchType) {
@@ -83,28 +172,6 @@ export default class extends Controller {
       table.remove()
       delete this.testTypes[searchType]
     }
-  }
-
-  toggleTestType(event) {
-    const checkbox = event.target
-    const testType = checkbox.value
-    const searchTypeTable = checkbox.closest('[data-search-type]')
-    const searchType = searchTypeTable.dataset.searchType
-    const tbody = searchTypeTable.querySelector('[data-test-types-tbody]')
-
-    if (checkbox.checked) {
-      if (!this.testTypes[searchType]) {
-        this.testTypes[searchType] = new Set()
-      }
-      this.testTypes[searchType].add(testType)
-      this.addTestTypeRow(tbody, searchType, testType)
-    } else {
-      this.testTypes[searchType].delete(testType)
-      this.removeTestTypeRow(tbody, testType)
-    }
-
-    // Update workload table after adding/removing test type
-    this.updateWorkloadTable(searchTypeTable)
   }
 
   addTestTypeRow(tbody, searchType, testType) {
@@ -242,6 +309,7 @@ export default class extends Controller {
   togglePowerSupply(event) {
     const searchTypeTable = event.target.closest('[data-search-type]')
     const specVariableInput = searchTypeTable.querySelector('input[name*="spec_variables"]')
+    const button = event.currentTarget
 
     // Get the core index and IP type
     const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
@@ -263,6 +331,7 @@ export default class extends Controller {
       } else {
         // No supply value, uncheck and alert
         event.target.checked = false
+        if (button) button.classList.remove('active')
         alert('Please enter a supply value first')
       }
     } else {
@@ -273,4 +342,5 @@ export default class extends Controller {
       specVariableInput.classList.remove('bg-gray-100')
     }
   }
+
 }

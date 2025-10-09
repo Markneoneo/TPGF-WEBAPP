@@ -6,15 +6,15 @@
   <!-- Search Granularity -->
   <div class="form-group">
     <label class="form-label">Search Granularity <span class="text-red-500">*</span></label>
-    <div class="form-hint">Select one or more granularity options</div>
-    <div class="charz-granularity-options">
+    <div class="charz-granularity-toggle">
       <% %w[allcore bycore].each do |granularity| %>
-        <label class="form-checkbox-label">
+        <button type="button" data-granularity="<%= granularity %>">
           <input type="checkbox" 
                  name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][search_granularity][]"
-                 value="<%= granularity %>">
-          <span><%= granularity %></span>
-        </label>
+                 value="<%= granularity %>"
+                 class="sr-only">
+          <%= granularity %>
+        </button>
       <% end %>
     </div>
   </div>
@@ -22,15 +22,15 @@
   <!-- Search Type -->
   <div class="form-group">
     <label class="form-label">Search Type <span class="text-red-500">*</span></label>
-    <div class="charz-search-options">
+    <div class="charz-search-toggle">
       <% %w[VMIN FMAX].each do |search_type| %>
-        <label class="form-checkbox-label">
+        <button type="button" data-search-type-btn="<%= search_type %>">
           <input type="checkbox" 
                  name="ip_configurations[<%= ip_type %>][charz_data][<%= core_index %>][search_types][]"
                  value="<%= search_type %>"
-                 data-action="change->charz-parameters#toggleSearchType">
-          <span><%= search_type %></span>
-        </label>
+                 class="sr-only">
+          <%= search_type %>
+        </button>
       <% end %>
     </div>
   </div>
@@ -57,12 +57,12 @@
     <div class="form-group">
       <div class="flex items-center justify-between mb-2">
         <label class="form-label mb-0">SEARCH_TYPE Spec Variable <span class="text-red-500">*</span></label>
-        <label class="form-checkbox-label text-sm">
+        <button type="button" class="use-option-btn" data-use-power-supply-charz>
           <input type="checkbox" 
                  name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][use_power_supply][SEARCH_TYPE]"
-                 data-action="change->charz-parameters#togglePowerSupply">
-          <span>Use Power Supply</span>
-        </label>
+                 class="sr-only">
+          Use Power Supply
+        </button>
       </div>
       <input type="text" 
              name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][spec_variables][SEARCH_TYPE]"
@@ -73,15 +73,15 @@
     <!-- Test Type Selection -->
     <div class="form-group">
       <label class="form-label">Test Types</label>
-      <div class="form-checkbox-group">
+      <div class="test-type-toggle">
         <% %w[CREST BIST PBIST].each do |test_type| %>
-          <label class="form-checkbox-label">
+          <button type="button" data-test-type-btn="<%= test_type %>">
             <input type="checkbox" 
                    name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][selected_test_types][SEARCH_TYPE][]"
                    value="<%= test_type %>"
-                   data-action="change->charz-parameters#toggleTestType">
-            <span><%= test_type %></span>
-          </label>
+                   class="sr-only">
+            <%= test_type %>
+          </button>
         <% end %>
       </div>
     </div>
