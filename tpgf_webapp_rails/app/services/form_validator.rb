@@ -226,6 +226,12 @@ class FormValidator
               "Charz #{search_type}: Spec variable is required"
           end
           
+          # NEW: Validate RM Settings for this search type
+          if charz_data.dig(:rm_settings, search_type).blank?
+            @errors["charz_#{search_type}_rm_settings_core_#{idx}"] = 
+              "Charz #{search_type}: RM settings is required"
+          end
+          
           # Check selected test types
           selected_test_types = charz_data.dig(:selected_test_types, search_type) || []
           if selected_test_types.empty?
@@ -237,6 +243,9 @@ class FormValidator
           selected_test_types.each do |test_type|
             table_data = charz_data.dig(:table, search_type, test_type) || {}
             
+            # REMOVED: RM settings validation from table_data
+            # The RM settings is now validated at the search type level above
+  
             # Validate WL count
             if table_data[:wl_count].blank?
               @errors["charz_#{search_type}_#{test_type}_wl_count_core_#{idx}"] = 
@@ -246,16 +255,17 @@ class FormValidator
                 "Charz #{search_type} #{test_type}: WL count must be a number"
             end
             
-            # Validate test points
+            # Validate test points (accepts both decimal and 'p' notation)
             if table_data[:tp].blank?
               @errors["charz_#{search_type}_#{test_type}_tp_core_#{idx}"] = 
                 "Charz #{search_type} #{test_type}: Test points are required"
             elsif table_data[:tp].present?
-              # Validate comma-separated numbers
+              # Validate comma-separated numbers or 'p' notation (e.g., 1p1, 1.1)
               points = table_data[:tp].split(',').map(&:strip)
-              if points.any? { |p| !p.match?(/^-?\d*\.?\d+$/) }
+              # Accept either decimal format (1.1) or 'p' format (1p1)
+              if points.any? { |p| !p.match?(/^-?\d*[p\.]?\d+$/) }
                 @errors["charz_#{search_type}_#{test_type}_tp_core_#{idx}"] = 
-                  "Charz #{search_type} #{test_type}: Test points must be comma-separated numbers"
+                  "Charz #{search_type} #{test_type}: Test points must be comma-separated numbers (e.g., 1.1 or 1p1)"
               end
             end
             

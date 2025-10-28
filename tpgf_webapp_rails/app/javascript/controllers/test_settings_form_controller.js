@@ -177,8 +177,23 @@ export default class extends Controller {
             // Clear all Tom Select instances (flow orders and insertions)
             document.querySelectorAll('select').forEach(select => {
                 if (select.tomselect) {
-                    select.tomselect.clear()
-                    select.tomselect.clearOptions()
+                    // Store the options before destroying
+                    const options = Array.from(select.options).map(opt => ({
+                        value: opt.value,
+                        text: opt.text
+                    }))
+
+                    // Destroy the Tom Select instance
+                    select.tomselect.destroy()
+
+                    // Restore the original options
+                    select.innerHTML = ''
+                    options.forEach(opt => {
+                        const option = document.createElement('option')
+                        option.value = opt.value
+                        option.text = opt.text
+                        select.appendChild(option)
+                    })
                 }
             })
 
@@ -209,6 +224,57 @@ export default class extends Controller {
 
             // Reset the form
             this.element.reset()
+
+            // Re-initialize Tom Select for core type 1 (index 0) after clearing
+            setTimeout(() => {
+                document.querySelectorAll('[data-ip-type]').forEach(ipSection => {
+                    const ipType = ipSection.dataset.ipType
+                    const productionSection = ipSection.querySelector('[data-production-section="0"]')
+
+                    if (productionSection) {
+                        const flowOrderSelect = productionSection.querySelector('select[data-production-parameters-target="flowOrdersSelect"]')
+
+                        if (flowOrderSelect && !flowOrderSelect.tomselect) {
+                            // Get the production parameters controller instance
+                            const productionController = this.application.getControllerForElementAndIdentifier(
+                                productionSection.closest('[data-controller~="production-parameters"]'),
+                                'production-parameters'
+                            )
+
+                            if (productionController) {
+                                // Re-initialize using the controller's method
+                                productionController.initializeFlowOrdersSelect()
+                            } else {
+                                // Fallback: manually initialize with event handlers
+                                const tomSelect = new TomSelect(flowOrderSelect, {
+                                    plugins: ['remove_button'],
+                                    create: false,
+                                    maxItems: null,
+                                    placeholder: 'Search and select flow orders...',
+                                    searchField: ['text'],
+                                    closeAfterSelect: false,
+                                    onItemAdd: (value) => {
+                                        // Manually trigger the add flow order mapping
+                                        const event = new CustomEvent('floworder:add', {
+                                            detail: { value: value },
+                                            bubbles: true
+                                        })
+                                        flowOrderSelect.dispatchEvent(event)
+                                    },
+                                    onItemRemove: (value) => {
+                                        // Manually trigger the remove flow order mapping
+                                        const event = new CustomEvent('floworder:remove', {
+                                            detail: { value: value },
+                                            bubbles: true
+                                        })
+                                        flowOrderSelect.dispatchEvent(event)
+                                    }
+                                })
+                            }
+                        }
+                    }
+                })
+            }, 200)
 
             // Clear selected IP types set
             this.selectedIpTypes.clear()
@@ -456,6 +522,15 @@ export default class extends Controller {
                                 hasErrors = true
                             }
 
+                            // NEW: Check RM Settings
+                            const rmSettings = searchTypeTable.querySelector('[name*="rm_settings"]')
+                            if (rmSettings && !rmSettings.value.trim()) {
+                                rmSettings.classList.add('error-field')
+                                this.addErrorMessage(rmSettings, 'RM settings is required')
+                                errors.push(`${ipType} Core ${parseInt(coreIndex) + 1} - ${searchType}: RM settings is required`)
+                                hasErrors = true
+                            }
+
                             // Check selected test types
                             const selectedTestTypes = searchTypeTable.querySelectorAll('[name*="selected_test_types"]:checked')
                             if (selectedTestTypes.length === 0) {
@@ -468,7 +543,8 @@ export default class extends Controller {
                             tbody.querySelectorAll('tr').forEach(row => {
                                 const testType = row.dataset.testType
 
-                                // Check all required fields
+                                // REMOVED: RM settings validation from table row
+                                // Check all required fields (excluding rm_settings)
                                 const requiredFields = ['wl_count', 'tp', 'search_start', 'search_end', 'search_step', 'resolution']
                                 requiredFields.forEach(field => {
                                     const input = row.querySelector(`[name*="[${field}]"]`)
@@ -493,6 +569,7 @@ export default class extends Controller {
                     }
                 }
             })
+
         })
 
         if (hasErrors) {
@@ -649,6 +726,16 @@ export default class extends Controller {
                                 this.addErrorMessage(input, 'Spec variable is required')
                             }
                         }
+                    } else if (parts[1] === 'rm' && parts[2] === 'settings') {
+                        // NEW: Handle RM settings error at search type level
+                        const searchTypeTable = charzSection.querySelector(`[data-search-type="${searchType}"]`)
+                        if (searchTypeTable) {
+                            const input = searchTypeTable.querySelector('[name*="rm_settings"]')
+                            if (input) {
+                                input.classList.add('error-field')
+                                this.addErrorMessage(input, 'RM settings is required')
+                            }
+                        }
                     } else if (parts[1] === 'test' && parts[2] === 'types') {
                         const searchTypeTable = charzSection.querySelector(`[data-search-type="${searchType}"]`)
                         if (searchTypeTable) {
@@ -657,6 +744,7 @@ export default class extends Controller {
                         }
                     } else {
                         // Handle table field errors (e.g., VMIN_CREST_wl_count)
+                        // NOTE: No longer handling rm_settings here since it's moved out of the table
                         const testType = parts[1].toUpperCase()
                         const field = parts.slice(2).join('_')
                         const searchTypeTable = charzSection.querySelector(`[data-search-type="${searchType}"]`)

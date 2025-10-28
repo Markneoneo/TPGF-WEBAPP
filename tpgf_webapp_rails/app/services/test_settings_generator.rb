@@ -288,8 +288,8 @@ class Search < Test
       result = {}
       
       # Add PSM register size if available
-      if coretype_config[:psm_register_size]
-        result[:psm_register_size] = coretype_config[:psm_register_size].to_i
+      if charztype_mapping[:psm_register_size]
+        result[:psm_register_size] = charztype_mapping[:psm_register_size].to_i
       end
       
       charztype_mapping[:granularity].each_with_object(result) do |gran, gran_hash|
@@ -298,28 +298,35 @@ class Search < Test
           gran_hash[gran][stype] = {}
           next unless stype_config[:testtype]
           
-          stype_config[:testtype].each do |testtype, config|
-            gran_hash[gran][stype][testtype] = {}
-            wl_list = config[:wl] || []
-            next if wl_list.empty?
+          # Iterate through rm_settings first
+          stype_config[:testtype].each do |rm_key, rm_config|
+            gran_hash[gran][stype][rm_key] = {}
             
-            wl_list.each do |wl|
-              search_obj = Search.new(
-                ip: ip,
-                coretype: coretype,
-                testtype: testtype.to_s,
-                tp: config[:test_points] || [],
-                spec_variable: stype_config[:specvariable] || "", 
-                wl: wl,
-                searchsettings: config[:searchsettings] || {}
+            # Then iterate through test types under each rm_settings
+            rm_config.each do |testtype, testtype_config|
+              gran_hash[gran][stype][rm_key][testtype] = {}
+              
+              # Then iterate through workloads
+              testtype_config.each do |wl, config|
+                search_obj = Search.new(
+                  ip: ip,
+                  coretype: coretype,
+                  testtype: testtype.to_s,
+                  tp: config[:test_points] || [],
+                  spec_variable: stype_config[:specvariable] || '', 
+                  wl: wl,
+                  searchsettings: config[:searchsettings] || {}
                 )
                 offset = calculate_offset(stype)
-                gran_hash[gran][stype][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
+                
+                # Store under rm_settings -> testtype -> workload
+                gran_hash[gran][stype][rm_key][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
               end
             end
           end
         end
-        
+      end
+      
       result
     end    
   

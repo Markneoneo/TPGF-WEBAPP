@@ -6,7 +6,6 @@
   <!-- Flow Orders Selection -->
   <div class="form-group">
     <label class="form-label">Flow Orders</label>
-    <div class="form-hint">Select one or more flow orders</div>
     <select id="flow-orders-<%= ip_type %>-<%= core_index %>" 
             name="ip_configurations[<%= ip_type %>][flow_orders][<%= core_index %>][]" 
             multiple
@@ -22,9 +21,11 @@
   <div data-production-parameters-target="mappingContainer" class="spacer-md"></div>
   
   <!-- Template for flow order mapping -->
-<template id="flow-order-mapping-template">
+  <template id="flow-order-mapping-template">
   <div class="flow-order-mapping" data-order="ORDER">
-    <div class="flow-order-header">ORDER Configuration</div>
+    <div class="flow-order-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <span>ORDER Configuration</span>
+    </div>
     
     <!-- Read Type -->
     <div class="form-group">

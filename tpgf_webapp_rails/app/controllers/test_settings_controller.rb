@@ -404,51 +404,72 @@ class TestSettingsController < ApplicationController
     end  
   
     def build_search_types(charz_data, supply_value = nil)
-        search_types = {}
+      search_types = {}
+      
+      (charz_data[:search_types] || []).each do |search_type|
+        selected_test_types = charz_data.dig(:selected_test_types, search_type) || []
         
-        (charz_data[:search_types] || []).each do |search_type|
-            selected_test_types = charz_data.dig(:selected_test_types, search_type) || []
-            
-            # Handle spec variable with use_power_supply
-            spec_variable = if charz_data.dig(:use_power_supply, search_type).present? && supply_value
-            supply_value
-            else
-            charz_data.dig(:spec_variables, search_type) || ''
+        # Handle spec variable with use_power_supply
+        spec_variable = if charz_data.dig(:use_power_supply, search_type).present? && supply_value
+          supply_value
+        else
+          charz_data.dig(:spec_variables, search_type) || ''
+        end
+        
+        # NEW: Get RM settings for this search type
+        rm_settings_key = charz_data.dig(:rm_settings, search_type) || 'default'
+        
+        search_types[search_type] = {
+          specvariable: spec_variable,
+          testtype: {}
+        }
+        
+        selected_test_types.each do |test_type|
+          table = charz_data.dig(:table, search_type, test_type) || {}
+          wl_array = charz_data.dig(:workload_table, search_type, test_type) || []
+          
+          # Parse test points (comma-separated list, handle 'p' notation)
+          test_points = if table[:tp].present?
+            table[:tp].to_s.split(',').map(&:strip).map do |tp|
+              # Convert 'p' notation back to decimal (e.g., "1p1" -> 1.1)
+              if tp.include?('p')
+                tp.gsub('p', '.').to_f
+              else
+                tp.to_f
+              end
             end
-            
-            search_types[search_type] = {
-            specvariable: spec_variable,
-            testtype: {}
-            }
-            
-            selected_test_types.each do |test_type|
-            table = charz_data.dig(:table, search_type, test_type) || {}
-            wl_array = charz_data.dig(:workload_table, search_type, test_type) || []
-            
-            # Parse test points (comma-separated list)
-            test_points = if table[:tp].present?
-                table[:tp].to_s.split(',').map(&:strip).map(&:to_f)
-            else
-                []
-            end
-            
-            search_types[search_type][:testtype][test_type.downcase] = {
-                wl_count: table[:wl_count].to_i,
-                wl: wl_array,
-                test_points: test_points,
-                searchsettings: {
+          else
+            []
+          end
+
+          # Build the base configuration for each workload
+          wl_array.each do |wl|
+            test_type_config = {
+              wl_count: table[:wl_count].to_i,
+              wl: [wl],  # Single workload per entry
+              test_points: test_points,
+              searchsettings: {
                 start: table[:search_start] || '',
                 stop: table[:search_end] || '',
                 mode: 'LinBin',
                 res: table[:resolution] || '',
                 step: table[:search_step] || ''
-                }
+              }
             }
-            end
+            
+            # NEW STRUCTURE: rm_settings -> test_type -> workload
+            # Initialize the nested structure
+            search_types[search_type][:testtype][rm_settings_key] ||= {}
+            search_types[search_type][:testtype][rm_settings_key][test_type.downcase] ||= {}
+            
+            # Add the config under the workload
+            search_types[search_type][:testtype][rm_settings_key][test_type.downcase][wl] = test_type_config
+          end
         end
-        
-        search_types
-    end
+      end
+      
+      search_types
+    end    
   
     def symbolize_keys(hash)
       case hash

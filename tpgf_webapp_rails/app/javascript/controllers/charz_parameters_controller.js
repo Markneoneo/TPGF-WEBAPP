@@ -168,6 +168,7 @@ export default class extends Controller {
 
     row.innerHTML = `
       <td>${testType}</td>
+      <!-- REMOVED RM Settings input -->
       <td>
         <input type="number" 
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][wl_count]"
@@ -179,7 +180,8 @@ export default class extends Controller {
       <td>
         <input type="text" 
                name="ip_configurations[${ipType}][charz_data][${coreIndex}][table][${searchType}][${testType}][tp]"
-               placeholder="${units.tp}">
+               placeholder="${units.tp}"
+               data-action="blur->charz-parameters#convertPeriodsToP">
       </td>
       <td>
         <input type="text" 
@@ -323,6 +325,28 @@ export default class extends Controller {
       specVariableInput.disabled = false
       specVariableInput.classList.remove('bg-gray-100')
     }
+  }
+
+  convertPeriodsToP(event) {
+    const input = event.target
+    let value = input.value.trim()
+
+    if (!value) return
+
+    // Convert periods to 'p' in the value
+    // Handles both single values and comma-separated lists
+    const convertedValue = value
+      .split(',')
+      .map(item => item.trim())
+      .map(item => {
+        // Replace decimal point with 'p'
+        // e.g., "1.1" becomes "1p1", "0.75" becomes "0p75"
+        return item.replace('.', 'p')
+      })
+      .join(', ')
+
+    // Update the input value
+    input.value = convertedValue
   }
 
 }

@@ -13,6 +13,19 @@ export default class extends Controller {
             return
         }
 
+        // Listen for custom flow order events (for re-initialization after clear)
+        this.element.addEventListener('floworder:add', (event) => {
+            const value = event.detail.value
+            this.flowOrders.add(value)
+            this.addFlowOrderMapping(value)
+        })
+
+        this.element.addEventListener('floworder:remove', (event) => {
+            const value = event.detail.value
+            this.flowOrders.delete(value)
+            this.removeFlowOrderMapping(value)
+        })
+
         // Add a small delay to ensure DOM is ready
         setTimeout(() => {
             if (this.hasFlowOrdersSelectTarget) {
@@ -145,6 +158,15 @@ export default class extends Controller {
                 rangeFields.style.display = 'grid'
                 listField.style.display = 'none'
                 typeInput.value = 'Range'
+
+                // Clear list field when switching to range
+                const listInput = listField.querySelector('input')
+                if (listInput) {
+                    listInput.value = ''
+                    listInput.classList.remove('error-field')
+                    const errorMsg = listInput.parentElement.querySelector('.error-message')
+                    if (errorMsg) errorMsg.remove()
+                }
             })
 
             listBtn.addEventListener('click', () => {
@@ -153,6 +175,15 @@ export default class extends Controller {
                 rangeFields.style.display = 'none'
                 listField.style.display = 'block'
                 typeInput.value = 'List'
+
+                // Clear range fields when switching to list
+                const rangeInputs = rangeFields.querySelectorAll('input')
+                rangeInputs.forEach(input => {
+                    input.value = ''
+                    input.classList.remove('error-field')
+                    const errorMsg = input.parentElement.querySelector('.error-message')
+                    if (errorMsg) errorMsg.remove()
+                })
             })
         }
     }
