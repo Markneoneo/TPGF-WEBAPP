@@ -33,4 +33,24 @@
   <div data-ip-configuration-target="coreMappingTemplate" style="display: none;">
     <%= render 'core_mapping', ip_type: ip_type, core_index: 999 %>
   </div>
+
+  <!-- Combined Settings Toggle -->
+  <div class="collapsible-section" data-section-type="combined">
+    <div class="collapsible-header"
+         data-section-name="combined">
+      <input type="checkbox" 
+             name="ip_configurations[<%= ip_type %>][show_combined_settings]"
+             class="sr-only"
+             data-combined-checkbox="true">
+      <span class="toggle-label">Combined Settings</span>
+      <svg class="collapsible-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
+    
+    <div class="collapsible-content" data-combined-content>
+      <%= render 'combined_settings', ip_type: ip_type %>
+    </div>
+  </div>
+  
 </div>

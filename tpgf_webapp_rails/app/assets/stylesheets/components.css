@@ -163,12 +163,13 @@
 
 /* Test Points Configuration */
 .test-points-config {
-    background: var(--color-gray-50);
-    border: 1px solid var(--color-gray-200);
+    background: linear-gradient(to right, #ffedd5, white);
+    border: 2px solid #fed7aa;
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-md);
     margin-top: var(--spacing-sm);
+    padding-bottom: 0;
 }
 
 .test-points-toggle {
@@ -207,7 +208,7 @@
 .test-points-range-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
 }
 
 /* Add Read Type Toggle styles */
@@ -971,4 +972,383 @@
     border: none;
     outline: none;
     font-size: var(--text-base);
+}
+
+/* Repetition Settings Styles */
+.repetition-fields-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.repetition-field-set {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.repetition-field-set .form-label {
+    color: #9a3412;
+    font-weight: 600;
+}
+
+.repetition-field-set input {
+    border-color: #fed7aa;
+    background-color: white;
+}
+
+.repetition-field-set input:focus {
+    border-color: #fb923c;
+    box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+}
+
+/* Combined Settings - Lime Green Theme */
+.combined-settings-container {
+    background: linear-gradient(to bottom, #f7fee7, white);
+    border: 2px solid #d9f99d;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    box-shadow: 0 4px 6px rgba(132, 204, 22, 0.1);
+}
+
+.combined-settings-container .parameter-header {
+    background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
+    color: white;
+    margin: calc(var(--spacing-lg) * -1) calc(var(--spacing-lg) * -1) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.combined-flow-order-mapping {
+    background-color: white;
+    border: 2px solid #d9f99d;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    box-shadow: 0 2px 4px rgba(132, 204, 22, 0.05);
+}
+
+.combined-flow-order-mapping .flow-order-header {
+    font-weight: 600;
+    color: #3f6212;
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(to right, #ecfccb, transparent);
+    border-left: 4px solid #a3e635;
+    margin: calc(var(--spacing-md) * -1) calc(var(--spacing-md) * -1) var(--spacing-md);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+/* Combined Settings Toggle Buttons */
+.combined-settings-container .test-points-toggle button.active,
+.combined-flow-order-mapping .test-points-toggle button.active {
+    background-color: #84cc16;
+    color: white;
+}
+
+.combined-settings-container .test-points-toggle button:hover,
+.combined-flow-order-mapping .test-points-toggle button:hover {
+    background-color: #ecfccb;
+    border-color: #d9f99d;
+}
+
+.combined-settings-container .read-type-toggle button.active,
+.combined-flow-order-mapping .read-type-toggle button.active {
+    background-color: #84cc16;
+    color: white;
+}
+
+.combined-settings-container .read-type-toggle button:hover,
+.combined-flow-order-mapping .read-type-toggle button:hover {
+    background-color: #ecfccb;
+    border-color: #d9f99d;
+}
+
+.combined-settings-container .boolean-options-toggle button.active,
+.combined-flow-order-mapping .boolean-options-toggle button.active {
+    background-color: #84cc16;
+    color: white;
+}
+
+.combined-settings-container .boolean-options-toggle button:hover,
+.combined-flow-order-mapping .boolean-options-toggle button:hover {
+    background-color: #ecfccb;
+    border-color: #d9f99d;
+}
+
+.combined-settings-container .use-option-btn.active,
+.combined-flow-order-mapping .use-option-btn.active {
+    background-color: #84cc16;
+}
+
+/* Combined Settings Number Input */
+.combined-settings-container .number-input-group,
+.combined-flow-order-mapping .number-input-group {
+    border-color: #d9f99d;
+}
+
+.combined-settings-container .number-input-group button,
+.combined-flow-order-mapping .number-input-group button {
+    background: #ecfccb;
+    color: #3f6212;
+}
+
+.combined-settings-container .number-input-group button:hover,
+.combined-flow-order-mapping .number-input-group button:hover {
+    background: #d9f99d;
+}
+
+.combined-settings-container .number-input-group input,
+.combined-flow-order-mapping .number-input-group input {
+    border-left: 1px solid #d9f99d;
+    border-right: 1px solid #d9f99d;
+}
+
+/* Combined Settings Test Points Config */
+.combined-flow-order-mapping .test-points-config {
+    background: linear-gradient(to right, #ecfccb, white);
+    border: 2px solid #d9f99d;
+}
+
+.combined-flow-order-mapping .card-nested {
+    background: linear-gradient(to right, #ecfccb, white);
+    border: 2px solid #d9f99d;
+}
+
+.combined-flow-order-mapping .card-nested .form-label {
+    color: #3f6212;
+    font-weight: 600;
+}
+
+/* Test Points Sections Container */
+.test-points-sections-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.combined-test-points-section {
+    background: #f7fee7;
+    border: 2px solid #d9f99d;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.test-points-section-header {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid #d9f99d;
+}
+
+.test-points-section-header h5 {
+    color: #3f6212;
+    font-weight: 600;
+    font-size: var(--text-base);
+    margin: 0;
+}
+
+.combined-test-points-section .form-label {
+    color: #3f6212;
+}
+
+.combined-test-points-section input {
+    border-color: #d9f99d;
+}
+
+.combined-test-points-section input:focus {
+    border-color: #84cc16;
+    box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.1);
+}
+
+/* Collapsible Section for Combined Settings */
+.collapsible-section[data-section-type="combined"] {
+    border-color: #d9f99d;
+}
+
+.collapsible-section[data-section-type="combined"] .collapsible-header {
+    background-color: #ecfccb;
+}
+
+.collapsible-section[data-section-type="combined"] .collapsible-header:hover {
+    background-color: #d9f99d;
+}
+
+.collapsible-section[data-section-type="combined"].expanded .collapsible-header {
+    background-color: #a3e635;
+    color: white;
+    border-bottom: 1px solid #84cc16;
+}
+
+.collapsible-section[data-section-type="combined"].expanded .toggle-label {
+    color: white;
+}
+
+.collapsible-section[data-section-type="combined"].expanded .collapsible-icon {
+    color: white;
+}
+
+/* Combined Settings Repetition Fields */
+.combined-settings-container .repetition-fields-container,
+.combined-flow-order-mapping .repetition-fields-container {
+    margin-top: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.combined-settings-container .repetition-field-set,
+.combined-flow-order-mapping .repetition-field-set {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.combined-settings-container .repetition-field-set .form-label,
+.combined-flow-order-mapping .repetition-field-set .form-label {
+    color: #3f6212;
+    font-weight: 600;
+}
+
+.combined-settings-container .repetition-field-set input,
+.combined-flow-order-mapping .repetition-field-set input {
+    border-color: #d9f99d;
+    background-color: white;
+}
+
+.combined-settings-container .repetition-field-set input:focus,
+.combined-flow-order-mapping .repetition-field-set input:focus {
+    border-color: #84cc16;
+    box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.1);
+}
+
+/* Combined Settings Form Group Inline */
+.combined-settings-container .form-group-inline,
+.combined-flow-order-mapping .form-group-inline {
+    background: linear-gradient(to right, #ecfccb, white);
+    border: 2px solid #d9f99d;
+}
+
+.combined-settings-container .form-group-inline .form-label,
+.combined-flow-order-mapping .form-group-inline .form-label {
+    color: #3f6212;
+}
+
+/* RM Settings Fields Container */
+.rm-settings-fields-container {
+    margin-top: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.rm-setting-field-set {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.rm-setting-field-set .form-label {
+    color: #6b21a8;
+    font-weight: 600;
+}
+
+.rm-setting-field-set input {
+    border-color: #e9d5ff;
+    background-color: white;
+}
+
+.rm-setting-field-set input:focus {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+}
+
+/* RM Settings Number Input - Purple Theme */
+.charz-params-container .form-group-inline,
+.charz-search-type-card .form-group-inline {
+    background: linear-gradient(to right, #faf5ff, white);
+    border: 2px solid #e9d5ff;
+}
+
+.charz-params-container .form-group-inline .form-label,
+.charz-search-type-card .form-group-inline .form-label {
+    color: #6b21a8;
+}
+
+.charz-params-container .number-input-group,
+.charz-search-type-card .number-input-group {
+    border-color: #e9d5ff;
+}
+
+.charz-params-container .number-input-group button,
+.charz-search-type-card .number-input-group button {
+    background: #faf5ff;
+    color: #6b21a8;
+}
+
+.charz-params-container .number-input-group button:hover,
+.charz-search-type-card .number-input-group button:hover {
+    background: #f3e8ff;
+}
+
+.charz-params-container .number-input-group input,
+.charz-search-type-card .number-input-group input {
+    border-left: 1px solid #e9d5ff;
+    border-right: 1px solid #e9d5ff;
+}
+
+/* Test Points Sets Container */
+.test-points-sets-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.test-points-set {
+    background: linear-gradient(to right, #ffedd5, white);
+    border: 2px solid #fed7aa;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.test-points-set-header {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid #fed7aa;
+}
+
+.test-points-set-header h5 {
+    color: #9a3412;
+    font-weight: 600;
+    font-size: var(--text-base);
+    margin: 0;
+}
+
+.test-points-set .form-label {
+    color: #9a3412;
+}
+
+.test-points-set input {
+    border-color: #fed7aa;
+}
+
+.test-points-set input:focus {
+    border-color: #fb923c;
+    box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.1);
+}
+
+/* Production Parameters Form Group Inline - Orange Theme */
+.production-params-container .form-group-inline,
+.flow-order-mapping .form-group-inline {
+    background: linear-gradient(to right, #ffedd5, white);
+    border: 2px solid #fed7aa;
+}
+
+.production-params-container .form-group-inline .form-label,
+.flow-order-mapping .form-group-inline .form-label {
+    color: #9a3412;
 }

@@ -22,107 +22,55 @@
   
   <!-- Template for flow order mapping -->
   <template id="flow-order-mapping-template">
-  <div class="flow-order-mapping" data-order="ORDER">
-    <div class="flow-order-header" style="display: flex; justify-content: space-between; align-items: center;">
-      <span>ORDER Configuration</span>
-    </div>
-    
-    <!-- Read Type -->
-    <div class="form-group">
-      <label class="form-label">Read Type <span class="text-red-500">*</span></label>
-      <div class="read-type-toggle">
-        <button type="button" data-read-type="jtag">
-          <input type="checkbox" 
-                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][read_type_jtag]"
-                 class="sr-only">
-          JTAG
-        </button>
-        <button type="button" data-read-type="fw">
-          <input type="checkbox" 
-                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][read_type_fw]"
-                 class="sr-only">
-          FW
-        </button>
+    <div class="flow-order-mapping" data-order="ORDER">
+      <div class="flow-order-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <span>ORDER Configuration</span>
       </div>
-    </div>
-    
-    <!-- Test Points Configuration -->
-    <div class="test-points-config">
+      
+      <!-- Read Type -->
       <div class="form-group">
-        <label class="form-label">Test Points Configuration</label>
-        <div class="test-points-toggle">
-          <button type="button" class="active" data-test-points-type="range">
-            Range
+        <label class="form-label">Read Type <span class="text-red-500">*</span></label>
+        <div class="read-type-toggle">
+          <button type="button" data-read-type="jtag">
+            <input type="checkbox" 
+                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][read_type_jtag]"
+                   class="sr-only">
+            JTAG
           </button>
-          <button type="button" data-test-points-type="list">
-            List
+          <button type="button" data-read-type="fw">
+            <input type="checkbox" 
+                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][read_type_fw]"
+                   class="sr-only">
+            FW
           </button>
         </div>
-        <input type="hidden" name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points_type]" value="Range">
       </div>
       
-      <!-- Test Points Range -->
-      <div data-range-fields class="test-points-range-grid">
-        <div class="form-group">
-          <label class="form-label">Start</label>
-          <div class="input-group">
-            <input type="text" 
-                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points_start]"
-                   class="form-input form-input-sm">
-            <span class="input-addon">V</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Stop</label>
-          <div class="input-group">
-            <input type="text" 
-                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points_stop]"
-                   class="form-input form-input-sm">
-            <span class="input-addon">V</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Step</label>
-          <div class="input-group">
-            <input type="text" 
-                   name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points_step]"
-                   class="form-input form-input-sm">
-            <span class="input-addon">V</span>
-          </div>
+      <!-- Test Points Sets Counter -->
+      <div class="form-group-inline">
+        <label class="form-label">Number of Test Point Sets</label>
+        <div class="number-input-group">
+          <button type="button" 
+                  data-action="click->production-parameters#decrementTestPointsSets"
+                  data-order="ORDER">−</button>
+          <input type="number" 
+                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][num_test_points_sets]"
+                 value="1" 
+                 min="1"
+                 max="10"
+                 data-test-points-sets-count="ORDER"
+                 data-action="change->production-parameters#updateTestPointsSetsCount">
+          <button type="button" 
+                  data-action="click->production-parameters#incrementTestPointsSets"
+                  data-order="ORDER">+</button>
         </div>
       </div>
       
-      <!-- Test Points List -->
-      <div data-list-field style="display: none;">
-        <div class="form-group">
-          <input type="text" 
-                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][test_points]"
-                 placeholder="Enter comma-separated values (e.g., 0.5, 0.6, 0.7)"
-                 class="form-input">
-        </div>
-      </div>
-    </div>
-      
+      <!-- Test Points Sets Container -->
+      <div data-test-points-sets-container="ORDER" class="test-points-sets-container"></div>
+        
       <!-- Other Parameters Grid -->
       <div class="grid grid-cols-2 gap-4">
-
-        <!-- Spec Variable -->
-        <div class="form-group">
-          <div class="flex items-center justify-between mb-2">
-            <label class="form-label mb-0">Spec Variable <span class="text-red-500">*</span></label>
-            <button type="button" class="use-option-btn" data-use-power-supply>
-              <input type="checkbox" 
-                     name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][use_power_supply]"
-                     class="sr-only">
-              Use Power Supply
-            </button>
-          </div>
-          <input type="text" 
-                 name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][spec_variable]"
-                 placeholder="e.g., VDDCR"
-                 class="form-input">
-        </div>
-        
         <!-- Frequency -->
         <div class="form-group">
           <div class="flex items-center justify-between mb-2">
@@ -194,7 +142,31 @@
           </button>
         </div>
       </div>
-
+  
+      <!-- Repetition Settings -->
+      <div class="form-group-inline">
+        <label class="form-label">Repetition Settings</label>
+        <div class="number-input-group">
+          <button type="button" 
+                  data-action="click->production-parameters#decrementRepetitions"
+                  data-order="ORDER">−</button>
+          <input type="number" 
+                  name="ip_configurations[IP_TYPE][production_mappings][CORE_INDEX][ORDER][num_repetitions]"
+                  value="0" 
+                  min="0"
+                  max="3"
+                  data-repetition-count="ORDER"
+                  data-action="change->production-parameters#updateRepetitionCount">
+          <button type="button" 
+                  data-action="click->production-parameters#incrementRepetitions"
+                  data-order="ORDER">+</button>
+        </div>
+      </div>
+      
+      <!-- Repetition Fields Container -->
+      <div data-repetition-container="ORDER" class="repetition-fields-container"></div>
+  
     </div>
   </template>
+  
 </div>

@@ -174,6 +174,21 @@ export default class extends Controller {
                 }
             })
 
+            // Uncheck all production and charz checkboxes
+            document.querySelectorAll('[data-production-checkbox], [data-charz-checkbox]').forEach(checkbox => {
+                checkbox.checked = false
+            })
+
+            // Hide all production and charz content sections
+            document.querySelectorAll('[data-production-section], [data-charz-section]').forEach(section => {
+                section.classList.add('hidden')
+            })
+
+            // Remove expanded class from collapsible sections
+            document.querySelectorAll('.collapsible-section').forEach(section => {
+                section.classList.remove('expanded')
+            })
+
             // Clear all Tom Select instances (flow orders and insertions)
             document.querySelectorAll('select').forEach(select => {
                 if (select.tomselect) {
@@ -205,6 +220,11 @@ export default class extends Controller {
                 }
             })
 
+            // Remove all dynamically added combined flow order mappings
+            document.querySelectorAll('[data-combined-settings-target="mappingContainer"]').forEach(container => {
+                container.innerHTML = ''
+            })
+
             // Remove all dynamically added search type tables
             document.querySelectorAll('[data-charz-section]').forEach(section => {
                 const tablesContainer = section.querySelector('[data-charz-parameters-target="tablesContainer"]')
@@ -225,57 +245,6 @@ export default class extends Controller {
             // Reset the form
             this.element.reset()
 
-            // Re-initialize Tom Select for core type 1 (index 0) after clearing
-            setTimeout(() => {
-                document.querySelectorAll('[data-ip-type]').forEach(ipSection => {
-                    const ipType = ipSection.dataset.ipType
-                    const productionSection = ipSection.querySelector('[data-production-section="0"]')
-
-                    if (productionSection) {
-                        const flowOrderSelect = productionSection.querySelector('select[data-production-parameters-target="flowOrdersSelect"]')
-
-                        if (flowOrderSelect && !flowOrderSelect.tomselect) {
-                            // Get the production parameters controller instance
-                            const productionController = this.application.getControllerForElementAndIdentifier(
-                                productionSection.closest('[data-controller~="production-parameters"]'),
-                                'production-parameters'
-                            )
-
-                            if (productionController) {
-                                // Re-initialize using the controller's method
-                                productionController.initializeFlowOrdersSelect()
-                            } else {
-                                // Fallback: manually initialize with event handlers
-                                const tomSelect = new TomSelect(flowOrderSelect, {
-                                    plugins: ['remove_button'],
-                                    create: false,
-                                    maxItems: null,
-                                    placeholder: 'Search and select flow orders...',
-                                    searchField: ['text'],
-                                    closeAfterSelect: false,
-                                    onItemAdd: (value) => {
-                                        // Manually trigger the add flow order mapping
-                                        const event = new CustomEvent('floworder:add', {
-                                            detail: { value: value },
-                                            bubbles: true
-                                        })
-                                        flowOrderSelect.dispatchEvent(event)
-                                    },
-                                    onItemRemove: (value) => {
-                                        // Manually trigger the remove flow order mapping
-                                        const event = new CustomEvent('floworder:remove', {
-                                            detail: { value: value },
-                                            bubbles: true
-                                        })
-                                        flowOrderSelect.dispatchEvent(event)
-                                    }
-                                })
-                            }
-                        }
-                    }
-                })
-            }, 200)
-
             // Clear selected IP types set
             this.selectedIpTypes.clear()
 
@@ -292,6 +261,39 @@ export default class extends Controller {
             if (jsonContent) {
                 jsonContent.textContent = ''
             }
+
+            // Re-initialize Tom Select for core type 1 (index 0) after clearing
+            setTimeout(() => {
+                // Re-initialize production parameters Tom Select
+                document.querySelectorAll('[data-production-section="0"]').forEach(section => {
+                    const flowOrderSelect = section.querySelector('select[data-production-parameters-target="flowOrdersSelect"]')
+
+                    if (flowOrderSelect && !flowOrderSelect.tomselect) {
+                        new TomSelect(flowOrderSelect, {
+                            plugins: ['remove_button'],
+                            create: false,
+                            maxItems: null,
+                            placeholder: 'Search and select flow orders...',
+                            searchField: ['text'],
+                            closeAfterSelect: false
+                        })
+                    }
+                })
+
+                // Re-initialize combined settings selects
+                document.querySelectorAll('[data-combined-settings-target="coreTypesSelect"]').forEach(select => {
+                    if (!select.tomselect) {
+                        new TomSelect(select, {
+                            plugins: ['remove_button'],
+                            create: false,
+                            maxItems: null,
+                            placeholder: 'Select core types...',
+                            searchField: ['text'],
+                            closeAfterSelect: false
+                        })
+                    }
+                })
+            }, 300) // Increased delay to ensure DOM is fully reset
 
             showWarning('All configurations cleared')
         }
@@ -314,7 +316,6 @@ export default class extends Controller {
         }
     }
 
-    // ✅ Updated flow order + charz validation
     validateBeforeSubmit() {
         let hasErrors = false
         const errors = []
@@ -322,6 +323,165 @@ export default class extends Controller {
         // Check each selected IP type
         this.selectedIpTypes.forEach(ipType => {
             const configSection = document.getElementById(`${ipType}-config`)
+
+            // Validate combined settings if enabled
+            const combinedCheckbox = configSection.querySelector('[data-combined-checkbox]')
+            if (combinedCheckbox && combinedCheckbox.checked) {
+                const combinedSection = configSection.querySelector('[data-combined-settings-target="coreTypesSelect"]')
+
+                if (combinedSection) {
+                    const selectedCores = combinedSection.tomselect ? combinedSection.tomselect.items : []
+
+                    if (selectedCores.length === 0) {
+                        errors.push(`${ipType}: At least one core type must be selected for combined settings`)
+                        hasErrors = true
+                    } else {
+                        // Validate that all selected cores have same clock and frequency
+                        const clocks = new Set()
+                        const frequencies = new Set()
+
+                        selectedCores.forEach(coreIdx => {
+                            const coreMapping = configSection.querySelector(`[data-core-index="${coreIdx}"]`)
+                            if (coreMapping) {
+                                const clockInput = coreMapping.querySelector('input[name*="[clock]"]')
+                                const freqInput = coreMapping.querySelector('input[name*="[frequency]"]')
+
+                                if (clockInput) clocks.add(clockInput.value)
+                                if (freqInput) frequencies.add(freqInput.value)
+                            }
+                        })
+
+                        if (clocks.size > 1) {
+                            errors.push(`${ipType}: All selected core types in combined settings must have the same clock value`)
+                            hasErrors = true
+                        }
+
+                        if (frequencies.size > 1) {
+                            errors.push(`${ipType}: All selected core types in combined settings must have the same frequency value`)
+                            hasErrors = true
+                        }
+
+                        // Validate combined flow orders
+                        const combinedContainer = configSection.querySelector('[data-combined-settings-target="mappingContainer"]')
+                        if (combinedContainer) {
+                            const flowOrderMappings = combinedContainer.querySelectorAll('.combined-flow-order-mapping')
+
+                            flowOrderMappings.forEach(mapping => {
+                                const order = mapping.dataset.order
+
+                                // Validate read type
+                                const readTypes = mapping.querySelectorAll('[name*="read_type"]:checked')
+                                if (readTypes.length === 0) {
+                                    errors.push(`${ipType} Combined - ${order}: Read type is required`)
+                                    hasErrors = true
+                                }
+
+                                // Validate frequency (no use_core_frequency in combined settings)
+                                const frequency = mapping.querySelector('[data-frequency-input]')
+                                if (frequency && !frequency.value.trim()) {
+                                    frequency.classList.add('error-field')
+                                    this.addErrorMessage(frequency, 'Frequency is required')
+                                    errors.push(`${ipType} Combined - ${order}: Frequency is required`)
+                                    hasErrors = true
+                                }
+
+                                // Validate register size
+                                const registerSize = mapping.querySelector('[name*="register_size"]')
+                                if (registerSize && !registerSize.value.trim()) {
+                                    registerSize.classList.add('error-field')
+                                    this.addErrorMessage(registerSize, 'Register size is required')
+                                    errors.push(`${ipType} Combined - ${order}: Register size is required`)
+                                    hasErrors = true
+                                }
+
+                                // Validate test points for each core
+                                const testPointsSections = mapping.querySelectorAll('.combined-test-points-section')
+                                testPointsSections.forEach(section => {
+                                    const coreIdx = section.dataset.coreIndex
+
+                                    // Validate spec variable
+                                    const specVar = section.querySelector('[name*="spec_variable"]')
+                                    if (specVar && !specVar.value.trim()) {
+                                        specVar.classList.add('error-field')
+                                        this.addErrorMessage(specVar, 'Spec variable is required')
+                                        errors.push(`${ipType} Combined - ${order} Core ${coreIdx}: Spec variable is required`)
+                                        hasErrors = true
+                                    }
+
+                                    // Validate test points based on type
+                                    const typeInput = section.querySelector(`[data-type-input="${coreIdx}"]`)
+                                    const testPointsType = typeInput ? typeInput.value : 'Range'
+
+                                    if (testPointsType === 'Range') {
+                                        const startInput = section.querySelector(`[data-range-fields="${coreIdx}"] input[name*="[start]"]`)
+                                        const stopInput = section.querySelector(`[data-range-fields="${coreIdx}"] input[name*="[stop]"]`)
+                                        const stepInput = section.querySelector(`[data-range-fields="${coreIdx}"] input[name*="[step]"]`)
+
+                                        if (startInput && !startInput.value.trim()) {
+                                            startInput.classList.add('error-field')
+                                            this.addErrorMessage(startInput, 'Start is required')
+                                            errors.push(`${ipType} Combined - ${order} Core ${coreIdx}: Test points start is required`)
+                                            hasErrors = true
+                                        }
+
+                                        if (stopInput && !stopInput.value.trim()) {
+                                            stopInput.classList.add('error-field')
+                                            this.addErrorMessage(stopInput, 'Stop is required')
+                                            errors.push(`${ipType} Combined - ${order} Core ${coreIdx}: Test points stop is required`)
+                                            hasErrors = true
+                                        }
+
+                                        if (stepInput && !stepInput.value.trim()) {
+                                            stepInput.classList.add('error-field')
+                                            this.addErrorMessage(stepInput, 'Step is required')
+                                            errors.push(`${ipType} Combined - ${order} Core ${coreIdx}: Test points step is required`)
+                                            hasErrors = true
+                                        }
+                                    } else {
+                                        const listInput = section.querySelector(`[data-list-field="${coreIdx}"] input`)
+                                        if (listInput && !listInput.value.trim()) {
+                                            listInput.classList.add('error-field')
+                                            this.addErrorMessage(listInput, 'Test points list is required')
+                                            errors.push(`${ipType} Combined - ${order} Core ${coreIdx}: Test points list is required`)
+                                            hasErrors = true
+                                        }
+                                    }
+                                })
+
+                                // Validate repetition settings
+                                const numRepetitions = mapping.querySelector('[name*="num_repetitions"]')
+                                if (numRepetitions && parseInt(numRepetitions.value) > 0) {
+                                    const repCount = parseInt(numRepetitions.value)
+                                    const repContainer = mapping.querySelector(`[data-repetition-container="${order}"]`)
+
+                                    if (repContainer) {
+                                        const nameInputs = repContainer.querySelectorAll('[name*="[name]"]')
+                                        const listInputs = repContainer.querySelectorAll('[name*="[list]"]')
+
+                                        nameInputs.forEach((input, idx) => {
+                                            if (!input.value.trim()) {
+                                                input.classList.add('error-field')
+                                                this.addErrorMessage(input, `Setting name ${idx + 1} is required`)
+                                                errors.push(`${ipType} Combined - ${order}: Repetition setting name ${idx + 1} is required`)
+                                                hasErrors = true
+                                            }
+                                        })
+
+                                        listInputs.forEach((input, idx) => {
+                                            if (!input.value.trim()) {
+                                                input.classList.add('error-field')
+                                                this.addErrorMessage(input, `Setting list ${idx + 1} is required`)
+                                                errors.push(`${ipType} Combined - ${order}: Repetition setting list ${idx + 1} is required`)
+                                                hasErrors = true
+                                            }
+                                        })
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+            }
 
             // Check core mappings
             const coreMappings = configSection.querySelectorAll('[data-core-index]:not([data-core-index="999"])')
@@ -376,7 +536,6 @@ export default class extends Controller {
             const productionSections = configSection.querySelectorAll('[data-production-section]')
 
             productionSections.forEach((section) => {
-
                 const coreIndex = section.dataset.productionSection
 
                 const productionCheckbox = configSection.querySelector(`[name*="show_production_for_core][${coreIndex}]"]`)
@@ -402,28 +561,77 @@ export default class extends Controller {
                     }
 
                     flowOrdersSelected.forEach(order => {
-                        const container = section.querySelector(`[data-order="${order}"]`)
+                        const orderContainer = section.querySelector(`[data-order="${order}"]`)
 
-                        if (container) {
-                            // Read type
-                            const readTypes = container.querySelectorAll('[name*="read_type"]:checked')
+                        if (orderContainer) {
+                            // Validate read type
+                            const readTypes = orderContainer.querySelectorAll('[name*="read_type"]:checked')
                             if (readTypes.length === 0) {
                                 errors.push(`${ipType} - ${order}: Read type is required`)
                                 hasErrors = true
                             }
 
-                            // Spec variable
-                            const specVar = container.querySelector('[name*="spec_variable"]')
-                            if (specVar && !specVar.value.trim() && !specVar.disabled) {
-                                specVar.classList.add('error-field')
-                                this.addErrorMessage(specVar, 'Spec variable is required')
-                                errors.push(`${ipType} - ${order}: Spec variable is required`)
-                                hasErrors = true
+                            // Validate test points sets
+                            const testPointsSetsContainer = orderContainer.querySelector(`[data-test-points-sets-container="${order}"]`)
+                            if (testPointsSetsContainer) {
+                                const testPointsSets = testPointsSetsContainer.querySelectorAll('.test-points-set')
+
+                                testPointsSets.forEach((set, setIdx) => {
+                                    // Validate spec variable for this set
+                                    const specVar = set.querySelector(`[data-spec-variable-set="${setIdx}"]`)
+                                    if (specVar && !specVar.value.trim() && !specVar.disabled) {
+                                        specVar.classList.add('error-field')
+                                        this.addErrorMessage(specVar, 'Spec variable is required')
+                                        errors.push(`${ipType} - ${order} Set ${setIdx + 1}: Spec variable is required`)
+                                        hasErrors = true
+                                    }
+
+                                    // Validate test points based on type
+                                    const typeInput = set.querySelector(`[data-type-input-set="${setIdx}"]`)
+                                    const testPointsType = typeInput ? typeInput.value : 'Range'
+
+                                    if (testPointsType === 'Range') {
+                                        const rangeFields = set.querySelector(`[data-range-fields-set="${setIdx}"]`)
+                                        const startInput = rangeFields?.querySelector('input[name*="[start]"]')
+                                        const stopInput = rangeFields?.querySelector('input[name*="[stop]"]')
+                                        const stepInput = rangeFields?.querySelector('input[name*="[step]"]')
+
+                                        if (startInput && !startInput.value.trim()) {
+                                            startInput.classList.add('error-field')
+                                            this.addErrorMessage(startInput, 'Start is required')
+                                            errors.push(`${ipType} - ${order} Set ${setIdx + 1}: Test points start is required`)
+                                            hasErrors = true
+                                        }
+
+                                        if (stopInput && !stopInput.value.trim()) {
+                                            stopInput.classList.add('error-field')
+                                            this.addErrorMessage(stopInput, 'Stop is required')
+                                            errors.push(`${ipType} - ${order} Set ${setIdx + 1}: Test points stop is required`)
+                                            hasErrors = true
+                                        }
+
+                                        if (stepInput && !stepInput.value.trim()) {
+                                            stepInput.classList.add('error-field')
+                                            this.addErrorMessage(stepInput, 'Step is required')
+                                            errors.push(`${ipType} - ${order} Set ${setIdx + 1}: Test points step is required`)
+                                            hasErrors = true
+                                        }
+                                    } else {
+                                        const listField = set.querySelector(`[data-list-field-set="${setIdx}"]`)
+                                        const listInput = listField?.querySelector('input')
+                                        if (listInput && !listInput.value.trim()) {
+                                            listInput.classList.add('error-field')
+                                            this.addErrorMessage(listInput, 'Test points list is required')
+                                            errors.push(`${ipType} - ${order} Set ${setIdx + 1}: Test points list is required`)
+                                            hasErrors = true
+                                        }
+                                    }
+                                })
                             }
 
-                            // Frequency
-                            const usesCoreFreq = container.querySelector('[name*="use_core_frequency"]')
-                            const frequency = container.querySelector('[name*="frequency"]')
+                            // Validate frequency
+                            const usesCoreFreq = orderContainer.querySelector('[name*="use_core_frequency"]')
+                            const frequency = orderContainer.querySelector('[data-frequency-input]')
                             if (frequency && !frequency.value.trim() && (!usesCoreFreq || !usesCoreFreq.checked)) {
                                 frequency.classList.add('error-field')
                                 this.addErrorMessage(frequency, 'Frequency is required')
@@ -431,8 +639,8 @@ export default class extends Controller {
                                 hasErrors = true
                             }
 
-                            // Register size
-                            const registerSize = container.querySelector('[name*="register_size"]')
+                            // Validate register size
+                            const registerSize = orderContainer.querySelector('[name*="register_size"]')
                             if (registerSize && !registerSize.value.trim()) {
                                 registerSize.classList.add('error-field')
                                 this.addErrorMessage(registerSize, 'Register size is required')
@@ -440,48 +648,38 @@ export default class extends Controller {
                                 hasErrors = true
                             }
 
-                            // Test points - check the type first
-                            const testPointsTypeInput = container.querySelector('[name*="test_points_type"]')
-                            const testPointsType = testPointsTypeInput ? testPointsTypeInput.value : 'Range'
+                            // Validate repetition settings
+                            const numRepetitions = orderContainer.querySelector('[name*="num_repetitions"]')
+                            if (numRepetitions && parseInt(numRepetitions.value) > 0) {
+                                const repCount = parseInt(numRepetitions.value)
+                                const repContainer = orderContainer.querySelector(`[data-repetition-container="${order}"]`)
 
-                            if (testPointsType === 'Range') {
-                                // Only validate range fields if Range is selected
-                                const startInput = container.querySelector('[name*="test_points_start"]')
-                                const stopInput = container.querySelector('[name*="test_points_stop"]')
-                                const stepInput = container.querySelector('[name*="test_points_step"]')
+                                if (repContainer) {
+                                    const nameInputs = repContainer.querySelectorAll('[name*="[name]"]')
+                                    const listInputs = repContainer.querySelectorAll('[name*="[list]"]')
 
-                                if (startInput && !startInput.value.trim()) {
-                                    startInput.classList.add('error-field')
-                                    this.addErrorMessage(startInput, 'Start is required')
-                                    errors.push(`${ipType} - ${order}: Test points start is required`)
-                                    hasErrors = true
-                                }
+                                    nameInputs.forEach((input, idx) => {
+                                        if (!input.value.trim()) {
+                                            input.classList.add('error-field')
+                                            this.addErrorMessage(input, `Setting name ${idx + 1} is required`)
+                                            errors.push(`${ipType} - ${order}: Repetition setting name ${idx + 1} is required`)
+                                            hasErrors = true
+                                        }
+                                    })
 
-                                if (stopInput && !stopInput.value.trim()) {
-                                    stopInput.classList.add('error-field')
-                                    this.addErrorMessage(stopInput, 'Stop is required')
-                                    errors.push(`${ipType} - ${order}: Test points stop is required`)
-                                    hasErrors = true
-                                }
-
-                                if (stepInput && !stepInput.value.trim()) {
-                                    stepInput.classList.add('error-field')
-                                    this.addErrorMessage(stepInput, 'Step is required')
-                                    errors.push(`${ipType} - ${order}: Test points step is required`)
-                                    hasErrors = true
-                                }
-                            } else {
-                                // Validate list field if List is selected
-                                const listInput = container.querySelector('[name*="test_points"][name$="[test_points]"]')
-                                if (listInput && !listInput.value.trim()) {
-                                    listInput.classList.add('error-field')
-                                    this.addErrorMessage(listInput, 'Test points list is required')
-                                    errors.push(`${ipType} - ${order}: Test points list is required`)
-                                    hasErrors = true
+                                    listInputs.forEach((input, idx) => {
+                                        if (!input.value.trim()) {
+                                            input.classList.add('error-field')
+                                            this.addErrorMessage(input, `Setting list ${idx + 1} is required`)
+                                            errors.push(`${ipType} - ${order}: Repetition setting list ${idx + 1} is required`)
+                                            hasErrors = true
+                                        }
+                                    })
                                 }
                             }
                         }
                     })
+
                 }
             })
 
@@ -522,13 +720,44 @@ export default class extends Controller {
                                 hasErrors = true
                             }
 
-                            // NEW: Check RM Settings
-                            const rmSettings = searchTypeTable.querySelector('[name*="rm_settings"]')
-                            if (rmSettings && !rmSettings.value.trim()) {
-                                rmSettings.classList.add('error-field')
-                                this.addErrorMessage(rmSettings, 'RM settings is required')
-                                errors.push(`${ipType} Core ${parseInt(coreIndex) + 1} - ${searchType}: RM settings is required`)
-                                hasErrors = true
+                            // Validate RM Settings
+                            const numRmSettings = searchTypeTable.querySelector(`[data-rm-count="${searchType}"]`)
+                            if (numRmSettings && parseInt(numRmSettings.value) > 0) {
+                                const rmCount = parseInt(numRmSettings.value)
+                                const rmContainer = searchTypeTable.querySelector(`[data-rm-settings-container="${searchType}"]`)
+
+                                if (rmContainer) {
+                                    const nameInputs = rmContainer.querySelectorAll('[name*="[name]"]')
+                                    const fuseNameInputs = rmContainer.querySelectorAll('[name*="[fuse_name]"]')
+                                    const fuseValueInputs = rmContainer.querySelectorAll('[name*="[fuse_value]"]')
+
+                                    nameInputs.forEach((input, idx) => {
+                                        if (!input.value.trim()) {
+                                            input.classList.add('error-field')
+                                            this.addErrorMessage(input, `Setting name ${idx + 1} is required`)
+                                            errors.push(`${ipType} Core ${parseInt(coreIndex) + 1} - ${searchType}: RM setting name ${idx + 1} is required`)
+                                            hasErrors = true
+                                        }
+                                    })
+
+                                    fuseNameInputs.forEach((input, idx) => {
+                                        if (!input.value.trim()) {
+                                            input.classList.add('error-field')
+                                            this.addErrorMessage(input, `Fuse name ${idx + 1} is required`)
+                                            errors.push(`${ipType} Core ${parseInt(coreIndex) + 1} - ${searchType}: RM fuse name ${idx + 1} is required`)
+                                            hasErrors = true
+                                        }
+                                    })
+
+                                    fuseValueInputs.forEach((input, idx) => {
+                                        if (!input.value.trim()) {
+                                            input.classList.add('error-field')
+                                            this.addErrorMessage(input, `Fuse value ${idx + 1} is required`)
+                                            errors.push(`${ipType} Core ${parseInt(coreIndex) + 1} - ${searchType}: RM fuse value ${idx + 1} is required`)
+                                            hasErrors = true
+                                        }
+                                    })
+                                }
                             }
 
                             // Check selected test types
@@ -672,8 +901,150 @@ export default class extends Controller {
                     const match = fieldError.match(/(.+)_(.+)_core_(\d+)/)
                     if (match) {
                         const [, fieldName, order, idx] = match
-                        selector = `input[name*="[production_mappings][${idx}][${order}][${fieldName}]"]`
+
+                        // Special handling for spec_variable which is now in test points config
+                        if (fieldName === 'spec' && fieldError.includes('variable')) {
+                            const productionSection = configSection.querySelector(`[data-production-section="${idx}"]`)
+                            if (productionSection) {
+                                const orderMapping = productionSection.querySelector(`[data-order="${order}"]`)
+                                if (orderMapping) {
+                                    const testPointsConfig = orderMapping.querySelector('.test-points-config')
+                                    const specInput = testPointsConfig?.querySelector('[name*="spec_variable"]')
+                                    if (specInput) {
+                                        specInput.classList.add('error-field')
+                                        this.addErrorMessage(specInput, 'Spec variable is required')
+                                    }
+                                }
+                            }
+                        } else {
+                            // Other fields remain the same
+                            selector = `input[name*="[production_mappings][${idx}][${order}][${fieldName}]"]`
+                            const input = configSection.querySelector(selector)
+                            if (input) {
+                                input.classList.add('error-field')
+                                let errorSpan = input.parentElement.querySelector('.error-message')
+                                if (!errorSpan) {
+                                    errorSpan = document.createElement('span')
+                                    errorSpan.className = 'error-message'
+                                    errorSpan.textContent = this.getErrorMessage(fieldName)
+                                    input.parentElement.appendChild(errorSpan)
+                                }
+                            }
+                        }
                     }
+                }
+
+                // Handle combined settings errors
+                if (fieldError.includes('combined_')) {
+                    const configSection = document.querySelector(`[data-ip-type="${ipType}"]`)
+                    if (!configSection) return
+
+                    const combinedSection = configSection.querySelector('[data-combined-settings-target="mappingContainer"]')
+                    if (!combinedSection) return
+
+                    // Parse the error field
+                    const parts = fieldError.split('_')
+
+                    if (fieldError.includes('combined_core_types')) {
+                        const select = configSection.querySelector('[data-combined-settings-target="coreTypesSelect"]')
+                        if (select) {
+                            select.classList.add('error-field')
+                        }
+                    } else if (fieldError.includes('combined_clock')) {
+                        // Highlight all clock fields in selected cores
+                        const coreSelects = configSection.querySelector('[data-combined-settings-target="coreTypesSelect"]')
+                        if (coreSelects && coreSelects.tomselect) {
+                            coreSelects.tomselect.items.forEach(coreIdx => {
+                                const coreMapping = configSection.querySelector(`[data-core-index="${coreIdx}"]`)
+                                const clockInput = coreMapping?.querySelector('input[name*="[clock]"]')
+                                if (clockInput) {
+                                    clockInput.classList.add('error-field')
+                                    this.addErrorMessage(clockInput, 'All selected cores must have same clock')
+                                }
+                            })
+                        }
+                    } else if (fieldError.includes('combined_frequency') && !fieldError.includes('_core_')) {
+                        // Highlight all frequency fields in selected cores
+                        const coreSelects = configSection.querySelector('[data-combined-settings-target="coreTypesSelect"]')
+                        if (coreSelects && coreSelects.tomselect) {
+                            coreSelects.tomselect.items.forEach(coreIdx => {
+                                const coreMapping = configSection.querySelector(`[data-core-index="${coreIdx}"]`)
+                                const freqInput = coreMapping?.querySelector('input[name*="[frequency]"]')
+                                if (freqInput) {
+                                    freqInput.classList.add('error-field')
+                                    this.addErrorMessage(freqInput, 'All selected cores must have same frequency')
+                                }
+                            })
+                        }
+                    } else {
+                        // Handle specific flow order errors
+                        const match = fieldError.match(/combined_(.+?)_(.+?)(?:_core_(\d+))?$/)
+                        if (match) {
+                            const [, fieldType, order, coreIdx] = match
+                            const flowOrderMapping = combinedSection.querySelector(`[data-order="${order}"]`)
+
+                            if (flowOrderMapping) {
+                                if (fieldType === 'read' && fieldError.includes('type')) {
+                                    const readTypeButtons = flowOrderMapping.querySelectorAll('[data-read-type]')
+                                    readTypeButtons.forEach(btn => btn.classList.add('error-field'))
+                                } else if (fieldType === 'frequency') {
+                                    const freqInput = flowOrderMapping.querySelector('[data-frequency-input]')
+                                    if (freqInput) {
+                                        freqInput.classList.add('error-field')
+                                        this.addErrorMessage(freqInput, 'Frequency is required')
+                                    }
+                                } else if (fieldType === 'register' && fieldError.includes('size')) {
+                                    const regInput = flowOrderMapping.querySelector('[name*="register_size"]')
+                                    if (regInput) {
+                                        regInput.classList.add('error-field')
+                                        this.addErrorMessage(regInput, 'Register size is required')
+                                    }
+                                } else if (fieldType === 'spec' && coreIdx) {
+                                    const testPointsSection = flowOrderMapping.querySelector(`[data-core-index="${coreIdx}"]`)
+                                    const specInput = testPointsSection?.querySelector('[name*="spec_variable"]')
+                                    if (specInput) {
+                                        specInput.classList.add('error-field')
+                                        this.addErrorMessage(specInput, 'Spec variable is required')
+                                    }
+                                } else if (fieldType === 'test' && fieldError.includes('points') && coreIdx) {
+                                    const testPointsSection = flowOrderMapping.querySelector(`[data-core-index="${coreIdx}"]`)
+                                    if (testPointsSection) {
+                                        const typeInput = testPointsSection.querySelector(`[data-type-input="${coreIdx}"]`)
+                                        const isRange = typeInput?.value === 'Range'
+
+                                        if (isRange) {
+                                            if (fieldError.includes('start')) {
+                                                const input = testPointsSection.querySelector('[name*="[start]"]')
+                                                if (input) {
+                                                    input.classList.add('error-field')
+                                                    this.addErrorMessage(input, 'Start is required')
+                                                }
+                                            } else if (fieldError.includes('stop')) {
+                                                const input = testPointsSection.querySelector('[name*="[stop]"]')
+                                                if (input) {
+                                                    input.classList.add('error-field')
+                                                    this.addErrorMessage(input, 'Stop is required')
+                                                }
+                                            } else if (fieldError.includes('step')) {
+                                                const input = testPointsSection.querySelector('[name*="[step]"]')
+                                                if (input) {
+                                                    input.classList.add('error-field')
+                                                    this.addErrorMessage(input, 'Step is required')
+                                                }
+                                            }
+                                        } else {
+                                            const input = testPointsSection.querySelector(`[data-list-field="${coreIdx}"] input`)
+                                            if (input) {
+                                                input.classList.add('error-field')
+                                                this.addErrorMessage(input, 'Test points list is required')
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return
                 }
         }
 
@@ -711,6 +1082,26 @@ export default class extends Controller {
                     if (input) {
                         input.classList.add('error-field')
                         this.addErrorMessage(input, 'PSM register size is required')
+                    }
+                } else if (fieldPart.includes('_rm_')) {
+                    // Handle RM settings errors
+                    const rmMatch = fieldPart.match(/(.+)_rm_(name|fuse_name|fuse_value)_(\d+)/)
+                    if (rmMatch) {
+                        const [, searchType, fieldType, rmIdx] = rmMatch
+                        const searchTypeTable = charzSection.querySelector(`[data-search-type="${searchType.toUpperCase()}"]`)
+                        if (searchTypeTable) {
+                            const rmContainer = searchTypeTable.querySelector(`[data-rm-settings-container="${searchType.toUpperCase()}"]`)
+                            if (rmContainer) {
+                                const fieldSets = rmContainer.querySelectorAll('.rm-setting-field-set')
+                                if (fieldSets[parseInt(rmIdx)]) {
+                                    const input = fieldSets[parseInt(rmIdx)].querySelector(`[name*="[${fieldType}]"]`)
+                                    if (input) {
+                                        input.classList.add('error-field')
+                                        this.addErrorMessage(input, `${fieldType.replace('_', ' ')} is required`)
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else if (fieldPart.includes('_')) {
                     // Handle search type specific errors

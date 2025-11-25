@@ -7,11 +7,12 @@
     <div class="form-group">
       <label class="form-label">Core Name <span class="text-red-500">*</span></label>
       <input type="text" 
-             name="ip_configurations[<%= ip_type %>][core_mappings][<%= core_index %>][core]"
-             class="form-input"
-             placeholder="e.g., core_a">
+            name="ip_configurations[<%= ip_type %>][core_mappings][<%= core_index %>][core]"
+            class="form-input"
+            placeholder="e.g., core_a"
+            data-action="input->ip-configuration#updateCombinedCoreOptions">
     </div>
-    
+
     <div class="form-group">
       <label class="form-label">Core Count <span class="text-red-500">*</span></label>
       <input type="text" 

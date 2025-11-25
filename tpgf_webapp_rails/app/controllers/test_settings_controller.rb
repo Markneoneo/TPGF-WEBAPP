@@ -168,6 +168,17 @@ class TestSettingsController < ApplicationController
     end
     
     private
+
+    def parse_repetition_settings(repetition_data)
+      return [] if repetition_data.blank?
+      
+      # repetition_data is a hash with indices as keys
+      # Convert to array of hashes with setting_name: setting_list format
+      repetition_data.to_h.values.map do |setting|
+        next if setting[:name].blank? || setting[:list].blank?
+        { setting[:name] => setting[:list] }
+      end.compact
+    end    
     
     def cleanup_expired_cache_entries
       # This is a simple cleanup mechanism
@@ -231,72 +242,254 @@ class TestSettingsController < ApplicationController
     end
     
     def transform_core_mapping(config)
-        core_mapping = {}
+      core_mapping = {}
+      
+      # Handle combined settings first
+      if config[:show_combined_settings].present? && config[:combined_settings].present?
+        combined_data = config[:combined_settings]
+        selected_cores = combined_data[:selected_core_types] || []
         
-        return core_mapping unless config[:core_mappings]
-        
-        config[:core_mappings].to_h.each do |idx, mapping|
-          next if idx.to_s == '999'
-          
-          core_name = mapping[:core]
-          next if core_name.blank?      
-          
-          # Get the supply value for this core
-          supply_value = mapping[:supply]
-          
-          # Build floworder_mapping if production is enabled
-          floworder_mapping = {}
-          if config[:show_production_for_core] && config[:show_production_for_core][idx]
-            flow_orders = config[:flow_orders] && config[:flow_orders][idx] || []
-            production_mappings = config[:production_mappings] && config[:production_mappings][idx] || {}
-            
-            flow_orders.each do |order|
-                mapping_data = production_mappings[order] || {}
-              
-                floworder_mapping[order.downcase] = {
-                  test_points: parse_test_points(mapping_data),
-                  frequency: mapping_data[:use_core_frequency].present? ? mapping[:frequency].to_f : mapping_data[:frequency].to_f,
-                  register_size: mapping_data[:register_size].to_i,
-                  binnable: mapping_data[:binnable].present?,
-                  softsetenable: mapping_data[:softsetenable].present?,
-                  fallbackenable: mapping_data[:fallbackenable].present?,
-                  insertionlist: parse_insertion_list(mapping_data[:insertion]),
-                  readtype: build_read_type(mapping_data),
-                  specvariable: mapping_data[:use_power_supply].present? ? mapping[:supply] : (mapping_data[:spec_variable] || ''),
-                  use_power_supply: mapping_data[:use_power_supply].present?
-                }
-              end
-              
+        if selected_cores.any?
+          # Build combined core name
+          core_names = selected_cores.map do |core_idx|
+            config.dig(:core_mappings, core_idx, :core) || "core_#{core_idx}"
           end
+          combined_core_name = core_names.join('')
           
-          # Build charztype_mapping if enabled
-          charztype_mapping = {}
-          if config[:show_charz_for_core] && config[:show_charz_for_core][idx]
-            charz_data = config[:charz_data] && config[:charz_data][idx] || {}
-            
-            if charz_data[:search_granularity].present? && charz_data[:search_types].present?
-              charztype_mapping = {
-                granularity: charz_data[:search_granularity],
-                searchtype: build_search_types(charz_data, supply_value),
-                psm_register_size: charz_data[:psm_register_size]
-              }
+          # Validate that all selected cores have same clock, frequency
+          clocks = selected_cores.map { |idx| config.dig(:core_mappings, idx, :clock) }.uniq
+          frequencies = selected_cores.map { |idx| config.dig(:core_mappings, idx, :frequency) }.uniq
+          
+          if clocks.size > 1 || frequencies.size > 1
+            # This will be caught by validation
+          else
+            # Build combined power supply
+            supplies = selected_cores.map do |core_idx|
+              config.dig(:core_mappings, core_idx, :supply) || ''
             end
-          end
-          
-            # Build the core mapping entry
-            core_mapping[core_name] = {
-            count: mapping[:core_count].to_i,
-            power_supply: mapping[:supply] || '',
-            clock: mapping[:clock] || '',
-            freq: mapping[:frequency].to_f,  # Change from hardcoded 1000 to actual frequency
-            floworder_mapping: floworder_mapping,
-            charztype_mapping: charztype_mapping
+            combined_supply = supplies.join('')
+            
+            # Build combined floworder_mapping
+            combined_floworder = build_combined_floworder_mapping(combined_data, selected_cores, config)
+            
+            core_mapping[combined_core_name] = {
+              count: 1,
+              power_supply: combined_supply,
+              clock: clocks.first || '',
+              freq: frequencies.first.to_f,
+              floworder_mapping: combined_floworder,
+              charztype_mapping: {}
             }
+          end
+        end
+      end
+      
+      # Continue with existing core mappings...
+      return core_mapping unless config[:core_mappings]
+      
+      config[:core_mappings].to_h.each do |idx, mapping|
+        next if idx.to_s == '999'
+        
+        core_name = mapping[:core]
+        next if core_name.blank?
+        
+        # Get the supply value for this core
+        supply_value = mapping[:supply]
+        
+        # Build floworder_mapping if production is enabled
+        floworder_mapping = {}
+        if config[:show_production_for_core] && config[:show_production_for_core][idx]
+          flow_orders = config[:flow_orders] && config[:flow_orders][idx] || []
+          production_mappings = config[:production_mappings] && config[:production_mappings][idx] || {}
+          
+          # Filter out flow orders that are in combined settings
+          combined_flow_orders = get_combined_flow_orders_for_core(config, idx)
 
+          flow_orders.each do |order|
+            mapping_data = production_mappings[order] || {}
+            
+            # Parse test points sets (new structure)
+            test_points_by_spec = {}
+            test_points_sets = mapping_data[:test_points_sets]&.to_h || {}
+            
+            if test_points_sets.any?
+              # Multiple test points sets
+              test_points_sets.each do |set_idx, set_data|
+                set_data = set_data.to_h if set_data.respond_to?(:to_h)
+                
+                spec_var = if set_data[:use_power_supply].present?
+                  mapping[:supply]
+                else
+                  set_data[:spec_variable] || ''
+                end
+                
+                next if spec_var.blank?
+                
+                # Parse test points for this set
+                test_points = if set_data[:type] == 'List'
+                  set_data[:list].to_s.split(',').map(&:strip).map(&:to_f).reject(&:zero?)
+                else
+                  generate_range(
+                    set_data[:start].to_f,
+                    set_data[:stop].to_f,
+                    set_data[:step].to_f
+                  )
+                end
+                
+                test_points_by_spec[spec_var] = test_points
+              end
+            end
+          
+            floworder_mapping[order.downcase] = {
+              test_points_by_spec: test_points_by_spec,
+              frequency: mapping_data[:use_core_frequency].present? ? mapping[:frequency].to_f : mapping_data[:frequency].to_f,
+              register_size: mapping_data[:register_size].to_i,
+              binnable: mapping_data[:binnable].present?,
+              softsetenable: mapping_data[:softsetenable].present?,
+              fallbackenable: mapping_data[:fallbackenable].present?,
+              insertionlist: parse_insertion_list(mapping_data[:insertion]),
+              repetition_settings: parse_repetition_settings(mapping_data[:repetition_settings]),
+              readtype: build_read_type(mapping_data),
+              has_multiple_specs: test_points_by_spec.size > 1
+            }
+          end             
+          
         end
         
-        core_mapping
-      end      
+        # Build charztype_mapping if enabled
+        charztype_mapping = {}
+        if config[:show_charz_for_core] && config[:show_charz_for_core][idx]
+          charz_data = config[:charz_data] && config[:charz_data][idx] || {}
+          
+          if charz_data[:search_granularity].present? && charz_data[:search_types].present?
+            charztype_mapping = {
+              granularity: charz_data[:search_granularity],
+              searchtype: build_search_types(charz_data, supply_value),
+              psm_register_size: charz_data[:psm_register_size]
+            }
+          end
+        end
+        
+        # Build the core mapping entry
+        core_mapping[core_name] = {
+          count: mapping[:core_count].to_i,
+          power_supply: mapping[:supply] || '',
+          clock: mapping[:clock] || '',
+          freq: mapping[:frequency].to_f,
+          floworder_mapping: floworder_mapping,
+          charztype_mapping: charztype_mapping
+        }
+      end
+      
+      core_mapping
+    end    
+
+    def build_combined_floworder_mapping(combined_data, selected_cores, config)
+      floworder_mapping = {}
+      flow_orders_data = combined_data[:flow_orders] || {}
+      
+      flow_orders_data.each do |order, order_data|
+        test_points_by_spec = {}
+        
+        # Group test points by spec variable
+        selected_cores.each do |core_idx|
+          tp_data = order_data.dig(:test_points, core_idx) || {}
+          spec_var = tp_data[:spec_variable] || "spec_#{core_idx}"
+          
+          # Parse test points for this core
+          test_points = if tp_data[:type] == 'List'
+            parse_test_points_list(tp_data[:list])
+          else
+            parse_test_points_range(tp_data[:start], tp_data[:stop], tp_data[:step])
+          end
+          
+          test_points_by_spec[spec_var] = test_points
+        end
+        
+        # Get frequency directly (no use_core_frequency option in combined settings)
+        frequency = order_data[:frequency].to_f
+        
+        floworder_mapping[order.downcase] = {
+          test_points_by_spec: test_points_by_spec,
+          frequency: frequency,
+          register_size: order_data[:register_size].to_i,
+          binnable: order_data[:binnable].present?,
+          softsetenable: order_data[:softsetenable].present?,
+          fallbackenable: order_data[:fallbackenable].present?,
+          insertionlist: parse_insertion_list(order_data[:insertion]),
+          repetition_settings: parse_repetition_settings(order_data[:repetition_settings]),
+          readtype: build_read_type(order_data),
+          is_combined: true
+        }
+      end
+      
+      floworder_mapping
+    end    
+    
+    def get_combined_flow_orders_for_core(config, core_idx)
+      return [] unless config[:show_combined_settings].present? && config[:combined_settings].present?
+      
+      combined_data = config[:combined_settings]
+      selected_cores = combined_data[:selected_core_types] || []
+      
+      # Check if this core is in the selected cores
+      return [] unless selected_cores.include?(core_idx.to_s) || selected_cores.include?(core_idx)
+      
+      # Return the flow orders that are in combined settings
+      flow_orders_data = combined_data[:flow_orders] || {}
+      flow_orders_data.keys.map(&:to_s)
+    end
+    
+    def parse_test_points_list(list_string)
+      return [] if list_string.blank?
+      list_string.split(',').map(&:strip).map(&:to_f).reject(&:zero?)
+    end
+    
+    def parse_test_points_range(start, stop, step)
+      return [] if start.blank? || stop.blank? || step.blank?
+      
+      start_val = start.to_f
+      stop_val = stop.to_f
+      step_val = step.to_f
+      
+      return [] if step_val == 0
+      return [] if start_val == stop_val
+      
+      # Validate step direction
+      if (stop_val > start_val && step_val < 0) || (stop_val < start_val && step_val > 0)
+        return []
+      end
+      
+      # Determine decimal places for precision
+      decimal_places = [
+        start.to_s.split('.')[1]&.length || 0,
+        stop.to_s.split('.')[1]&.length || 0,
+        step.to_s.split('.')[1]&.length || 0
+      ].max
+      
+      result = []
+      current = start_val
+      epsilon = 10 ** -(decimal_places + 2)
+      
+      if step_val > 0
+        while current <= stop_val + epsilon
+          result << current.round(decimal_places)
+          current = (current + step_val).round(decimal_places + 2)
+        end
+      else
+        while current >= stop_val - epsilon
+          result << current.round(decimal_places)
+          current = (current + step_val).round(decimal_places + 2)
+        end
+      end
+      
+      # Ensure we don't overshoot
+      if result.last && ((step_val > 0 && result.last > stop_val) || (step_val < 0 && result.last < stop_val))
+        result.pop
+      end
+      
+      result
+    end    
   
     def parse_test_points(mapping)
       return [] unless mapping
@@ -416,13 +609,16 @@ class TestSettingsController < ApplicationController
           charz_data.dig(:spec_variables, search_type) || ''
         end
         
-        # NEW: Get RM settings for this search type
-        rm_settings_key = charz_data.dig(:rm_settings, search_type) || 'default'
+        # Parse RM settings for this search type
+        rm_types = parse_rm_settings(charz_data.dig(:rm_settings, search_type))
         
         search_types[search_type] = {
           specvariable: spec_variable,
           testtype: {}
         }
+        
+        # Add rm_types if present
+        search_types[search_type][:rm_types] = rm_types unless rm_types.empty?
         
         selected_test_types.each do |test_type|
           table = charz_data.dig(:table, search_type, test_type) || {}
@@ -441,34 +637,43 @@ class TestSettingsController < ApplicationController
           else
             []
           end
-
-          # Build the base configuration for each workload
-          wl_array.each do |wl|
-            test_type_config = {
-              wl_count: table[:wl_count].to_i,
-              wl: [wl],  # Single workload per entry
-              test_points: test_points,
-              searchsettings: {
-                start: table[:search_start] || '',
-                stop: table[:search_end] || '',
-                mode: 'LinBin',
-                res: table[:resolution] || '',
-                step: table[:search_step] || ''
-              }
+    
+          # Build the base structure
+          test_type_config = {
+            wl_count: table[:wl_count].to_i,
+            wl: wl_array,
+            test_points: test_points,
+            searchsettings: {
+              start: table[:search_start] || '',
+              stop: table[:search_end] || '',
+              mode: 'LinBin',
+              res: table[:resolution] || '',
+              step: table[:search_step] || ''
             }
-            
-            # NEW STRUCTURE: rm_settings -> test_type -> workload
-            # Initialize the nested structure
-            search_types[search_type][:testtype][rm_settings_key] ||= {}
-            search_types[search_type][:testtype][rm_settings_key][test_type.downcase] ||= {}
-            
-            # Add the config under the workload
-            search_types[search_type][:testtype][rm_settings_key][test_type.downcase][wl] = test_type_config
-          end
+          }
+          
+          # Initialize test type if it doesn't exist
+          search_types[search_type][:testtype][test_type.downcase] ||= test_type_config
         end
       end
       
       search_types
+    end
+    
+    def parse_rm_settings(rm_settings_data)
+      return {} if rm_settings_data.blank?
+      
+      # rm_settings_data is a hash with indices as keys
+      # Convert to hash with setting_name: { fuse_name: fuse_value } format
+      result = {}
+      
+      rm_settings_data.to_h.values.each do |setting|
+        next if setting[:name].blank? || setting[:fuse_name].blank? || setting[:fuse_value].blank?
+        
+        result[setting[:name]] = { setting[:fuse_name] => setting[:fuse_value] }
+      end
+      
+      result
     end    
   
     def symbolize_keys(hash)

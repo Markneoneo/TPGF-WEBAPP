@@ -126,11 +126,14 @@ export default class extends Controller {
 
         // Initialize components after DOM insertion
         setTimeout(() => {
-            this.initializeTestPointsToggle(order)
+            // this.initializeTestPointsToggle(order)
             this.initializeReadTypeToggle(order)
             this.initializeBooleanOptionsToggle(order)
             this.initializeUseOptionButtons(order)
             this.initializeInsertionSelect(order)
+
+            // Initialize the first test points set (default is 1)
+            this.updateTestPointsSets(order, 1)
         }, 100)
     }
 
@@ -141,6 +144,7 @@ export default class extends Controller {
         }
     }
 
+    /*
     initializeTestPointsToggle(order) {
         const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
         if (!mapping) return
@@ -187,6 +191,7 @@ export default class extends Controller {
             })
         }
     }
+        */
 
     initializeReadTypeToggle(order) {
         const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
@@ -254,18 +259,18 @@ export default class extends Controller {
         if (!mapping) return
 
         // Initialize Use Power Supply button
-        const usePowerSupplyBtn = mapping.querySelector('[data-use-power-supply]')
-        if (usePowerSupplyBtn) {
-            const checkbox = usePowerSupplyBtn.querySelector('input[type="checkbox"]')
+        // const usePowerSupplyBtn = mapping.querySelector('[data-use-power-supply]')
+        // if (usePowerSupplyBtn) {
+        //     const checkbox = usePowerSupplyBtn.querySelector('input[type="checkbox"]')
 
-            usePowerSupplyBtn.addEventListener('click', () => {
-                checkbox.checked = !checkbox.checked
-                usePowerSupplyBtn.classList.toggle('active', checkbox.checked)
+        //     usePowerSupplyBtn.addEventListener('click', () => {
+        //         checkbox.checked = !checkbox.checked
+        //         usePowerSupplyBtn.classList.toggle('active', checkbox.checked)
 
-                // Trigger the togglePowerSupply logic
-                this.togglePowerSupply({ target: checkbox, currentTarget: usePowerSupplyBtn })
-            })
-        }
+        //         // Trigger the togglePowerSupply logic
+        //         this.togglePowerSupply({ target: checkbox, currentTarget: usePowerSupplyBtn })
+        //     })
+        // }
 
         // Initialize Use Core Frequency button
         const useCoreFreqBtn = mapping.querySelector('[data-use-core-frequency]')
@@ -282,23 +287,217 @@ export default class extends Controller {
         }
     }
 
-    toggleTestPointsType(event) {
-        const container = event.target.closest('.flow-order-mapping')
-        const rangeFields = container.querySelector('.test-points-range')
-        const listField = container.querySelector('.test-points-list')
+    incrementTestPointsSets(event) {
+        const order = event.currentTarget.dataset.order
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        const input = mapping.querySelector(`[data-test-points-sets-count="${order}"]`)
+        const current = parseInt(input.value) || 1
 
-        if (event.target.value === 'List') {
-            rangeFields.classList.add('hidden')
-            listField.classList.remove('hidden')
-        } else {
-            rangeFields.classList.remove('hidden')
-            listField.classList.add('hidden')
+        if (current < 10) {
+            input.value = current + 1
+            this.updateTestPointsSets(order, current + 1)
         }
     }
 
-    togglePowerSupply(event) {
-        const container = event.target.closest('.flow-order-mapping')
-        const specVariableInput = container.querySelector('[name*="spec_variable"]')
+    decrementTestPointsSets(event) {
+        const order = event.currentTarget.dataset.order
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        const input = mapping.querySelector(`[data-test-points-sets-count="${order}"]`)
+        const current = parseInt(input.value) || 1
+
+        if (current > 1) {
+            input.value = current - 1
+            this.updateTestPointsSets(order, current - 1)
+        }
+    }
+
+    updateTestPointsSetsCount(event) {
+        const order = event.target.closest('[data-order]').dataset.order
+        let value = parseInt(event.target.value) || 1
+
+        // Enforce min/max
+        if (value < 1) value = 1
+        if (value > 10) value = 10
+
+        event.target.value = value
+        this.updateTestPointsSets(order, value)
+    }
+
+    updateTestPointsSets(order, count) {
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        const container = mapping.querySelector(`[data-test-points-sets-container="${order}"]`)
+
+        if (!container) return
+
+        // Get IP type and core index
+        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
+        const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+
+        // Clear existing sets
+        container.innerHTML = ''
+
+        // Add new sets based on count
+        for (let i = 0; i < count; i++) {
+            const testPointsSet = this.createTestPointsSet(order, i, ipType, coreIndex)
+            container.appendChild(testPointsSet)
+
+            // Initialize toggles for this set
+            setTimeout(() => {
+                this.initializeTestPointsToggleForSet(order, i, testPointsSet)
+                this.initializeUsePowerSupplyForSet(order, i, testPointsSet)
+            }, 50)
+        }
+    }
+
+    createTestPointsSet(order, index, ipType, coreIndex) {
+        const set = document.createElement('div')
+        set.className = 'test-points-set'
+        set.dataset.setIndex = index
+
+        set.innerHTML = `
+            <div class="test-points-set-header">
+                <h5>Test Points Set ${index + 1}</h5>
+            </div>
+            
+            <!-- Spec Variable -->
+            <div class="form-group">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="form-label mb-0">Spec Variable <span class="text-red-500">*</span></label>
+                    <button type="button" class="use-option-btn" data-use-power-supply-set="${index}">
+                        <input type="checkbox" 
+                               name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][test_points_sets][${index}][use_power_supply]"
+                               class="sr-only">
+                        Use Power Supply
+                    </button>
+                </div>
+                <input type="text" 
+                       name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][test_points_sets][${index}][spec_variable]"
+                       placeholder="e.g., VDDCR_${index + 1}"
+                       class="form-input"
+                       data-spec-variable-set="${index}">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Test Points Configuration</label>
+                <div class="test-points-toggle">
+                    <button type="button" class="active" data-test-points-type="range" data-set="${index}">
+                        Range
+                    </button>
+                    <button type="button" data-test-points-type="list" data-set="${index}">
+                        List
+                    </button>
+                </div>
+                <input type="hidden" 
+                       name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][test_points_sets][${index}][type]" 
+                       value="Range"
+                       data-type-input-set="${index}">
+            </div>
+            
+            <!-- Test Points Range -->
+            <div data-range-fields-set="${index}" class="test-points-range-grid">
+                <div class="form-group">
+                    <label class="form-label">Start</label>
+                    <div class="input-group">
+                        <input type="text" 
+                               name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][test_points_sets][${index}][start]"
+                               class="form-input form-input-sm">
+                        <span class="input-addon">V</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stop</label>
+                    <div class="input-group">
+                        <input type="text" 
+                               name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][test_points_sets][${index}][stop]"
+                               class="form-input form-input-sm">
+                        <span class="input-addon">V</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Step</label>
+                    <div class="input-group">
+                        <input type="text" 
+                               name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][test_points_sets][${index}][step]"
+                               class="form-input form-input-sm">
+                        <span class="input-addon">V</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Test Points List -->
+            <div data-list-field-set="${index}" style="display: none;">
+                <div class="form-group">
+                    <input type="text" 
+                           name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][test_points_sets][${index}][list]"
+                           placeholder="Enter comma-separated values (e.g., 0.5, 0.6, 0.7)"
+                           class="form-input">
+                </div>
+            </div>
+        `
+
+        return set
+    }
+
+    initializeTestPointsToggleForSet(order, setIndex, setElement) {
+        const rangeBtn = setElement.querySelector(`[data-test-points-type="range"][data-set="${setIndex}"]`)
+        const listBtn = setElement.querySelector(`[data-test-points-type="list"][data-set="${setIndex}"]`)
+        const rangeFields = setElement.querySelector(`[data-range-fields-set="${setIndex}"]`)
+        const listField = setElement.querySelector(`[data-list-field-set="${setIndex}"]`)
+        const typeInput = setElement.querySelector(`[data-type-input-set="${setIndex}"]`)
+
+        if (rangeBtn && listBtn) {
+            rangeBtn.addEventListener('click', () => {
+                rangeBtn.classList.add('active')
+                listBtn.classList.remove('active')
+                rangeFields.style.display = 'grid'
+                listField.style.display = 'none'
+                typeInput.value = 'Range'
+
+                // Clear list field
+                const listInput = listField.querySelector('input')
+                if (listInput) {
+                    listInput.value = ''
+                    listInput.classList.remove('error-field')
+                    const errorMsg = listInput.parentElement.querySelector('.error-message')
+                    if (errorMsg) errorMsg.remove()
+                }
+            })
+
+            listBtn.addEventListener('click', () => {
+                listBtn.classList.add('active')
+                rangeBtn.classList.remove('active')
+                rangeFields.style.display = 'none'
+                listField.style.display = 'block'
+                typeInput.value = 'List'
+
+                // Clear range fields
+                const rangeInputs = rangeFields.querySelectorAll('input')
+                rangeInputs.forEach(input => {
+                    input.value = ''
+                    input.classList.remove('error-field')
+                    const errorMsg = input.parentElement.querySelector('.error-message')
+                    if (errorMsg) errorMsg.remove()
+                })
+            })
+        }
+    }
+
+    initializeUsePowerSupplyForSet(order, setIndex, setElement) {
+        const usePowerSupplyBtn = setElement.querySelector(`[data-use-power-supply-set="${setIndex}"]`)
+        if (!usePowerSupplyBtn) return
+
+        const checkbox = usePowerSupplyBtn.querySelector('input[type="checkbox"]')
+
+        usePowerSupplyBtn.addEventListener('click', () => {
+            checkbox.checked = !checkbox.checked
+            usePowerSupplyBtn.classList.toggle('active', checkbox.checked)
+            // Trigger the togglePowerSupply logic for this set
+            this.togglePowerSupplyForSet({ target: checkbox, currentTarget: usePowerSupplyBtn }, setIndex, setElement)
+        })
+    }
+
+    togglePowerSupplyForSet(event, setIndex, setElement) {
+        const specVariableInput = setElement.querySelector(`[data-spec-variable-set="${setIndex}"]`)
         const button = event.currentTarget
 
         if (!specVariableInput) {
@@ -340,6 +539,69 @@ export default class extends Controller {
             specVariableInput.classList.remove('bg-gray-100')
         }
     }
+
+    /*
+    toggleTestPointsType(event) {
+        const container = event.target.closest('.flow-order-mapping')
+        const rangeFields = container.querySelector('.test-points-range')
+        const listField = container.querySelector('.test-points-list')
+
+        if (event.target.value === 'List') {
+            rangeFields.classList.add('hidden')
+            listField.classList.remove('hidden')
+        } else {
+            rangeFields.classList.remove('hidden')
+            listField.classList.add('hidden')
+        }
+    }
+
+    togglePowerSupply(event) {
+        const container = event.target.closest('.flow-order-mapping')
+        // Find spec variable inside test points config
+        const testPointsConfig = container.querySelector('.test-points-config')
+        const specVariableInput = testPointsConfig?.querySelector('[name*="spec_variable"]')
+        const button = event.currentTarget
+
+        if (!specVariableInput) {
+            console.error('Spec variable input not found')
+            return
+        }
+
+        // Get the core index from the production parameters container
+        const productionContainer = this.element.closest('[data-core-index]')
+        const coreIndex = productionContainer ? productionContainer.dataset.coreIndex : '0'
+
+        // Get the IP type
+        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
+
+        // Find the supply input for this specific core and IP type
+        const supplySelector = `[data-ip-type="${ipType}"] input[name="ip_configurations[${ipType}][core_mappings][${coreIndex}][supply]"]`
+        const supplyInput = document.querySelector(supplySelector)
+
+        if (event.target.checked) {
+            if (supplyInput && supplyInput.value) {
+                // Store original value if not already stored
+                if (!specVariableInput.dataset.originalValue) {
+                    specVariableInput.dataset.originalValue = specVariableInput.value || ''
+                }
+                specVariableInput.value = supplyInput.value
+                specVariableInput.disabled = true
+                specVariableInput.classList.add('bg-gray-100')
+            } else {
+                // No supply value, uncheck and alert
+                event.target.checked = false
+                if (button) button.classList.remove('active')
+                alert('Please enter a supply value first')
+            }
+        } else {
+            // Restore original value
+            specVariableInput.value = specVariableInput.dataset.originalValue || ''
+            delete specVariableInput.dataset.originalValue
+            specVariableInput.disabled = false
+            specVariableInput.classList.remove('bg-gray-100')
+        }
+    }
+    */
 
     toggleCoreFrequency(event) {
         const container = event.target.closest('.flow-order-mapping')
@@ -424,4 +686,80 @@ export default class extends Controller {
             maxOptions: null
         })
     }
+
+    incrementRepetitions(event) {
+        const order = event.currentTarget.dataset.order
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        const input = mapping.querySelector(`[data-repetition-count="${order}"]`)
+        const current = parseInt(input.value) || 0
+
+        if (current < 3) {
+            input.value = current + 1
+            this.updateRepetitionFields(order, current + 1)
+        }
+    }
+
+    decrementRepetitions(event) {
+        const order = event.currentTarget.dataset.order
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        const input = mapping.querySelector(`[data-repetition-count="${order}"]`)
+        const current = parseInt(input.value) || 0
+
+        if (current > 0) {
+            input.value = current - 1
+            this.updateRepetitionFields(order, current - 1)
+        }
+    }
+
+    updateRepetitionCount(event) {
+        const order = event.target.closest('[data-order]').dataset.order
+        let value = parseInt(event.target.value) || 0
+
+        // Enforce min/max
+        if (value < 0) value = 0
+        if (value > 3) value = 3
+
+        event.target.value = value
+        this.updateRepetitionFields(order, value)
+    }
+
+    updateRepetitionFields(order, count) {
+        const mapping = this.mappingContainerTarget.querySelector(`[data-order="${order}"]`)
+        const container = mapping.querySelector(`[data-repetition-container="${order}"]`)
+
+        if (!container) return
+
+        // Get IP type and core index
+        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
+        const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+
+        // Clear existing fields
+        container.innerHTML = ''
+
+        // Add new fields based on count
+        for (let i = 0; i < count; i++) {
+            const fieldSet = document.createElement('div')
+            fieldSet.className = 'repetition-field-set'
+            fieldSet.innerHTML = `
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Setting Name ${i + 1}</label>
+                        <input type="text" 
+                               name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][repetition_settings][${i}][name]"
+                               placeholder="e.g., setting_${i + 1}"
+                               class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Setting List ${i + 1}</label>
+                        <input type="text" 
+                               name="ip_configurations[${ipType}][production_mappings][${coreIndex}][${order}][repetition_settings][${i}][list]"
+                               placeholder="e.g., value_${i + 1}"
+                               class="form-input">
+                    </div>
+                </div>
+            `
+            container.appendChild(fieldSet)
+        }
+    }
+
 }

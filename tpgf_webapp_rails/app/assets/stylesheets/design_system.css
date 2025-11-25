@@ -144,6 +144,19 @@
     margin-bottom: var(--spacing-md);
 }
 
+/* Production Parameters Card Nested - Orange Theme */
+.production-params-container .card-nested,
+.flow-order-mapping .card-nested {
+    background: linear-gradient(to right, #ffedd5, white);
+    border: 2px solid #fed7aa;
+}
+
+.production-params-container .card-nested .form-label,
+.flow-order-mapping .card-nested .form-label {
+    color: #9a3412;
+    font-weight: 600;
+}
+
 /* ===================================
      FORM COMPONENTS
      =================================== */
@@ -194,6 +207,7 @@
     border-radius: var(--radius-md);
     font-size: var(--text-base);
     transition: all var(--transition-fast);
+    background-color: white;
 }
 
 .form-input:focus {
@@ -667,4 +681,38 @@
     .hide-desktop {
         display: none;
     }
+}
+
+/* Production Parameters Number Input - Orange Theme */
+.production-params-container .number-input-group,
+.flow-order-mapping .number-input-group {
+    border-color: #fed7aa;
+}
+
+.production-params-container .number-input-group button,
+.flow-order-mapping .number-input-group button {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.production-params-container .number-input-group button:hover,
+.flow-order-mapping .number-input-group button:hover {
+    background: #fed7aa;
+}
+
+.production-params-container .number-input-group input,
+.flow-order-mapping .number-input-group input {
+    border-left: 1px solid #fed7aa;
+    border-right: 1px solid #fed7aa;
+}
+
+.production-params-container .form-group-inline,
+.flow-order-mapping .form-group-inline {
+    background: linear-gradient(to right, #ffedd5, white);
+    border: 2px solid #fed7aa;
+}
+
+.production-params-container .form-group-inline .form-label,
+.flow-order-mapping .form-group-inline .form-label {
+    color: #9a3412;
 }

@@ -39,16 +39,46 @@ export default class extends Controller {
         event.stopPropagation()
 
         const header = event.currentTarget
-        const coreIndex = header.dataset.coreIndex
         const sectionName = header.dataset.sectionName
         const collapsibleSection = header.closest('.collapsible-section')
 
-        console.log('Collapsible clicked:', { coreIndex, sectionName })
+        console.log('Collapsible clicked:', { sectionName })
 
-        // Find the checkbox
+        // Handle combined settings differently
+        if (sectionName === 'combined') {
+            const checkbox = collapsibleSection.querySelector('[data-combined-checkbox]')
+            const contentSection = collapsibleSection.querySelector('[data-combined-content]')
+
+            if (!checkbox || !contentSection) {
+                console.error('Could not find checkbox or content section for combined')
+                return
+            }
+
+            checkbox.checked = !checkbox.checked
+            console.log('Toggled combined checkbox to:', checkbox.checked)
+
+            if (checkbox.checked) {
+                contentSection.classList.remove('hidden')
+                collapsibleSection.classList.add('expanded')
+
+                // Initialize combined settings controller
+                setTimeout(() => {
+                    const combinedController = contentSection.querySelector('[data-controller~="combined-settings"]')
+                    if (combinedController) {
+                        const event = new Event('stimulus:connect')
+                        combinedController.dispatchEvent(event)
+                    }
+                }, 100)
+            } else {
+                contentSection.classList.add('hidden')
+                collapsibleSection.classList.remove('expanded')
+            }
+            return
+        }
+
+        // Existing logic for production and charz
+        const coreIndex = header.dataset.coreIndex
         const checkbox = collapsibleSection.querySelector(`[data-${sectionName}-checkbox="${coreIndex}"]`)
-
-        // Find the content section
         const contentSection = this.element.querySelector(`[data-${sectionName}-section="${coreIndex}"]`)
 
         if (!checkbox || !contentSection) {
@@ -56,17 +86,13 @@ export default class extends Controller {
             return
         }
 
-        // Toggle checkbox
         checkbox.checked = !checkbox.checked
-
         console.log('Toggled checkbox to:', checkbox.checked)
 
-        // Toggle UI
         if (checkbox.checked) {
             contentSection.classList.remove('hidden')
             collapsibleSection.classList.add('expanded')
 
-            // Initialize Tom Select for production parameters if needed
             if (sectionName === 'production') {
                 setTimeout(() => {
                     this.initializeProductionSelect(coreIndex)
@@ -95,34 +121,62 @@ export default class extends Controller {
     updateCoreCount() {
         const targetCount = parseInt(this.numCoresTarget.value) || 1
 
-        // Get only direct children with data-core-index, not from template
         const allCoreMappings = Array.from(this.coreMappingsTarget.children).filter(child => {
-            // Skip the template div
             if (child.hasAttribute('data-ip-configuration-target') &&
                 child.getAttribute('data-ip-configuration-target') === 'coreMappingTemplate') {
                 return false
             }
-            // Only count elements that have data-core-index
             return child.hasAttribute('data-core-index')
         })
 
         const currentCount = allCoreMappings.length
 
         console.log(`Actually found ${currentCount} core mappings (target: ${targetCount})`)
-        console.log('Core mappings:', allCoreMappings.map(el => el.getAttribute('data-core-index')))
 
         if (targetCount > currentCount) {
-            // Add new core mappings
             for (let i = currentCount; i < targetCount; i++) {
                 console.log(`Adding core type ${i + 1}`)
                 this.addCoreMapping(i)
             }
         } else if (targetCount < currentCount) {
-            // Remove excess core mappings from the end
             for (let i = currentCount - 1; i >= targetCount; i--) {
                 console.log(`Removing core type ${i + 1}`)
                 allCoreMappings[i].remove()
             }
+        }
+
+        // Update combined settings core options after core count changes
+        setTimeout(() => {
+            this.updateCombinedCoreOptions()
+            this.refreshCombinedSettings()
+        }, 200) // Increased delay to ensure DOM is updated
+    }
+
+    updateCombinedCoreOptions(event) {
+        const combinedSection = this.element.querySelector('[data-combined-settings-target="coreTypesSelect"]')
+        if (!combinedSection) return
+
+        const controller = this.application.getControllerForElementAndIdentifier(
+            combinedSection.closest('[data-controller~="combined-settings"]'),
+            'combined-settings'
+        )
+
+        if (controller && controller.populateCoreTypeOptions) {
+            controller.populateCoreTypeOptions()
+        }
+    }
+
+    refreshCombinedSettings() {
+        const combinedSection = this.element.querySelector('[data-controller~="combined-settings"]')
+        if (!combinedSection) return
+
+        const controller = this.application.getControllerForElementAndIdentifier(
+            combinedSection,
+            'combined-settings'
+        )
+
+        if (controller && controller.refreshOnCoreChange) {
+            controller.refreshOnCoreChange()
         }
     }
 
@@ -184,4 +238,5 @@ export default class extends Controller {
             closeAfterSelect: false
         })
     }
+
 }

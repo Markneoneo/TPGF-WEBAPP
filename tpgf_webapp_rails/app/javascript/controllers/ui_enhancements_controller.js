@@ -22,6 +22,21 @@ export default class extends Controller {
                     }
 
                     section.classList.toggle('expanded')
+
+                    // If this is the combined settings section, initialize the controller
+                    if (header.dataset.sectionName === 'combined' && checkbox.checked) {
+                        const combinedContent = section.querySelector('[data-combined-content]')
+                        if (combinedContent) {
+                            const controller = combinedContent.querySelector('[data-controller~="combined-settings"]')
+                            if (controller) {
+                                // Trigger a small delay to ensure DOM is ready
+                                setTimeout(() => {
+                                    const event = new Event('stimulus:connect')
+                                    controller.dispatchEvent(event)
+                                }, 100)
+                            }
+                        }
+                    }
                 }
             })
         })

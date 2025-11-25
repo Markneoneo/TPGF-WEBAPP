@@ -114,16 +114,19 @@ class Test
   end
 end
 
+# NOTE: Parametric class is kept for backward compatibility and setup_settings generation
+# Production parameters now use the multiple spec variables structure directly
 class Parametric < Test
   include TestHelper
-  attr_accessor :spec_variable, :insertionlist, :readtype, :frequency 
+  attr_accessor :spec_variable, :insertionlist, :readtype, :frequency, :repetition_settings
 
   def post_initialize(options)
     @spec_variable = options[:spec_variable] || ""
     @insertionlist = options[:insertionlist] || default_insertionlist
     @readtype = options[:readtype] || ['fw']
-    @frequency = options[:frequency] || 0  
-  end
+    @frequency = options[:frequency] || 0
+    @repetition_settings = options[:repetition_settings] || []
+  end  
 
   def default_insertionlist
     ['ws1', 'ft1']
@@ -135,7 +138,7 @@ class Parametric < Test
       unique_item = pertpburst? ? "#{tname}_#{tpnum}" : nil
       values[tpnum] = ParametricTestPoint.new(tp, unique_item).generate
     end
-  end
+  end  
 
   def testsettings
     settings = {}
@@ -147,22 +150,23 @@ class Parametric < Test
     # Add frequency right after binnable
     settings['frequency'] = @frequency
     
-    # Then add test_points
+    # Then add test_points with spec variable as key
     settings['test_points'] = {
-      'spec_variable' => spec_variable,
-      'values' => gentp
+      spec_variable => gentp
     }
     
     # Add register_setup
     settings.merge!(regreadsetup)
     
-    # Finally add the remaining fields
+    # Add the remaining fields
     settings['softsets'] = softsetprofile if softsetenable
     settings['insertion_list'] = insertionlist
+    settings['repetition_settings'] = @repetition_settings || []
     settings['fallback_enable'] = fallbackenable
     
     settings
-  end  
+  end   
+
 end
 
 class Search < Test
@@ -216,12 +220,49 @@ class Search < Test
     end
   
     def generate_settings
-      if core_mapping.size == 1
+      # Separate combined and regular cores
+      # Convert keys to strings for comparison
+      combined_cores = core_mapping.select { |name, _| name.to_s.include?('_') && name.to_s.split('_').size > 1 }
+      regular_cores = core_mapping.reject { |name, _| name.to_s.include?('_') && name.to_s.split('_').size > 1 }
+      
+      if combined_cores.any?
+        # Generate structure with combined cores at top level
+        result = {}
+        
+        combined_cores.each do |coretype, coretype_config|
+          coretype_str = coretype.to_s
+          result[coretype_str] = {
+            power_supply: coretype_config[:power_supply],
+            clock: coretype_config[:clock],
+            frequency: coretype_config[:freq],
+            setup_settings: generate_setup_settings(coretype_str),
+            prod_settings: {}
+          }
+          
+          # Add the combined core's own prod_settings
+          result[coretype_str][:prod_settings][coretype_str] = generate_prod_settings(coretype_str, coretype_config)
+          
+          # Add individual cores' prod_settings
+          regular_cores.each do |regular_coretype, regular_config|
+            regular_coretype_str = regular_coretype.to_s
+            result[coretype_str][:prod_settings][regular_coretype_str] = {
+              power_supply: regular_config[:power_supply],
+              clock: regular_config[:clock],
+              frequency: regular_config[:freq],
+              setup_settings: generate_setup_settings(regular_coretype_str),
+              prod_settings: generate_prod_settings(regular_coretype_str, regular_config),
+              charz_settings: generate_charz_settings(regular_coretype_str, regular_config)
+            }
+          end
+        end
+        
+        result
+      elsif core_mapping.size == 1
         generate_single_core_settings
       else
         generate_multiple_core_settings
       end
-    end
+    end    
   
     private
   
@@ -239,15 +280,31 @@ class Search < Test
     end
   
     def generate_core_settings(coretype, coretype_config)
-      {
+      coretype_str = coretype.to_s
+      
+      settings = {
         power_supply: coretype_config[:power_supply], 
         clock: coretype_config[:clock],                 
-        frequency: coretype_config[:freq],        
-        setup_settings: generate_setup_settings(coretype),
-        prod_settings: generate_prod_settings(coretype, coretype_config),
-        charz_settings: generate_charz_settings(coretype, coretype_config)
+        frequency: coretype_config[:freq]
       }
-    end     
+      
+      # Add setup_settings
+      settings[:setup_settings] = generate_setup_settings(coretype_str)
+      
+      # For combined cores, prod_settings should be nested under the combined core name
+      if coretype_str.include?('_') && coretype_str.split('_').size > 1
+        # This is a combined core
+        settings[:prod_settings] = {
+          coretype_str => generate_prod_settings(coretype_str, coretype_config)
+        }
+      else
+        # Regular core
+        settings[:prod_settings] = generate_prod_settings(coretype_str, coretype_config)
+        settings[:charz_settings] = generate_charz_settings(coretype_str, coretype_config)
+      end
+      
+      settings
+    end    
 
     # Changed this method name from generate_fwload_settings to generate_setup_settings
     def generate_setup_settings(coretype)
@@ -264,22 +321,34 @@ class Search < Test
       
       coretype_config[:floworder_mapping].each_with_object({}) do |(testtype, config), result|
         
-        param_obj = Parametric.new(
-          ip: ip,
-          coretype: coretype,
-          testtype: testtype.to_s,
-          tp: config[:test_points] || [],
-          spec_variable: config[:specvariable] || "", 
-          binnable: config[:binnable] || false,
-          softsetenable: config[:softsetenable] || false,
-          fallbackenable: config[:fallbackenable] || false,
-          insertionlist: config[:insertionlist] || [],
-          readtype: config[:readtype] || ['fw'],
-          frequency: config[:frequency] || 0 
-        )
-        result[testtype.to_s] = param_obj.testsettings
+        # All production settings now use multiple spec variables structure
+        test_points_hash = {}
+        
+        if config[:test_points_by_spec] && config[:test_points_by_spec].any?
+          config[:test_points_by_spec].each do |spec_var, test_points|
+            test_points_hash[spec_var] = test_points.each_with_index.each_with_object({}) do |(tp, idx), values|
+              tpnum = "tp#{idx}"
+              values[tpnum] = { 'value' => tp }
+            end
+          end
+        end
+        
+        result[testtype.to_s] = {
+          'burst' => "avfs_#{ip}_#{coretype}_#{testtype}_burst",
+          'binnable' => config[:binnable] || false,
+          'frequency' => config[:frequency] || 0,
+          'test_points' => test_points_hash,
+          'register_setup' => {
+            'pattern' => { "avfs_#{ip}_#{coretype}_#{testtype}" => config[:register_size] || 512 }
+          }
+        }
+        
+        result[testtype.to_s]['softsets'] = "SoftsetProfile_avfs_#{ip}_#{coretype}_#{testtype}" if config[:softsetenable]
+        result[testtype.to_s]['insertion_list'] = config[:insertionlist] || []
+        result[testtype.to_s]['repetition_settings'] = config[:repetition_settings] || []
+        result[testtype.to_s]['fallback_enable'] = config[:fallbackenable] || false
       end
-    end
+    end    
   
     def generate_charz_settings(coretype, coretype_config)
       charztype_mapping = coretype_config[:charztype_mapping]
@@ -296,32 +365,34 @@ class Search < Test
         gran_hash[gran] = {}
         charztype_mapping[:searchtype].each do |stype, stype_config|
           gran_hash[gran][stype] = {}
+          
+          # Add rm_types if present
+          if stype_config[:rm_types] && !stype_config[:rm_types].empty?
+            gran_hash[gran][stype][:rm_types] = stype_config[:rm_types]
+          end
+          
           next unless stype_config[:testtype]
           
-          # Iterate through rm_settings first
-          stype_config[:testtype].each do |rm_key, rm_config|
-            gran_hash[gran][stype][rm_key] = {}
+          stype_config[:testtype].each do |testtype, testtype_config|
+            gran_hash[gran][stype][testtype] = {}
             
-            # Then iterate through test types under each rm_settings
-            rm_config.each do |testtype, testtype_config|
-              gran_hash[gran][stype][rm_key][testtype] = {}
+            # Handle workloads
+            wl_list = testtype_config[:wl] || []
+            next if wl_list.empty?
+            
+            wl_list.each do |wl|
+              search_obj = Search.new(
+                ip: ip,
+                coretype: coretype,
+                testtype: testtype.to_s,
+                tp: testtype_config[:test_points] || [],
+                spec_variable: stype_config[:specvariable] || '', 
+                wl: wl,
+                searchsettings: testtype_config[:searchsettings] || {}
+              )
+              offset = calculate_offset(stype)
               
-              # Then iterate through workloads
-              testtype_config.each do |wl, config|
-                search_obj = Search.new(
-                  ip: ip,
-                  coretype: coretype,
-                  testtype: testtype.to_s,
-                  tp: config[:test_points] || [],
-                  spec_variable: stype_config[:specvariable] || '', 
-                  wl: wl,
-                  searchsettings: config[:searchsettings] || {}
-                )
-                offset = calculate_offset(stype)
-                
-                # Store under rm_settings -> testtype -> workload
-                gran_hash[gran][stype][rm_key][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
-              end
+              gran_hash[gran][stype][testtype][wl] = search_obj.testsettings.merge('offset' => offset)
             end
           end
         end
@@ -338,3 +409,4 @@ class Search < Test
       end
     end
   end
+    

@@ -1,0 +1,157 @@
+<div class="combined-settings-container" data-controller="combined-settings" data-combined-section>
+  <div class="parameter-header">
+    <span>Combined Settings Configuration</span>
+  </div>
+  
+  <!-- Core Types Selection -->
+  <div class="form-group">
+    <label class="form-label">Select Core Types to Combine <span class="text-red-500">*</span></label>
+    <select name="ip_configurations[<%= ip_type %>][combined_settings][selected_core_types][]" 
+            multiple
+            placeholder="Select core types..."
+            data-combined-settings-target="coreTypesSelect">
+    </select>
+  </div>
+  
+  <!-- Flow Orders Selection -->
+  <div class="form-group" data-combined-settings-target="flowOrdersSection" style="display: none;">
+    <label class="form-label">Flow Orders</label>
+    <select name="ip_configurations[<%= ip_type %>][combined_settings][flow_orders_list][]" 
+            multiple
+            placeholder="Search and select flow orders..."
+            data-combined-settings-target="flowOrdersSelect">
+      <% %w[AVGPSM MINPSM DLDOAVGPSM DLDOMINPSM CPO FAVFS MAFDD DFLL XVMIN XVMINDD].each do |order| %>
+        <option value="<%= order %>"><%= order %></option>
+      <% end %>
+    </select>
+  </div>
+  
+  <!-- Flow Order Mappings Container -->
+  <div data-combined-settings-target="mappingContainer" class="spacer-md"></div>
+
+</div>
+
+<!-- Template for combined flow order mapping -->
+<template id="combined-flow-order-template">
+  <div class="combined-flow-order-mapping" data-order="ORDER">
+    <div class="flow-order-header">
+      <span>ORDER Configuration</span>
+    </div>
+    
+    <!-- Read Type -->
+    <div class="form-group">
+      <label class="form-label">Read Type <span class="text-red-500">*</span></label>
+      <div class="read-type-toggle">
+        <button type="button" data-read-type="jtag">
+          <input type="checkbox" 
+                 name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][read_type_jtag]"
+                 class="sr-only">
+          JTAG
+        </button>
+        <button type="button" data-read-type="fw">
+          <input type="checkbox" 
+                 name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][read_type_fw]"
+                 class="sr-only">
+          FW
+        </button>
+      </div>
+    </div>
+    
+    <!-- Test Points Container (will be populated dynamically) -->
+    <div data-test-points-container class="test-points-sections-container"></div>
+    
+    <!-- Other Parameters Grid -->
+    <div class="grid grid-cols-2 gap-4">
+      <!-- Frequency (removed Use Core Frequency button) -->
+      <div class="form-group">
+        <label class="form-label">Frequency <span class="text-red-500">*</span></label>
+        <div class="input-group">
+          <input type="text" 
+                 name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][frequency]"
+                 placeholder="e.g., 1000"
+                 class="form-input"
+                 data-frequency-input="ORDER">
+          <span class="input-addon">MHz</span>
+        </div>
+      </div>
+      
+      <!-- Register Size -->
+      <div class="form-group">
+        <label class="form-label">Register Size <span class="text-red-500">*</span></label>
+        <input type="text" 
+               name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][register_size]"
+               placeholder="e.g., 512"
+               class="form-input">
+      </div>
+      
+      <!-- Insertion List -->
+      <div class="form-group">
+        <label class="form-label">Insertion List</label>
+        <select name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][insertion][]"
+                multiple
+                placeholder="Select insertions..."
+                data-insertion-select="ORDER"
+                class="form-input">
+          <option value="WS1">WS1</option>
+          <option value="WS2">WS2</option>
+          <option value="FT1">FT1</option>
+          <option value="FTCOLD">FTCOLD</option>
+          <option value="FTCHARZ">FTCHARZ</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Repetition Settings -->
+    <div class="form-group-inline">
+      <label class="form-label">Repetition Settings</label>
+      <div class="number-input-group">
+        <button type="button" 
+                data-action="click->combined-settings#decrementRepetitions"
+                data-order="ORDER">−</button>
+        <input type="number" 
+                name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][num_repetitions]"
+                value="0" 
+                min="0"
+                max="3"
+                data-repetition-count="ORDER"
+                data-action="change->combined-settings#updateRepetitionCount">
+        <button type="button" 
+                data-action="click->combined-settings#incrementRepetitions"
+                data-order="ORDER">+</button>
+      </div>
+    </div>
+    
+    <!-- Repetition Fields Container -->
+    <div data-repetition-container="ORDER" class="repetition-fields-container"></div>
+    
+    <!-- Boolean Options -->
+    <div class="card-nested">
+      <div class="form-label">Options</div>
+      <div class="boolean-options-toggle">
+        <button type="button" data-boolean-option="binnable">
+          <input type="checkbox" 
+                 name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][binnable]"
+                 class="sr-only">
+          Binnable
+        </button>
+        <button type="button" data-boolean-option="softsetenable">
+          <input type="checkbox" 
+                 name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][softsetenable]"
+                 class="sr-only">
+          Softset Enable
+        </button>
+        <button type="button" data-boolean-option="fallbackenable">
+          <input type="checkbox" 
+                 name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][fallbackenable]"
+                 class="sr-only">
+          Fallback Enable
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden field to store selected core types -->
+    <input type="hidden" 
+           name="ip_configurations[IP_TYPE][combined_settings][flow_orders][ORDER][core_types]"
+           value="CORE_TYPES_JSON">
+  </div>
+</template>

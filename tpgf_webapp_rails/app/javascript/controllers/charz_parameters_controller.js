@@ -349,4 +349,86 @@ export default class extends Controller {
     input.value = convertedValue
   }
 
+  incrementRmSettings(event) {
+    const searchType = event.currentTarget.dataset.searchType
+    const searchTypeCard = event.currentTarget.closest('.charz-search-type-card')
+    const input = searchTypeCard.querySelector(`[data-rm-count="${searchType}"]`)
+    const current = parseInt(input.value) || 0
+
+    if (current < 10) {
+      input.value = current + 1
+      this.updateRmSettingsFields(searchType, current + 1, searchTypeCard)
+    }
+  }
+
+  decrementRmSettings(event) {
+    const searchType = event.currentTarget.dataset.searchType
+    const searchTypeCard = event.currentTarget.closest('.charz-search-type-card')
+    const input = searchTypeCard.querySelector(`[data-rm-count="${searchType}"]`)
+    const current = parseInt(input.value) || 0
+
+    if (current > 0) {
+      input.value = current - 1
+      this.updateRmSettingsFields(searchType, current - 1, searchTypeCard)
+    }
+  }
+
+  updateRmSettingsCount(event) {
+    const searchType = event.target.dataset.rmCount
+    const searchTypeCard = event.target.closest('.charz-search-type-card')
+    let value = parseInt(event.target.value) || 0
+
+    // Enforce min/max
+    if (value < 0) value = 0
+    if (value > 10) value = 10
+
+    event.target.value = value
+    this.updateRmSettingsFields(searchType, value, searchTypeCard)
+  }
+
+  updateRmSettingsFields(searchType, count, searchTypeCard) {
+    const container = searchTypeCard.querySelector(`[data-rm-settings-container="${searchType}"]`)
+
+    if (!container) return
+
+    // Get IP type and core index
+    const ipType = this.element.closest('[data-ip-type]').dataset.ipType
+    const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+
+    // Clear existing fields
+    container.innerHTML = ''
+
+    // Add new fields based on count
+    for (let i = 0; i < count; i++) {
+      const fieldSet = document.createElement('div')
+      fieldSet.className = 'rm-setting-field-set'
+      fieldSet.innerHTML = `
+            <div class="grid grid-cols-3 gap-4">
+                <div class="form-group">
+                    <label class="form-label">Setting Name ${i + 1}</label>
+                    <input type="text" 
+                           name="ip_configurations[${ipType}][charz_data][${coreIndex}][rm_settings][${searchType}][${i}][name]"
+                           placeholder="e.g., rm_setting_${i + 1}"
+                           class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fuse Name ${i + 1}</label>
+                    <input type="text" 
+                           name="ip_configurations[${ipType}][charz_data][${coreIndex}][rm_settings][${searchType}][${i}][fuse_name]"
+                           placeholder="e.g., fuse_${i + 1}"
+                           class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fuse Value ${i + 1}</label>
+                    <input type="text" 
+                           name="ip_configurations[${ipType}][charz_data][${coreIndex}][rm_settings][${searchType}][${i}][fuse_value]"
+                           placeholder="e.g., value_${i + 1}"
+                           class="form-input">
+                </div>
+            </div>
+        `
+      container.appendChild(fieldSet)
+    }
+  }
+
 }

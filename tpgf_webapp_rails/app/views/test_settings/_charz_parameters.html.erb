@@ -78,14 +78,28 @@
                class="form-input">
       </div>
 
-      <!-- RM Settings - NEW FIELD -->
-      <div class="form-group">
-        <label class="form-label">RM Settings <span class="text-red-500">*</span></label>
-        <input type="text" 
-               name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][rm_settings][SEARCH_TYPE]"
-               placeholder="Enter RM settings"
-               class="form-input">
+      <!-- RM Settings -->
+      <div class="form-group-inline">
+        <label class="form-label">RM Settings</label>
+        <div class="number-input-group">
+          <button type="button" 
+                  data-action="click->charz-parameters#decrementRmSettings"
+                  data-search-type="SEARCH_TYPE">−</button>
+          <input type="number" 
+                 name="ip_configurations[IP_TYPE][charz_data][CORE_INDEX][num_rm_settings][SEARCH_TYPE]"
+                 value="0" 
+                 min="0"
+                 max="10"
+                 data-rm-count="SEARCH_TYPE"
+                 data-action="change->charz-parameters#updateRmSettingsCount">
+          <button type="button" 
+                  data-action="click->charz-parameters#incrementRmSettings"
+                  data-search-type="SEARCH_TYPE">+</button>
+        </div>
       </div>
+      
+      <!-- RM Settings Fields Container -->
+      <div data-rm-settings-container="SEARCH_TYPE" class="rm-settings-fields-container"></div>
       
       <!-- Test Type Selection -->
       <div class="form-group">
@@ -113,7 +127,6 @@
             <thead>
               <tr>
                 <th class="charz-th-fixed">Test Type</th>
-                <!-- REMOVED RM Settings column -->
                 <th class="charz-th">WL Count</th>
                 <th class="charz-th">Test Points</th>
                 <th class="charz-th">Search Start</th>
