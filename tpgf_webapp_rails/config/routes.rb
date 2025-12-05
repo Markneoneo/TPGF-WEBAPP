@@ -7,4 +7,6 @@ Rails.application.routes.draw do
       get :download
     end
   end
+
+  post 'import_settings/parse', to: 'import_settings#parse'
 end

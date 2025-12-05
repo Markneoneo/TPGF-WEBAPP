@@ -19,6 +19,7 @@ export default class extends Controller {
 
         const selectElement = this.coreTypesSelectTarget
 
+        // Destroy existing instance if present
         if (selectElement.tomselect) {
             selectElement.tomselect.destroy()
         }
@@ -45,6 +46,7 @@ export default class extends Controller {
         // Populate options from existing core types
         this.populateCoreTypeOptions()
     }
+
 
     initializeFlowOrdersSelect() {
         if (!this.hasFlowOrdersSelectTarget) return
@@ -597,4 +599,5 @@ export default class extends Controller {
             this.flowOrdersSelect.destroy()
         }
     }
+
 }

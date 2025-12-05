@@ -20,10 +20,10 @@ export default class extends Controller {
         // Find all collapsible headers within this controller's scope
         const headers = this.element.querySelectorAll('.collapsible-header[data-section-name]')
 
-        console.log(`Found ${headers.length} collapsible headers`)
+        console.log(`Found ${headers.length} collapsible headers for ${this.ipType}`)
 
         headers.forEach(header => {
-            // Remove existing listener if any
+            // Remove existing listener if any by cloning and replacing
             const newHeader = header.cloneNode(true)
             header.parentNode.replaceChild(newHeader, header)
 
@@ -93,11 +93,16 @@ export default class extends Controller {
             contentSection.classList.remove('hidden')
             collapsibleSection.classList.add('expanded')
 
+            // REMOVE THIS ENTIRE BLOCK:
+            /*
             if (sectionName === 'production') {
                 setTimeout(() => {
                     this.initializeProductionSelect(coreIndex)
                 }, 100)
             }
+            */
+
+            // The production-parameters controller will handle its own Tom Select initialization
         } else {
             contentSection.classList.add('hidden')
             collapsibleSection.classList.remove('expanded')
@@ -126,7 +131,7 @@ export default class extends Controller {
                 child.getAttribute('data-ip-configuration-target') === 'coreMappingTemplate') {
                 return false
             }
-            return child.hasAttribute('data-core-index')
+            return child.hasAttribute('data-core-index') && child.dataset.coreIndex !== '999'
         })
 
         const currentCount = allCoreMappings.length
@@ -149,7 +154,9 @@ export default class extends Controller {
         setTimeout(() => {
             this.updateCombinedCoreOptions()
             this.refreshCombinedSettings()
-        }, 200) // Increased delay to ensure DOM is updated
+            // Re-bind collapsible headers after adding/removing cores
+            this.bindCollapsibleHeaders()
+        }, 200)
     }
 
     updateCombinedCoreOptions(event) {
@@ -210,33 +217,6 @@ export default class extends Controller {
         setTimeout(() => {
             this.bindCollapsibleHeaders()
         }, 100)
-    }
-
-    initializeProductionSelect(coreIndex) {
-        const selectElement = this.element.querySelector(`#flow-orders-${this.ipType}-${coreIndex}`)
-
-        if (!selectElement) {
-            console.log(`No flow orders select found for core ${coreIndex}`)
-            return
-        }
-
-        // Check if Tom Select is already initialized
-        if (selectElement.tomselect) {
-            console.log('Tom Select already initialized for core', coreIndex)
-            return
-        }
-
-        console.log(`Initializing Tom Select for ${this.ipType} core ${coreIndex}`)
-
-        // Initialize Tom Select
-        new TomSelect(selectElement, {
-            plugins: ['remove_button'],
-            create: false,
-            maxItems: null,
-            placeholder: 'Search and select flow orders...',
-            searchField: ['text'],
-            closeAfterSelect: false
-        })
     }
 
 }

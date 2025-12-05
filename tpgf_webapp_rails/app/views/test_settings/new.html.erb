@@ -1,8 +1,43 @@
-<div class="test-settings-container">
+<div class="test-settings-container" data-controller="import-settings">
   <header class="section-header text-center">
     <h1 class="section-title">Test Settings Generator</h1>
     <p class="section-subtitle">Configure IP types and generate test settings</p>
   </header>
+  
+  <!-- Import/Export Actions -->
+  <div class="card mb-6">
+    <div class="card-header">
+      <h3 class="text-lg font-semibold">Import/Export Settings</h3>
+    </div>
+    <div class="card-body">
+      <div class="flex gap-4 justify-center">
+        <!-- Import Button -->
+        <button type="button" 
+                class="btn btn-outline btn-lg"
+                data-action="click->import-settings#selectFile">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          Import from JSON
+        </button>
+        
+        <!-- Hidden file input -->
+        <input type="file" 
+               accept=".json"
+               class="hidden"
+               data-import-settings-target="fileInput"
+               data-action="change->import-settings#handleFileSelect">
+        
+        <!-- Export info (download button is shown after generation) -->
+        <div class="text-sm text-gray-600 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Export: Generate settings first, then use the "Download JSON" button
+        </div>
+      </div>
+    </div>
+  </div>
   
   <%= form_with url: generate_test_settings_path, local: false, data: { 
     controller: "test-settings-form"
@@ -73,6 +108,15 @@
       </div>
     </div>
   <% end %>
+
+  <!-- Import Preview Modal -->
+  <%= render 'import_modal' %>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading-spinner"></div>
+    <p class="text-white mt-4">Processing...</p>
+  </div>
   
   <!-- JSON Preview Modal -->
   <div id="json-preview" class="hidden">

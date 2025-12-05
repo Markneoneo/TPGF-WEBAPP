@@ -304,21 +304,32 @@ class TestSettingsController < ApplicationController
           
           # Filter out flow orders that are in combined settings
           combined_flow_orders = get_combined_flow_orders_for_core(config, idx)
-
+    
           flow_orders.each do |order|
             mapping_data = production_mappings[order] || {}
             
             # Parse test points sets (new structure)
             test_points_by_spec = {}
-            test_points_sets = mapping_data[:test_points_sets]&.to_h || {}
+            test_points_sets = mapping_data[:test_points_sets]
             
-            if test_points_sets.any?
+            # Debug logging
+            Rails.logger.info "Processing test_points_sets for #{order}: #{test_points_sets.inspect}"
+            
+            # Convert to hash if it's an ActionController::Parameters
+            test_points_sets = test_points_sets.to_h if test_points_sets.respond_to?(:to_h)
+            
+            if test_points_sets.present? && test_points_sets.is_a?(Hash)
               # Multiple test points sets
               test_points_sets.each do |set_idx, set_data|
+                # Convert set_data to hash with symbol keys
                 set_data = set_data.to_h if set_data.respond_to?(:to_h)
+                set_data = set_data.symbolize_keys if set_data.respond_to?(:symbolize_keys)
                 
+                Rails.logger.info "Processing set #{set_idx}: #{set_data.inspect}"
+                
+                # Determine spec variable
                 spec_var = if set_data[:use_power_supply].present?
-                  mapping[:supply]
+                  supply_value
                 else
                   set_data[:spec_variable] || ''
                 end
@@ -327,18 +338,30 @@ class TestSettingsController < ApplicationController
                 
                 # Parse test points for this set
                 test_points = if set_data[:type] == 'List'
-                  set_data[:list].to_s.split(',').map(&:strip).map(&:to_f).reject(&:zero?)
+                  list_str = set_data[:list].to_s
+                  Rails.logger.info "Parsing list: #{list_str}"
+                  list_str.split(',').map(&:strip).map(&:to_f).reject(&:zero?)
                 else
-                  generate_range(
-                    set_data[:start].to_f,
-                    set_data[:stop].to_f,
-                    set_data[:step].to_f
-                  )
+                  start_val = set_data[:start].to_f
+                  stop_val = set_data[:stop].to_f
+                  step_val = set_data[:step].to_f
+                  Rails.logger.info "Generating range: start=#{start_val}, stop=#{stop_val}, step=#{step_val}"
+                  generate_range(start_val, stop_val, step_val)
                 end
                 
-                test_points_by_spec[spec_var] = test_points
+                Rails.logger.info "Generated test points for #{spec_var}: #{test_points.inspect}"
+                
+                # If the spec variable already exists, concatenate the test points
+                if test_points_by_spec[spec_var]
+                  Rails.logger.info "Spec variable #{spec_var} already exists, concatenating test points"
+                  test_points_by_spec[spec_var] = (test_points_by_spec[spec_var] + test_points).uniq
+                else
+                  test_points_by_spec[spec_var] = test_points unless test_points.empty?
+                end
               end
             end
+            
+            Rails.logger.info "Final test_points_by_spec for #{order}: #{test_points_by_spec.inspect}"
           
             floworder_mapping[order.downcase] = {
               test_points_by_spec: test_points_by_spec,
@@ -382,7 +405,7 @@ class TestSettingsController < ApplicationController
       end
       
       core_mapping
-    end    
+    end
 
     def build_combined_floworder_mapping(combined_data, selected_cores, config)
       floworder_mapping = {}

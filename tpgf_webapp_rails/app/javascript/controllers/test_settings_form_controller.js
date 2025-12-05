@@ -151,151 +151,18 @@ export default class extends Controller {
 
     clearAll() {
         if (confirm('Are you sure you want to clear all configurations?')) {
-            // Clear all errors first
-            this.clearErrors()
-
-            // Uncheck all IP types
-            document.querySelectorAll('input[name="selected_ip_types[]"]').forEach(checkbox => {
-                if (checkbox.checked) {
-                    checkbox.checked = false
-
-                    // Remove selected class from IP card
-                    const ipCard = checkbox.closest('.ip-checkbox-card')
-                    if (ipCard) {
-                        ipCard.classList.remove('selected')
-                    }
-
-                    // Hide the config section
-                    const ipType = checkbox.dataset.ipType
-                    const configSection = document.getElementById(`${ipType}-config`)
-                    if (configSection) {
-                        configSection.classList.add('hidden')
-                    }
-                }
-            })
-
-            // Uncheck all production and charz checkboxes
-            document.querySelectorAll('[data-production-checkbox], [data-charz-checkbox]').forEach(checkbox => {
-                checkbox.checked = false
-            })
-
-            // Hide all production and charz content sections
-            document.querySelectorAll('[data-production-section], [data-charz-section]').forEach(section => {
-                section.classList.add('hidden')
-            })
-
-            // Remove expanded class from collapsible sections
-            document.querySelectorAll('.collapsible-section').forEach(section => {
-                section.classList.remove('expanded')
-            })
-
-            // Clear all Tom Select instances (flow orders and insertions)
-            document.querySelectorAll('select').forEach(select => {
-                if (select.tomselect) {
-                    // Store the options before destroying
-                    const options = Array.from(select.options).map(opt => ({
-                        value: opt.value,
-                        text: opt.text
-                    }))
-
-                    // Destroy the Tom Select instance
-                    select.tomselect.destroy()
-
-                    // Restore the original options
-                    select.innerHTML = ''
-                    options.forEach(opt => {
-                        const option = document.createElement('option')
-                        option.value = opt.value
-                        option.text = opt.text
-                        select.appendChild(option)
-                    })
-                }
-            })
-
-            // Remove all dynamically added flow order mappings
-            document.querySelectorAll('[data-production-section]').forEach(section => {
-                const mappingContainer = section.querySelector('[data-production-parameters-target="mappingContainer"]')
-                if (mappingContainer) {
-                    mappingContainer.innerHTML = ''
-                }
-            })
-
-            // Remove all dynamically added combined flow order mappings
-            document.querySelectorAll('[data-combined-settings-target="mappingContainer"]').forEach(container => {
-                container.innerHTML = ''
-            })
-
-            // Remove all dynamically added search type tables
-            document.querySelectorAll('[data-charz-section]').forEach(section => {
-                const tablesContainer = section.querySelector('[data-charz-parameters-target="tablesContainer"]')
-                if (tablesContainer) {
-                    tablesContainer.innerHTML = ''
-                }
-            })
-
-            // Reset all button states (read type, boolean options, etc.)
-            document.querySelectorAll('button.active').forEach(button => {
-                button.classList.remove('active')
-                const checkbox = button.querySelector('input[type="checkbox"]')
-                if (checkbox) {
-                    checkbox.checked = false
-                }
-            })
-
-            // Reset the form
-            this.element.reset()
-
-            // Clear selected IP types set
-            this.selectedIpTypes.clear()
-
-            // Hide global actions
-            const globalActions = document.getElementById('global-actions')
-            globalActions.classList.add('hidden')
-
-            // Hide JSON preview and download button
-            document.getElementById('json-preview').classList.add('hidden')
-            document.getElementById('download-button').classList.add('hidden')
-
-            // Clear JSON content
-            const jsonContent = document.getElementById('json-content')
-            if (jsonContent) {
-                jsonContent.textContent = ''
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loading-overlay')
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove('hidden')
             }
 
-            // Re-initialize Tom Select for core type 1 (index 0) after clearing
+            // Show a brief message then reload
+            showWarning('Clearing all configurations...')
+
             setTimeout(() => {
-                // Re-initialize production parameters Tom Select
-                document.querySelectorAll('[data-production-section="0"]').forEach(section => {
-                    const flowOrderSelect = section.querySelector('select[data-production-parameters-target="flowOrdersSelect"]')
-
-                    if (flowOrderSelect && !flowOrderSelect.tomselect) {
-                        new TomSelect(flowOrderSelect, {
-                            plugins: ['remove_button'],
-                            create: false,
-                            maxItems: null,
-                            placeholder: 'Search and select flow orders...',
-                            searchField: ['text'],
-                            closeAfterSelect: false
-                        })
-                    }
-                })
-
-                // Re-initialize combined settings selects
-                document.querySelectorAll('[data-combined-settings-target="coreTypesSelect"]').forEach(select => {
-                    if (!select.tomselect) {
-                        new TomSelect(select, {
-                            plugins: ['remove_button'],
-                            create: false,
-                            maxItems: null,
-                            placeholder: 'Select core types...',
-                            searchField: ['text'],
-                            closeAfterSelect: false
-                        })
-                    }
-                })
-            }, 300) // Increased delay to ensure DOM is fully reset
-
-            showWarning('All configurations cleared')
+                window.location.reload()
+            }, 500)
         }
     }
 

@@ -13,20 +13,7 @@ export default class extends Controller {
             return
         }
 
-        // Listen for custom flow order events (for re-initialization after clear)
-        this.element.addEventListener('floworder:add', (event) => {
-            const value = event.detail.value
-            this.flowOrders.add(value)
-            this.addFlowOrderMapping(value)
-        })
-
-        this.element.addEventListener('floworder:remove', (event) => {
-            const value = event.detail.value
-            this.flowOrders.delete(value)
-            this.removeFlowOrderMapping(value)
-        })
-
-        // Add a small delay to ensure DOM is ready
+        // Initialize Tom Select after a delay to ensure element is visible
         setTimeout(() => {
             if (this.hasFlowOrdersSelectTarget) {
                 const selectElement = this.flowOrdersSelectTarget
@@ -37,9 +24,19 @@ export default class extends Controller {
                     return
                 }
 
+                console.log(`Attempting to initialize Tom Select for core ${coreIndex}`)
                 this.initializeFlowOrdersSelect()
+            } else {
+                console.log('flowOrdersSelectTarget not found')
             }
-        }, 100)
+        }, 200) // Increased delay
+    }
+
+    disconnect() {
+        // Clean up Tom Select instance
+        if (this.tomSelect) {
+            this.tomSelect.destroy()
+        }
     }
 
     initializeFlowOrdersSelect() {
@@ -58,14 +55,18 @@ export default class extends Controller {
             searchField: ['text'],
             closeAfterSelect: false,
             onItemAdd: (value) => {
+                console.log(`onItemAdd triggered for: ${value}`)
                 this.flowOrders.add(value)
                 this.addFlowOrderMapping(value)
             },
             onItemRemove: (value) => {
+                console.log(`onItemRemove triggered for: ${value}`)
                 this.flowOrders.delete(value)
                 this.removeFlowOrderMapping(value)
             }
         })
+
+        console.log('Tom Select initialized:', this.tomSelect)
     }
 
     addHiddenFlowOrderInput(order, ipType, coreIndex) {
@@ -84,13 +85,6 @@ export default class extends Controller {
         }
     }
 
-    disconnect() {
-        // Clean up Tom Select instance
-        if (this.tomSelect) {
-            this.tomSelect.destroy()
-        }
-    }
-
     toggleFlowOrder(event) {
         const order = event.target.value
 
@@ -104,11 +98,27 @@ export default class extends Controller {
     }
 
     addFlowOrderMapping(order) {
+        console.log(`addFlowOrderMapping called for order: ${order}`)
+
         const template = document.getElementById('flow-order-mapping-template')
 
+        if (!template) {
+            console.error('flow-order-mapping-template not found!')
+            return
+        }
+
+        console.log('Template found:', template)
+
         // Get the current IP type and core index
-        const ipType = this.element.closest('[data-ip-type]').dataset.ipType
-        const coreIndex = this.element.closest('[data-core-index]').dataset.coreIndex
+        const ipType = this.element.closest('[data-ip-type]')?.dataset.ipType
+        const coreIndex = this.element.closest('[data-core-index]')?.dataset.coreIndex
+
+        console.log(`IP Type: ${ipType}, Core Index: ${coreIndex}`)
+
+        if (!ipType || !coreIndex) {
+            console.error('Could not find IP type or core index')
+            return
+        }
 
         // Get template HTML and replace all placeholders
         let html = template.innerHTML
@@ -116,24 +126,33 @@ export default class extends Controller {
         html = html.replace(/IP_TYPE/g, ipType)
         html = html.replace(/CORE_INDEX/g, coreIndex)
 
+        console.log('HTML after replacement (first 200 chars):', html.substring(0, 200))
+
         // Create a div and set the HTML
         const div = document.createElement('div')
         div.innerHTML = html
 
         // Append the flow-order-mapping div
         const flowOrderDiv = div.querySelector('.flow-order-mapping')
+
+        if (!flowOrderDiv) {
+            console.error('flow-order-mapping div not found in template!')
+            console.log('Template HTML:', html)
+            return
+        }
+
+        console.log('Flow order div found, appending to container')
         this.mappingContainerTarget.appendChild(flowOrderDiv)
 
         // Initialize components after DOM insertion
         setTimeout(() => {
-            // this.initializeTestPointsToggle(order)
+            console.log(`Initializing components for ${order}`)
             this.initializeReadTypeToggle(order)
             this.initializeBooleanOptionsToggle(order)
             this.initializeUseOptionButtons(order)
             this.initializeInsertionSelect(order)
-
-            // Initialize the first test points set (default is 1)
             this.updateTestPointsSets(order, 1)
+            console.log(`Components initialized for ${order}`)
         }, 100)
     }
 
