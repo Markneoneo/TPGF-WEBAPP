@@ -31,7 +31,7 @@ class TestSettingsController < ApplicationController
         }, status: :unprocessable_content
         return
       end
-  
+    
       # Additional validation for test point ranges
       selected_ip_types.each do |ip_type|
         if params[:ip_configurations] && params[:ip_configurations][ip_type]
@@ -65,7 +65,7 @@ class TestSettingsController < ApplicationController
           end
         end
       end
-  
+    
       # Check again for validation errors
       unless validation_errors.empty?
         render json: {
@@ -124,15 +124,23 @@ class TestSettingsController < ApplicationController
         end
       end
       
-      # Store in cache instead of session
-      cache_key = "generated_settings_#{SecureRandom.hex(16)}"
-      Rails.cache.write(cache_key, combined_results, expires_in: 1.hour)
+      # Use file-based temporary storage instead of session/cache
+      file_id = SecureRandom.hex(16)
+      temp_file_path = Rails.root.join('tmp', 'generated_settings', "#{file_id}.json")
       
-      # Store only the cache key in session
-      session[:settings_cache_key] = cache_key
+      # Ensure directory exists
+      FileUtils.mkdir_p(File.dirname(temp_file_path))
       
-      # Clean up old cache entries periodically
-      cleanup_expired_cache_entries
+      # Write to file
+      File.write(temp_file_path, JSON.pretty_generate(combined_results))
+      
+      Rails.logger.info "Settings written to file: #{temp_file_path}"
+      
+      # Store only the file ID in session (very small)
+      session[:settings_file_id] = file_id
+      
+      # Clean up old files (older than 1 hour)
+      cleanup_old_temp_files
       
       render json: {
         status: 'success',
@@ -140,34 +148,54 @@ class TestSettingsController < ApplicationController
         ip_types_processed: combined_results.keys,
         data: combined_results
       }
-    end      
+    end  
   
     def download
-      cache_key = session[:settings_cache_key]
+      file_id = session[:settings_file_id]
       
-      if cache_key.nil?
+      Rails.logger.info "Download attempt - file_id: #{file_id.inspect}"
+      
+      if file_id.nil?
         redirect_to root_path, alert: "No settings to download. Please generate settings first."
         return
       end
       
-      settings = Rails.cache.read(cache_key)
+      temp_file_path = Rails.root.join('tmp', 'generated_settings', "#{file_id}.json")
       
-      if settings.nil?
+      unless File.exist?(temp_file_path)
+        Rails.logger.warn "File not found: #{temp_file_path}"
         redirect_to root_path, alert: "Settings have expired. Please generate settings again."
         return
       end
       
-      send_data JSON.pretty_generate(settings),
+      # Read the file
+      settings_json = File.read(temp_file_path)
+      
+      Rails.logger.info "Sending file..."
+      
+      send_data settings_json,
                 filename: "tsettings_#{Time.current.strftime('%Y%m%d_%H%M%S')}.json",
                 type: "application/json",
                 disposition: "attachment"
                 
       # Clean up after download
-      Rails.cache.delete(cache_key)
-      session.delete(:settings_cache_key)
+      File.delete(temp_file_path) if File.exist?(temp_file_path)
+      session.delete(:settings_file_id)
     end
     
-    private
+    private    
+    
+    def cleanup_old_temp_files
+      temp_dir = Rails.root.join('tmp', 'generated_settings')
+      return unless Dir.exist?(temp_dir)
+      
+      cutoff_time = 1.hour.ago
+      Dir.glob(File.join(temp_dir, '*.json')).each do |file|
+        File.delete(file) if File.mtime(file) < cutoff_time
+      end
+    rescue => e
+      Rails.logger.warn "Failed to cleanup temp files: #{e.message}"
+    end   
 
     def parse_repetition_settings(repetition_data)
       return [] if repetition_data.blank?
